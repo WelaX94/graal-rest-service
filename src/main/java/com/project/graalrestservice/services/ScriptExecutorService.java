@@ -29,3 +29,12 @@ public class ScriptExecutorService implements ScriptExecutor {
         return result + baos.toString();
     }
 }
+
+class ScriptExecutionThread extends Thread {
+
+    @Override
+    public void run() {
+
+    }
+
+}

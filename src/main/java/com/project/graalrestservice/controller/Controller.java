@@ -1,6 +1,5 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
