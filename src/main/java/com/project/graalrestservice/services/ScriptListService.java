@@ -35,7 +35,7 @@ public class ScriptListService implements ScriptList {
             result +=
                     entry.getKey() + ":\n"
                     + "\tStatus: " + entry.getValue().getStatus() + "\n"
-                    + "\tLink: " + entry.getValue().getLink() + "\n";
+                    + "\tLink: " + entry.getValue().getLink() + "\n\n";
         }
         return result;
     }

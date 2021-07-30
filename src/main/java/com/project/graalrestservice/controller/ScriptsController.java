@@ -12,14 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class ScriptsController {
 
     @Autowired
-    ScriptList scriptList;
-
-    @Autowired
     ScriptHandler scriptHandler;
 
     @RequestMapping(method = RequestMethod.GET)
     public String getScriptList() {
-        return scriptList.toString();
+        return scriptHandler.getAllScripts();
     }
 
     @RequestMapping(value = "/info", method = RequestMethod.GET)
@@ -30,13 +27,12 @@ public class ScriptsController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
     public String runScript(@RequestBody String script, @PathVariable String scriptName) {
-        ScriptInfo scriptInfo = scriptHandler.addScript(scriptName, script);
-        return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
+        return scriptHandler.addScript(scriptName, script);
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)
     public String getScriptInfo(@PathVariable String scriptName) {
-        return "SCRIPT INFO PAGE";
+        return scriptHandler.getScriptInfo(scriptName);
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
