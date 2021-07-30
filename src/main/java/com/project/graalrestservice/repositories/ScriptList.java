@@ -1,0 +1,17 @@
+package com.project.graalrestservice.repositories;
+
+import com.project.graalrestservice.models.ScriptInfo;
+
+import java.util.Map;
+
+public interface ScriptList {
+
+    public boolean put(String scriptName, ScriptInfo scriptInfo);
+
+    public void update(String scriptName, ScriptInfo scriptInfo);
+
+    public ScriptInfo get(String scriptName);
+
+    public String toString();
+
+}
