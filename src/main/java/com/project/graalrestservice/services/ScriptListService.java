@@ -28,6 +28,10 @@ public class ScriptListService implements ScriptList {
         return list.get(scriptName);
     }
 
+    public void delete(String scriptName) {
+        list.remove(scriptName);
+    }
+
     @Override
     public String toString() {
         String result = "";

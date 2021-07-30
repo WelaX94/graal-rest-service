@@ -42,7 +42,7 @@ public class ScriptsController {
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.DELETE)
     public String deleteScript(@PathVariable String scriptName) {
-        return "DELETE SCRIPT PAGE";
+        return scriptHandler.deleteScript(scriptName);
     }
 
 }

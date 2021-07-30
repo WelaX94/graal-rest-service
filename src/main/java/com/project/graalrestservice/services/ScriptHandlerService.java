@@ -3,7 +3,7 @@ package com.project.graalrestservice.services;
 import com.project.graalrestservice.enums.ScriptStatus;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
-import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatus;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import com.project.graalrestservice.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptHandler;
 import com.project.graalrestservice.repositories.ScriptList;
@@ -52,10 +52,20 @@ public class ScriptHandlerService implements ScriptHandler {
     public String stopScript(String scriptName) {
         ScriptInfo scriptInfo = scriptList.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
-        if (scriptInfo.getStatus() != ScriptStatus.RUNNING) throw new WrongScriptStatus
+        if (scriptInfo.getStatus() != ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("You cannot stop a script that is not running", scriptInfo.getStatus());
         scriptInfo.getContext().close(true);
         return "Script '" + scriptName + "' stopped";
+    }
+
+    @Override
+    public String deleteScript(String scriptName) {
+        ScriptInfo scriptInfo = scriptList.get(scriptName);
+        if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
+        if (scriptInfo.getStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
+                ("To delete a running script, you must first stop it", scriptInfo.getStatus());
+        scriptList.delete(scriptName);
+        return "Script '" + scriptName + "' deleted";
     }
 
     private boolean checkName(String scriptName) {

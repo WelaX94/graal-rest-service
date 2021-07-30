@@ -13,4 +13,6 @@ public interface ScriptHandler {
 
     public String stopScript(String scriptName);
 
+    public String deleteScript(String scriptName);
+
 }

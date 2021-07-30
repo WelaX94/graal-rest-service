@@ -12,6 +12,8 @@ public interface ScriptList {
 
     public ScriptInfo get(String scriptName);
 
+    public void delete(String scriptName);
+
     public String toString();
 
 }
