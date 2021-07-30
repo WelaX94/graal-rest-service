@@ -1,6 +1,7 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.repositories.ScriptExecutor;
+import com.project.graalrestservice.models.ScriptInfo;
+import com.project.graalrestservice.repositories.ScriptHandler;
 import com.project.graalrestservice.repositories.ScriptList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ public class ScriptsController {
     ScriptList scriptList;
 
     @Autowired
-    ScriptExecutor scriptExecutor;
+    ScriptHandler scriptHandler;
 
     @RequestMapping(method = RequestMethod.GET)
     public String getScriptList() {
@@ -29,7 +30,8 @@ public class ScriptsController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
     public String runScript(@RequestBody String script, @PathVariable String scriptName) {
-        return "RUN SCRIPT PAGE";
+        ScriptInfo scriptInfo = scriptHandler.addScript(scriptName, script);
+        return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)

@@ -1,46 +1,42 @@
-package com.project.graalrestservice.services;
+package com.project.graalrestservice.threads;
 
+import com.project.graalrestservice.enums.ScriptStatus;
 import com.project.graalrestservice.models.ScriptInfo;
-import com.project.graalrestservice.repositories.ScriptExecutor;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-public class ScriptExecutorService implements ScriptExecutor {
-
-    public void execute(String script) {
-
-    }
-}
-
-class ScriptExecutionThread extends Thread {
+public class ScriptExecutionThread extends Thread {
 
     final ScriptInfo scriptInfo;
 
-    ScriptExecutionThread(ScriptInfo scriptInfo) {
+    public ScriptExecutionThread(ScriptInfo scriptInfo) {
         this.scriptInfo = scriptInfo;
     }
 
     @Override
     public void run() {
+        scriptInfo.setStatus(ScriptStatus.RUNNING);
         PrintStream old = System.out;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
         System.setOut(ps);
-        String result = "";
 
         try (Context context = Context.create()){
             context.eval("js", scriptInfo.getScript());
+            scriptInfo.setStatus(ScriptStatus.EXECUTION_SUCCESSFUL);
         }
-        catch (Exception e) {
-            result = e.getMessage();
+        catch (PolyglotException e) {
+            scriptInfo.addLog(e.getMessage());
+            scriptInfo.setStatus(ScriptStatus.EXECUTION_FAILED);
         }
         finally {
             System.out.flush();
             System.setOut(old);
         }
-        result += baos.toString();
+        scriptInfo.addLog(baos.toString());
     }
 
 }

@@ -1,9 +1,9 @@
 package com.project.graalrestservice.repositories;
 
 import com.project.graalrestservice.models.ScriptInfo;
+import org.springframework.stereotype.Repository;
 
-import java.util.Map;
-
+@Repository
 public interface ScriptList {
 
     public boolean put(String scriptName, ScriptInfo scriptInfo);

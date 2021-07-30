@@ -2,10 +2,12 @@ package com.project.graalrestservice.services;
 
 import com.project.graalrestservice.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptList;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Service
 public class ScriptListService implements ScriptList {
 
     ConcurrentHashMap<String, ScriptInfo> list = new ConcurrentHashMap<>();

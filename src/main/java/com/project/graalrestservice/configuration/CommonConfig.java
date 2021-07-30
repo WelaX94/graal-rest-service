@@ -1,9 +1,9 @@
 package com.project.graalrestservice.configuration;
 
 import com.project.graalrestservice.models.ScriptInfo;
-import com.project.graalrestservice.repositories.ScriptExecutor;
+import com.project.graalrestservice.repositories.ScriptHandler;
 import com.project.graalrestservice.repositories.ScriptList;
-import com.project.graalrestservice.services.ScriptExecutorService;
+import com.project.graalrestservice.services.ScriptHandlerService;
 import com.project.graalrestservice.services.ScriptListService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,8 +19,8 @@ import java.util.concurrent.Executors;
 public class CommonConfig {
 
     @Bean
-    public ScriptExecutor scriptExecutor() {
-        return new ScriptExecutorService();
+    public ScriptHandler scriptHandler() {
+        return new ScriptHandlerService();
     }
 
     @Bean
