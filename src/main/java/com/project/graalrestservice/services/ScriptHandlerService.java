@@ -1,7 +1,9 @@
 package com.project.graalrestservice.services;
 
+import com.project.graalrestservice.enums.ScriptStatus;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatus;
 import com.project.graalrestservice.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptHandler;
 import com.project.graalrestservice.repositories.ScriptList;
@@ -23,13 +25,10 @@ public class ScriptHandlerService implements ScriptHandler {
     private ExecutorService executorService;
 
     public String addScript(String scriptName, String script) {
-
         ScriptInfo scriptInfo = new ScriptInfo(scriptName, script);
         if(!(checkName(scriptName)) || !scriptList.put(scriptName, scriptInfo)) throw new WrongNameException();
 
         ScriptExecutionThread scriptExecutionThread = new ScriptExecutionThread(scriptInfo);
-
-        scriptInfo.setScriptExecutionThread(scriptExecutionThread);
         executorService.execute(scriptExecutionThread);
 
         return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
@@ -47,6 +46,16 @@ public class ScriptHandlerService implements ScriptHandler {
                 + "Status: " + scriptInfo.getStatus() + "\n"
                 + "Logs:\n\n"
                 + scriptInfo.getLog();
+    }
+
+    @Override
+    public String stopScript(String scriptName) {
+        ScriptInfo scriptInfo = scriptList.get(scriptName);
+        if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
+        if (scriptInfo.getStatus() != ScriptStatus.RUNNING) throw new WrongScriptStatus
+                ("You cannot stop a script that is not running", scriptInfo.getStatus());
+        scriptInfo.getContext().close(true);
+        return "Script '" + scriptName + "' stopped";
     }
 
     private boolean checkName(String scriptName) {

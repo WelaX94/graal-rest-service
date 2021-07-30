@@ -1,6 +1,5 @@
 package com.project.graalrestservice.repositories;
 
-import com.project.graalrestservice.models.ScriptInfo;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -11,5 +10,7 @@ public interface ScriptHandler {
     public String getAllScripts();
 
     public String getScriptInfo(String scriptName);
+
+    public String stopScript(String scriptName);
 
 }

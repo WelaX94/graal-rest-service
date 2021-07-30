@@ -1,7 +1,7 @@
 package com.project.graalrestservice.models;
 
 import com.project.graalrestservice.enums.ScriptStatus;
-import com.project.graalrestservice.threads.ScriptExecutionThread;
+import org.graalvm.polyglot.Context;
 
 public class ScriptInfo {
 
@@ -9,7 +9,7 @@ public class ScriptInfo {
     private ScriptStatus status;
     final private String link;
     private String log = "";
-    private ScriptExecutionThread scriptExecutionThread;
+    private Context context;
 
     public ScriptInfo(String scriptName, String script) {
         this.script = script;
@@ -38,11 +38,10 @@ public class ScriptInfo {
     public String getLink() {
         return link;
     }
-    public ScriptExecutionThread getScriptExecutionThread() {
-        return scriptExecutionThread;
+    public Context getContext() {
+        return context;
     }
-    public void setScriptExecutionThread(ScriptExecutionThread scriptExecutionThread) {
-        this.scriptExecutionThread = scriptExecutionThread;
+    public void setContext(Context context) {
+        this.context = context;
     }
-
 }

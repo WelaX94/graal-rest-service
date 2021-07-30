@@ -23,20 +23,23 @@ public class ScriptExecutionThread extends Thread {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
         System.setOut(ps);
-
-        try (Context context = Context.create()){
+        Context context = Context.create();
+        scriptInfo.setContext(context);
+        String errorMessage = "";
+        try (context){
             context.eval("js", scriptInfo.getScript());
             scriptInfo.setStatus(ScriptStatus.EXECUTION_SUCCESSFUL);
         }
         catch (PolyglotException e) {
-            scriptInfo.addLog(e.getMessage());
-            scriptInfo.setStatus(ScriptStatus.EXECUTION_FAILED);
+            if (e.getMessage().equals("Context execution was cancelled.")) scriptInfo.setStatus(ScriptStatus.EXECUTION_STOPPED);
+            else scriptInfo.setStatus(ScriptStatus.EXECUTION_FAILED);
+            errorMessage = e.getMessage();
         }
         finally {
             System.out.flush();
             System.setOut(old);
         }
-        scriptInfo.addLog(baos.toString());
+        scriptInfo.addLog(baos + errorMessage);
     }
 
 }

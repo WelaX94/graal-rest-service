@@ -37,7 +37,7 @@ public class ScriptsController {
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
     public String stopScript(@PathVariable String scriptName) {
-        return "STOP SCRIPT PAGE";
+        return scriptHandler.stopScript(scriptName);
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.DELETE)
