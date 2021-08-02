@@ -13,14 +13,8 @@ public class ScriptListService implements ScriptList {
     ConcurrentHashMap<String, ScriptInfo> list = new ConcurrentHashMap<>();
 
     @Override
-    public void update(String scriptName, ScriptInfo scriptInfo) {
+    public void put(String scriptName, ScriptInfo scriptInfo) {
         list.put(scriptName, scriptInfo);
-    }
-
-    @Override
-    public boolean put(String scriptName, ScriptInfo scriptInfo) {
-        if(list.putIfAbsent(scriptName, scriptInfo) == null) return true;
-        else return false;
     }
 
     @Override

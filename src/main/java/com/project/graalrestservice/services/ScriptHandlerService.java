@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ScriptHandlerService implements ScriptHandler {
@@ -26,8 +28,8 @@ public class ScriptHandlerService implements ScriptHandler {
 
     public String addScript(String scriptName, String script) {
         ScriptInfo scriptInfo = new ScriptInfo(scriptName, script);
-        if(!(checkName(scriptName)) || !scriptList.put(scriptName, scriptInfo)) throw new WrongNameException();
-
+        checkName(scriptName);
+        scriptList.put(scriptName, scriptInfo);
         ScriptExecutionThread scriptExecutionThread = new ScriptExecutionThread(scriptInfo);
         executorService.execute(scriptExecutionThread);
 
@@ -70,13 +72,12 @@ public class ScriptHandlerService implements ScriptHandler {
         return "Script '" + scriptName + "' deleted";
     }
 
-    private boolean checkName(String scriptName) {
-        List<String> illegalNameSpace = new ArrayList<>();
-        illegalNameSpace.add("help");
-        for(String name: illegalNameSpace) {
-            if(scriptName.equals(name)) return false;
-        }
-        return true;
+    private void checkName(String scriptName) {
+        if (!(scriptList.get(scriptName) == null)) throw new WrongNameException("Such a name is already in use");
+        Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
+        boolean checkName = correctlyScriptName.matcher(scriptName).matches();
+        if (!checkName) throw new WrongNameException("The name uses illegal characters or exceeds the allowed length");
+
     }
 
 }

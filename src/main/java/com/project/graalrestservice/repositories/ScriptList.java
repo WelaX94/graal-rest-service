@@ -6,9 +6,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScriptList {
 
-    public boolean put(String scriptName, ScriptInfo scriptInfo);
-
-    public void update(String scriptName, ScriptInfo scriptInfo);
+    public void put(String scriptName, ScriptInfo scriptInfo);
 
     public ScriptInfo get(String scriptName);
 

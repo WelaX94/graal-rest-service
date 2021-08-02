@@ -2,10 +2,10 @@ package com.project.graalrestservice.threads;
 
 import com.project.graalrestservice.enums.ScriptStatus;
 import com.project.graalrestservice.models.ScriptInfo;
+import com.project.graalrestservice.util.CircularOutputStream;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -22,7 +22,7 @@ public class ScriptExecutionThread extends Thread {
     public void run() {
 
         scriptInfo.setScriptStatus(ScriptStatus.RUNNING);
-        OutputStream outputStream = new ByteArrayOutputStream();
+        OutputStream outputStream = new CircularOutputStream(65536);
         scriptInfo.setLogStream(outputStream);
         Context context = Context.newBuilder().out(outputStream).build();
         scriptInfo.setContext(context);
