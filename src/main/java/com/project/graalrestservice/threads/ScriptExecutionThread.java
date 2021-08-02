@@ -6,7 +6,9 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 
 public class ScriptExecutionThread extends Thread {
 
@@ -18,28 +20,24 @@ public class ScriptExecutionThread extends Thread {
 
     @Override
     public void run() {
-        scriptInfo.setStatus(ScriptStatus.RUNNING);
-        PrintStream old = System.out;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        System.setOut(ps);
-        Context context = Context.create();
+
+        scriptInfo.setScriptStatus(ScriptStatus.RUNNING);
+        OutputStream outputStream = new ByteArrayOutputStream();
+        scriptInfo.setLogStream(outputStream);
+        Context context = Context.newBuilder().out(outputStream).build();
         scriptInfo.setContext(context);
-        String errorMessage = "";
         try (context){
+            outputStream.write("Attempting to run a script\n".getBytes());
             context.eval("js", scriptInfo.getScript());
-            scriptInfo.setStatus(ScriptStatus.EXECUTION_SUCCESSFUL);
+            scriptInfo.setScriptStatus(ScriptStatus.EXECUTION_SUCCESSFUL);
         }
         catch (PolyglotException e) {
-            if (e.getMessage().equals("Context execution was cancelled.")) scriptInfo.setStatus(ScriptStatus.EXECUTION_STOPPED);
-            else scriptInfo.setStatus(ScriptStatus.EXECUTION_FAILED);
-            errorMessage = e.getMessage();
+            if (e.getMessage().equals("Context execution was cancelled.")) scriptInfo.setScriptStatus(ScriptStatus.EXECUTION_STOPPED);
+            else scriptInfo.setScriptStatus(ScriptStatus.EXECUTION_FAILED);
+            scriptInfo.setError(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        finally {
-            System.out.flush();
-            System.setOut(old);
-        }
-        scriptInfo.addLog(baos + errorMessage);
     }
 
 }

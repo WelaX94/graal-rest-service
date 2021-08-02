@@ -3,13 +3,16 @@ package com.project.graalrestservice.models;
 import com.project.graalrestservice.enums.ScriptStatus;
 import org.graalvm.polyglot.Context;
 
+import java.io.OutputStream;
+
 public class ScriptInfo {
 
     final private String script;
     private ScriptStatus status;
     final private String link;
-    private String log = "";
+    private OutputStream logStream;
     private Context context;
+    private String error = "";
 
     public ScriptInfo(String scriptName, String script) {
         this.script = script;
@@ -20,20 +23,11 @@ public class ScriptInfo {
     public String getScript() {
         return script;
     }
-    public ScriptStatus getStatus() {
+    public ScriptStatus getScriptStatus() {
         return status;
     }
-    public void setStatus(ScriptStatus status) {
+    public void setScriptStatus(ScriptStatus status) {
         this.status = status;
-    }
-    public void ScriptStatus(ScriptStatus status) {
-        this.status = status;
-    }
-    public String getLog() {
-        return log;
-    }
-    public void addLog(String log) {
-        this.log += log;
     }
     public String getLink() {
         return link;
@@ -43,5 +37,17 @@ public class ScriptInfo {
     }
     public void setContext(Context context) {
         this.context = context;
+    }
+    public OutputStream getLogStream() {
+        return logStream;
+    }
+    public void setLogStream(OutputStream logStream) {
+        this.logStream = logStream;
+    }
+    public String getError() {
+        return error;
+    }
+    public void setError(String error) {
+        this.error = error;
     }
 }

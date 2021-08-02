@@ -42,18 +42,20 @@ public class ScriptHandlerService implements ScriptHandler {
     public String getScriptInfo(String scriptName) {
         ScriptInfo scriptInfo = scriptList.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
-        return "\t" + scriptName + "\n"
-                + "Status: " + scriptInfo.getStatus() + "\n"
+        return "Script: " + scriptName + "\n"
+                + "Status: " + scriptInfo.getScriptStatus() + "\n"
                 + "Logs:\n\n"
-                + scriptInfo.getLog();
+                + scriptInfo.getLogStream()
+                + scriptInfo.getError();
+
     }
 
     @Override
     public String stopScript(String scriptName) {
         ScriptInfo scriptInfo = scriptList.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
-        if (scriptInfo.getStatus() != ScriptStatus.RUNNING) throw new WrongScriptStatusException
-                ("You cannot stop a script that is not running", scriptInfo.getStatus());
+        if (scriptInfo.getScriptStatus() != ScriptStatus.RUNNING) throw new WrongScriptStatusException
+                ("You cannot stop a script that is not running", scriptInfo.getScriptStatus());
         scriptInfo.getContext().close(true);
         return "Script '" + scriptName + "' stopped";
     }
@@ -62,8 +64,8 @@ public class ScriptHandlerService implements ScriptHandler {
     public String deleteScript(String scriptName) {
         ScriptInfo scriptInfo = scriptList.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
-        if (scriptInfo.getStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
-                ("To delete a running script, you must first stop it", scriptInfo.getStatus());
+        if (scriptInfo.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
+                ("To delete a running script, you must first stop it", scriptInfo.getScriptStatus());
         scriptList.delete(scriptName);
         return "Script '" + scriptName + "' deleted";
     }

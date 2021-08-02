@@ -38,7 +38,7 @@ public class ScriptListService implements ScriptList {
         for(Map.Entry<String, ScriptInfo> entry: list.entrySet()) {
             result +=
                     entry.getKey() + ":\n"
-                    + "\tStatus: " + entry.getValue().getStatus() + "\n"
+                    + "\tStatus: " + entry.getValue().getScriptStatus() + "\n"
                     + "\tLink: " + entry.getValue().getLink() + "\n\n";
         }
         return result;
