@@ -9,6 +9,7 @@ This service allows you to run arbitrary JavaScript code and get the result of i
 
 ### List of all scripts
 * GET http://localhost:3030/scripts
+* Additional Information: You can see the list of all scripts, their execution status, and assigned address
 
 ### Add new script
 * PUT http://localhost:3030/scripts/script_name
