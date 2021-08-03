@@ -1,8 +1,8 @@
-package com.project.graalrestservice.threads;
+package com.project.graalrestservice.applicationLogic.threads;
 
-import com.project.graalrestservice.enums.ScriptStatus;
-import com.project.graalrestservice.models.ScriptInfo;
-import com.project.graalrestservice.util.CircularOutputStream;
+import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
+import com.project.graalrestservice.applicationLogic.models.ScriptInfo;
+import com.project.graalrestservice.applicationLogic.utils.CircularOutputStream;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 
@@ -20,7 +20,6 @@ public class ScriptExecutionThread extends Thread {
 
     @Override
     public void run() {
-
         scriptInfo.setScriptStatus(ScriptStatus.RUNNING);
         OutputStream outputStream = new CircularOutputStream(65536);
         scriptInfo.setLogStream(outputStream);

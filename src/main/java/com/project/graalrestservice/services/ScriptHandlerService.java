@@ -1,20 +1,18 @@
 package com.project.graalrestservice.services;
 
-import com.project.graalrestservice.enums.ScriptStatus;
+import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
-import com.project.graalrestservice.models.ScriptInfo;
+import com.project.graalrestservice.applicationLogic.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptHandler;
 import com.project.graalrestservice.repositories.ScriptList;
-import com.project.graalrestservice.threads.ScriptExecutionThread;
+import com.project.graalrestservice.applicationLogic.threads.ScriptExecutionThread;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -26,13 +24,18 @@ public class ScriptHandlerService implements ScriptHandler {
     @Autowired
     private ExecutorService executorService;
 
+    @Value("${application.host}")
+    private String host;
+
+    @Value("${server.port}")
+    private int port;
+
     public String addScript(String scriptName, String script) {
-        ScriptInfo scriptInfo = new ScriptInfo(scriptName, script);
+        ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, host, port);
         checkName(scriptName);
         scriptList.put(scriptName, scriptInfo);
         ScriptExecutionThread scriptExecutionThread = new ScriptExecutionThread(scriptInfo);
         executorService.execute(scriptExecutionThread);
-
         return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
     }
 
@@ -41,6 +44,7 @@ public class ScriptHandlerService implements ScriptHandler {
         return scriptList.toString();
     }
 
+    @Override
     public String getScriptInfo(String scriptName) {
         ScriptInfo scriptInfo = scriptList.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
@@ -49,7 +53,6 @@ public class ScriptHandlerService implements ScriptHandler {
                 + "Logs:\n\n"
                 + scriptInfo.getLogStream()
                 + scriptInfo.getError();
-
     }
 
     @Override
@@ -77,7 +80,6 @@ public class ScriptHandlerService implements ScriptHandler {
         Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
         boolean checkName = correctlyScriptName.matcher(scriptName).matches();
         if (!checkName) throw new WrongNameException("The name uses illegal characters or exceeds the allowed length");
-
     }
 
 }

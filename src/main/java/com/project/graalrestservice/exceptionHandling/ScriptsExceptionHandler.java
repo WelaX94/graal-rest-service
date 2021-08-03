@@ -18,12 +18,12 @@ public class ScriptsExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<String> handleScriptNotFoundException(ScriptNotFoundException exception) {
-        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleWrongScriptStatusException(WrongScriptStatusException exception) {
-        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
 
 }

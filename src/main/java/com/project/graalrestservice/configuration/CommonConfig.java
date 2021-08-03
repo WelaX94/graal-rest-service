@@ -1,6 +1,5 @@
 package com.project.graalrestservice.configuration;
 
-import com.project.graalrestservice.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptHandler;
 import com.project.graalrestservice.repositories.ScriptList;
 import com.project.graalrestservice.services.ScriptHandlerService;

@@ -1,6 +1,6 @@
 package com.project.graalrestservice.exceptionHandling.exceptions;
 
-import com.project.graalrestservice.enums.ScriptStatus;
+import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
 
 public class WrongScriptStatusException extends RuntimeException{
     public WrongScriptStatusException(String message, ScriptStatus scriptStatus) {

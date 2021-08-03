@@ -1,6 +1,6 @@
-package com.project.graalrestservice.models;
+package com.project.graalrestservice.applicationLogic.models;
 
-import com.project.graalrestservice.enums.ScriptStatus;
+import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
 import org.graalvm.polyglot.Context;
 
 import java.io.OutputStream;
@@ -14,9 +14,9 @@ public class ScriptInfo {
     private Context context;
     private String error = "";
 
-    public ScriptInfo(String scriptName, String script) {
+    public ScriptInfo(String scriptName, String script, String host, int port) {
         this.script = script;
-        this.link = "http://localhost:3030/scripts/" + scriptName;
+        this.link = host + ":" + port + "/scripts/" + scriptName;
         this.status = ScriptStatus.IN_QUEUE;
     }
 

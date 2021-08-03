@@ -1,8 +1,6 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptHandler;
-import com.project.graalrestservice.repositories.ScriptList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +15,6 @@ public class ScriptsController {
     @RequestMapping(method = RequestMethod.GET)
     public String getScriptList() {
         return scriptHandler.getAllScripts();
-    }
-
-    @RequestMapping(value = "/info", method = RequestMethod.GET)
-    public String getInfo() {
-        return "INFO PAGE";
     }
 
     @ResponseStatus(HttpStatus.CREATED)
