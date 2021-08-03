@@ -31,8 +31,8 @@ public class ScriptHandlerService implements ScriptHandler {
     private int port;
 
     public String addScript(String scriptName, String script) {
-        ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, host, port);
         checkName(scriptName);
+        ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, host, port);
         scriptList.put(scriptName, scriptInfo);
         ScriptExecutionThread scriptExecutionThread = new ScriptExecutionThread(scriptInfo);
         executorService.execute(scriptExecutionThread);
@@ -82,4 +82,13 @@ public class ScriptHandlerService implements ScriptHandler {
         if (!checkName) throw new WrongNameException("The name uses illegal characters or exceeds the allowed length");
     }
 
+    public ScriptHandlerService() {
+    }
+
+    public ScriptHandlerService(ScriptList scriptList, String host, int port, ExecutorService executorService) {
+        this.scriptList = scriptList;
+        this.host = host;
+        this.port = port;
+        this.executorService = executorService;
+    }
 }

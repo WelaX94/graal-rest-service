@@ -38,4 +38,10 @@ public class ScriptListService implements ScriptList {
         return result;
     }
 
+    public ScriptListService() {
+    }
+
+    public ScriptListService(ConcurrentHashMap<String, ScriptInfo> list) {
+        this.list = list;
+    }
 }
