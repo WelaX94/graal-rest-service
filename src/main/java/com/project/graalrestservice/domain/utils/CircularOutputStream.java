@@ -25,17 +25,21 @@ public class CircularOutputStream extends OutputStream{
     }
 
     @Override
-    public synchronized String toString() {
-        return new String(toByteArray(), 0, toByteArray().length);
+    public String toString() {
+        return completed ? new String(toByteArray(), 0, capacity) : new String(toByteArray(), 0, position);
     }
 
-    private byte[] toByteArray() {
+    private synchronized byte[] toByteArray() {
         if (!completed)
             return Arrays.copyOf(buf, position);
-        byte[] result = new byte[capacity];
-        System.arraycopy(buf, position, result, 0, capacity - position);
-        System.arraycopy(buf, 0, result, capacity - position, position);
-        return result;
+        else {
+            byte[] result = new byte[capacity];
+            for (int i = position, k = 0; k < capacity; i++, k++) {
+                if (i == capacity) i = 0;
+                result[k] = buf[i];
+            }
+            return result;
+        }
     }
 
 }
