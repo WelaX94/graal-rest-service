@@ -1,6 +1,6 @@
 package com.project.graalrestservice.services;
 
-import com.project.graalrestservice.applicationLogic.models.ScriptInfo;
+import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptList;
 import org.springframework.stereotype.Service;
 

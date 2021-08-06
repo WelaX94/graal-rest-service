@@ -1,8 +1,8 @@
 package com.project.graalrestservice.services;
 
-import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
-import com.project.graalrestservice.applicationLogic.models.ScriptInfo;
-import com.project.graalrestservice.applicationLogic.utils.CircularOutputStream;
+import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;

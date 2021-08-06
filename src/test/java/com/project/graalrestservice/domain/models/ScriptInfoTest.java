@@ -1,9 +1,8 @@
-package com.project.graalrestservice.applicationLogic.threads;
+package com.project.graalrestservice.domain.models;
 
-import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
-import com.project.graalrestservice.applicationLogic.models.ScriptInfo;
-import com.project.graalrestservice.applicationLogic.utils.CircularOutputStream;
-import org.graalvm.polyglot.PolyglotException;
+import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.utils.CircularOutputStream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ScriptExecutionThreadTest {
+class ScriptInfoTest {
 
     String host = "http://localhost";
     int port = 3030;
@@ -53,32 +52,32 @@ class ScriptExecutionThreadTest {
         }
     }
 
+    @AfterEach
+    void tearDown() {
+    }
+
     @Test
     void run() {
         ScriptInfo script = scriptMap.get("emptyScript");
-        ScriptExecutionThread thread = new ScriptExecutionThread(script);
-        thread.run();
+        script.run();
         assertEquals("Attempting to run a script\n", script.getLogStream().toString());
         assertEquals("", script.getError());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
 
         script = scriptMap.get("emptyLog");
-        thread = new ScriptExecutionThread(script);
-        thread.run();
+        script.run();
         assertEquals("Attempting to run a script\n", script.getLogStream().toString());
         assertEquals("", script.getError());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
 
         script = scriptMap.get("longAwaitedScript");
-        thread = new ScriptExecutionThread(script);
-        thread.run();
+        script.run();
         assertEquals("Attempting to run a script\n", script.getLogStream().toString());
         assertEquals("", script.getError());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
 
         script = scriptMap.get("mistakeScript");
-        thread = new ScriptExecutionThread(script);
-        thread.run();
+        script.run();
         assertEquals("Attempting to run a script\n", script.getLogStream().toString());
         String excepted = "SyntaxError: Unnamed:1:5 Expected ; but found x\n" +
                 "vaar x = 0\n" +
@@ -87,11 +86,9 @@ class ScriptExecutionThreadTest {
         assertEquals(ScriptStatus.EXECUTION_FAILED, script.getScriptStatus());
 
         script = scriptMap.get("correctScript");
-        thread = new ScriptExecutionThread(script);
-        thread.run();
+        script.run();
         assertEquals("Attempting to run a script\n5\n10\n15\n", script.getLogStream().toString());
         assertEquals("", script.getError());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
     }
-
 }

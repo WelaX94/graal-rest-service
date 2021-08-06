@@ -1,4 +1,4 @@
-package com.project.graalrestservice.applicationLogic.utils;
+package com.project.graalrestservice.domain.utils;
 
 import java.io.OutputStream;
 import java.util.Arrays;

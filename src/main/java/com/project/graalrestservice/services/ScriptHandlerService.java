@@ -1,13 +1,12 @@
 package com.project.graalrestservice.services;
 
-import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
+import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
-import com.project.graalrestservice.applicationLogic.models.ScriptInfo;
+import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.repositories.ScriptHandler;
 import com.project.graalrestservice.repositories.ScriptList;
-import com.project.graalrestservice.applicationLogic.threads.ScriptExecutionThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,8 +33,7 @@ public class ScriptHandlerService implements ScriptHandler {
         checkName(scriptName);
         ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, host, port);
         scriptList.put(scriptName, scriptInfo);
-        ScriptExecutionThread scriptExecutionThread = new ScriptExecutionThread(scriptInfo);
-        executorService.execute(scriptExecutionThread);
+        executorService.execute(scriptInfo);
         return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
     }
 

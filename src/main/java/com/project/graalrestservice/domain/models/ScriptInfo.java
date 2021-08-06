@@ -1,11 +1,14 @@
-package com.project.graalrestservice.applicationLogic.models;
+package com.project.graalrestservice.domain.models;
 
-import com.project.graalrestservice.applicationLogic.enums.ScriptStatus;
+import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
-public class ScriptInfo {
+public class ScriptInfo implements Runnable{
 
     final private String script;
     private ScriptStatus status;
@@ -13,6 +16,27 @@ public class ScriptInfo {
     private OutputStream logStream;
     private Context context;
     private String error = "";
+
+    @Override
+    public void run() {
+        setScriptStatus(ScriptStatus.RUNNING);
+        OutputStream outputStream = new CircularOutputStream(65536);
+        setLogStream(outputStream);
+        Context context = Context.newBuilder().out(outputStream).err(outputStream).build();
+        setContext(context);
+        try (context){
+            outputStream.write("Attempting to run a script\n".getBytes());
+            context.eval("js", getScript());
+            setScriptStatus(ScriptStatus.EXECUTION_SUCCESSFUL);
+        }
+        catch (PolyglotException e) {
+            if (e.getMessage().equals("Context execution was cancelled.")) setScriptStatus(ScriptStatus.EXECUTION_STOPPED);
+            else setScriptStatus(ScriptStatus.EXECUTION_FAILED);
+            setError(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public ScriptInfo(String scriptName, String script, String host, int port) {
         this.script = script;

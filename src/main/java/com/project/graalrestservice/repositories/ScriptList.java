@@ -1,6 +1,6 @@
 package com.project.graalrestservice.repositories;
 
-import com.project.graalrestservice.applicationLogic.models.ScriptInfo;
+import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.springframework.stereotype.Repository;
 
 @Repository

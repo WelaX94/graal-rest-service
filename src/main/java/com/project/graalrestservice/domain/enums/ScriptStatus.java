@@ -1,4 +1,4 @@
-package com.project.graalrestservice.applicationLogic.enums;
+package com.project.graalrestservice.domain.enums;
 
 public enum ScriptStatus {
     IN_QUEUE,
