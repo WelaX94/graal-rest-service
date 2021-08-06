@@ -7,6 +7,8 @@ import org.graalvm.polyglot.PolyglotException;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class ScriptInfo implements Runnable{
 
@@ -15,7 +17,7 @@ public class ScriptInfo implements Runnable{
     final private String link;
     private OutputStream logStream;
     private Context context;
-    private String error = "";
+    private String outputInfo = "";
 
     @Override
     public void run() {
@@ -28,11 +30,15 @@ public class ScriptInfo implements Runnable{
             outputStream.write("Attempting to run a script\n".getBytes());
             context.eval("js", getScript());
             setScriptStatus(ScriptStatus.EXECUTION_SUCCESSFUL);
+            outputInfo = "Exited in /TIME/";
         }
         catch (PolyglotException e) {
-            if (e.getMessage().equals("Context execution was cancelled.")) setScriptStatus(ScriptStatus.EXECUTION_STOPPED);
+            if (e.isCancelled()) setScriptStatus(ScriptStatus.EXECUTION_STOPPED);
             else setScriptStatus(ScriptStatus.EXECUTION_FAILED);
-            setError(e.getMessage());
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            outputInfo += sw.toString();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,10 +74,10 @@ public class ScriptInfo implements Runnable{
     public void setLogStream(OutputStream logStream) {
         this.logStream = logStream;
     }
-    public String getError() {
-        return error;
+    public String getOutputInfo() {
+        return outputInfo;
     }
-    public void setError(String error) {
-        this.error = error;
+    public void setOutputInfo(String outputInfo) {
+        this.outputInfo = outputInfo;
     }
 }

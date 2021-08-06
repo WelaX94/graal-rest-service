@@ -50,7 +50,7 @@ public class ScriptHandlerService implements ScriptHandler {
                 + "Status: " + scriptInfo.getScriptStatus() + "\n"
                 + "Logs:\n\n"
                 + scriptInfo.getLogStream()
-                + scriptInfo.getError();
+                + scriptInfo.getOutputInfo();
     }
 
     @Override

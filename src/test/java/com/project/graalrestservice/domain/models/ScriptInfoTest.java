@@ -61,19 +61,19 @@ class ScriptInfoTest {
         ScriptInfo script = scriptMap.get("emptyScript");
         script.run();
         assertEquals("Attempting to run a script\n", script.getLogStream().toString());
-        assertEquals("", script.getError());
+        assertEquals("", script.getOutputInfo());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
 
         script = scriptMap.get("emptyLog");
         script.run();
         assertEquals("Attempting to run a script\n", script.getLogStream().toString());
-        assertEquals("", script.getError());
+        assertEquals("", script.getOutputInfo());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
 
         script = scriptMap.get("longAwaitedScript");
         script.run();
         assertEquals("Attempting to run a script\n", script.getLogStream().toString());
-        assertEquals("", script.getError());
+        assertEquals("", script.getOutputInfo());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
 
         script = scriptMap.get("mistakeScript");
@@ -82,13 +82,13 @@ class ScriptInfoTest {
         String excepted = "SyntaxError: Unnamed:1:5 Expected ; but found x\n" +
                 "vaar x = 0\n" +
                 "     ^\n";
-        assertEquals(excepted, script.getError());
+        assertEquals(excepted, script.getOutputInfo());
         assertEquals(ScriptStatus.EXECUTION_FAILED, script.getScriptStatus());
 
         script = scriptMap.get("correctScript");
         script.run();
         assertEquals("Attempting to run a script\n5\n10\n15\n", script.getLogStream().toString());
-        assertEquals("", script.getError());
+        assertEquals("", script.getOutputInfo());
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getScriptStatus());
     }
 }

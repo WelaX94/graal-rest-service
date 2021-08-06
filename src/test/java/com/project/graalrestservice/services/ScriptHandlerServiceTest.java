@@ -64,7 +64,7 @@ class ScriptHandlerServiceTest {
         s2_failed.setLogStream(circularOutputStream);
         ScriptInfo s3_stopped = new ScriptInfo("s3_stopped", "", host, port);
         s3_stopped.setScriptStatus(ScriptStatus.EXECUTION_STOPPED);
-        s3_stopped.setError("Context execution was cancelled.");
+        s3_stopped.setOutputInfo("Context execution was cancelled.");
         s3_stopped.setLogStream(circularOutputStream);
         ScriptInfo s4_running = new ScriptInfo("s4_running", "", host, port);
         s4_running.setScriptStatus(ScriptStatus.RUNNING);
