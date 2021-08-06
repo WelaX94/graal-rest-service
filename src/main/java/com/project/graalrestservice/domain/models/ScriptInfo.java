@@ -19,6 +19,12 @@ public class ScriptInfo implements Runnable{
     private Context context;
     private String outputInfo = "";
 
+    public ScriptInfo(String script, String link) {
+        this.script = script;
+        this.link = link;
+        this.status = ScriptStatus.IN_QUEUE;
+    }
+
     @Override
     public void run() {
         setScriptStatus(ScriptStatus.RUNNING);
@@ -42,12 +48,6 @@ public class ScriptInfo implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public ScriptInfo(String scriptName, String script, String host, int port) {
-        this.script = script;
-        this.link = host + ":" + port + "/scripts/" + scriptName;
-        this.status = ScriptStatus.IN_QUEUE;
     }
 
     public String getScript() {

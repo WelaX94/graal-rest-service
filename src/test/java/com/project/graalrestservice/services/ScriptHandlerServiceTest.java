@@ -22,8 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ScriptHandlerServiceTest {
 
-    private String host = "http://localhost";
-    private int port = 3030;
+    private String link = "http://localhost:3030/scripts/";
 
     private ScriptHandlerService scriptHandler;
     private ConcurrentHashMap<String, ScriptInfo> scriptInfoMap;
@@ -53,20 +52,20 @@ class ScriptHandlerServiceTest {
         context = Context.create();
         scriptInfoMap = new ConcurrentHashMap<>();
 
-        ScriptInfo s0_queue = new ScriptInfo("s0_queue", "", host, port);
+        ScriptInfo s0_queue = new ScriptInfo("", link);
         s0_queue.setScriptStatus(ScriptStatus.IN_QUEUE);
         s0_queue.setLogStream(circularOutputStream);
-        ScriptInfo s1_successful = new ScriptInfo("s1_successful", "", host, port);
+        ScriptInfo s1_successful = new ScriptInfo("", link);
         s1_successful.setScriptStatus(ScriptStatus.EXECUTION_SUCCESSFUL);
         s1_successful.setLogStream(circularOutputStream);
-        ScriptInfo s2_failed = new ScriptInfo("s2_failed", "", host, port);
+        ScriptInfo s2_failed = new ScriptInfo("", link);
         s2_failed.setScriptStatus(ScriptStatus.EXECUTION_FAILED);
         s2_failed.setLogStream(circularOutputStream);
-        ScriptInfo s3_stopped = new ScriptInfo("s3_stopped", "", host, port);
+        ScriptInfo s3_stopped = new ScriptInfo("", link);
         s3_stopped.setScriptStatus(ScriptStatus.EXECUTION_STOPPED);
         s3_stopped.setOutputInfo("Context execution was cancelled.");
         s3_stopped.setLogStream(circularOutputStream);
-        ScriptInfo s4_running = new ScriptInfo("s4_running", "", host, port);
+        ScriptInfo s4_running = new ScriptInfo("", link);
         s4_running.setScriptStatus(ScriptStatus.RUNNING);
         s4_running.setLogStream(circularOutputStream);
         s4_running.setContext(context);
@@ -78,7 +77,7 @@ class ScriptHandlerServiceTest {
         scriptInfoMap.put("s4_running", s4_running);
 
         ScriptList scriptList = new ScriptListService(scriptInfoMap);
-        scriptHandler = new ScriptHandlerService(scriptList, host, port, Executors.newFixedThreadPool(10));
+        scriptHandler = new ScriptHandlerService(scriptList, Executors.newFixedThreadPool(10));
     }
 
     @AfterEach
@@ -92,18 +91,18 @@ class ScriptHandlerServiceTest {
         String excepted;
         Throwable thrown;
         for (String scriptName: illegalNamespace) {
-            thrown = assertThrows(WrongNameException.class, () -> scriptHandler.addScript(scriptName, "var a = 0"));
+            thrown = assertThrows(WrongNameException.class, () -> scriptHandler.addScript(scriptName, "var a = 0", link + scriptName));
             excepted = "Wrong script name. The name uses illegal characters or exceeds the allowed length";
             assertEquals(excepted, thrown.getMessage());
         }
-        thrown = assertThrows(WrongNameException.class, () -> scriptHandler.addScript("s2_failed", "var a = 0"));
+        thrown = assertThrows(WrongNameException.class, () -> scriptHandler.addScript("s2_failed", "var a = 0", link + "s2_failed"));
         excepted = "Wrong script name. Such a name is already in use";
         assertEquals(excepted, thrown.getMessage());
 
         String scriptName = "newScript";
-        excepted = "The script is received and added to the execution queue.\nDetailed information: " + host + ":" + port + "/scripts/" + scriptName;
-        assertEquals(excepted, scriptHandler.addScript(scriptName, "var a = 0"));
-        thrown = assertThrows(WrongNameException.class, () -> scriptHandler.addScript(scriptName, "var a = 0"));
+        excepted = "The script is received and added to the execution queue.\nDetailed information: " + link + scriptName;
+        assertEquals(excepted, scriptHandler.addScript(scriptName, "var a = 0", link + scriptName));
+        thrown = assertThrows(WrongNameException.class, () -> scriptHandler.addScript(scriptName, "var a = 0", link + scriptName));
         excepted = "Wrong script name. Such a name is already in use";
         assertEquals(excepted, thrown.getMessage());
     }

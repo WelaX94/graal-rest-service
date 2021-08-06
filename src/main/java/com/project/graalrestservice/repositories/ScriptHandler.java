@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScriptHandler {
 
-    public String addScript(String scriptName, String script);
+    public String addScript(String name, String script, String link);
 
     public String getAllScripts();
 

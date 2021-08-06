@@ -13,15 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ScriptInfoTest {
 
-    String host = "http://localhost";
-    int port = 3030;
+    String link = "http://localhost:3030/";
     Map<String, ScriptInfo> scriptMap;
 
     @BeforeEach
     void setUp() {
         scriptMap = new HashMap<>();
-        ScriptInfo emptyScript = new ScriptInfo("emptyScript","", host, port);
-        ScriptInfo emptyLog = new ScriptInfo("emptyLog","var x = 0", host, port);
+        ScriptInfo emptyScript = new ScriptInfo("", link + "emptyScript");
+        ScriptInfo emptyLog = new ScriptInfo("var x = 0", link + "emptyLog");
         String script = "sleep(3000);\n" +
                 "\n" +
                 "function sleep(millis) {\n" +
@@ -31,15 +30,15 @@ class ScriptInfoTest {
                 "        i++;\n" +
                 "    }\n" +
                 "}";
-        ScriptInfo longAwaitedScript = new ScriptInfo("longAwaitedScript", script, host, port);
-        ScriptInfo mistakeScript = new ScriptInfo("mistakeScript", "vaar x = 0", host, port);
+        ScriptInfo longAwaitedScript = new ScriptInfo(script, link + "longAwaitedScript");
+        ScriptInfo mistakeScript = new ScriptInfo( "vaar x = 0", link + "mistakeScript");
         script = "var x = 5;\n" +
                 "var y = 10;\n " +
                 "var z = x + y;\n" +
                 "console.log(x);\n" +
                 "console.log(y);\n" +
                 "console.log(z);";
-        ScriptInfo correctScript = new ScriptInfo("correctScript", script, host, port);
+        ScriptInfo correctScript = new ScriptInfo(script, link + "correctScript");
 
         scriptMap.put("emptyScript", emptyScript);
         scriptMap.put("longAwaitedScript", longAwaitedScript);

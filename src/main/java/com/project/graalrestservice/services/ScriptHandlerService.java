@@ -23,15 +23,9 @@ public class ScriptHandlerService implements ScriptHandler {
     @Autowired
     private ExecutorService executorService;
 
-    @Value("${application.host}")
-    private String host;
-
-    @Value("${server.port}")
-    private int port;
-
-    public String addScript(String scriptName, String script) {
+    public String addScript(String scriptName, String script, String link) {
         checkName(scriptName);
-        ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, host, port);
+        ScriptInfo scriptInfo = new ScriptInfo(script, link);
         scriptList.put(scriptName, scriptInfo);
         executorService.execute(scriptInfo);
         return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
@@ -83,10 +77,8 @@ public class ScriptHandlerService implements ScriptHandler {
     public ScriptHandlerService() {
     }
 
-    public ScriptHandlerService(ScriptList scriptList, String host, int port, ExecutorService executorService) {
+    public ScriptHandlerService(ScriptList scriptList, ExecutorService executorService) {
         this.scriptList = scriptList;
-        this.host = host;
-        this.port = port;
         this.executorService = executorService;
     }
 }
