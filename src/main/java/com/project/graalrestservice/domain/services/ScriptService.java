@@ -1,10 +1,8 @@
-package com.project.graalrestservice.repositories;
+package com.project.graalrestservice.domain.services;
 
 import com.project.graalrestservice.domain.models.ScriptInfo;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ScriptList {
+public interface ScriptService {
 
     public void put(String scriptName, ScriptInfo scriptInfo);
 

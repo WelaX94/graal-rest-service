@@ -1,8 +1,5 @@
-package com.project.graalrestservice.repositories;
+package com.project.graalrestservice.domain.services;
 
-import org.springframework.stereotype.Repository;
-
-@Repository
 public interface ScriptHandler {
 
     public String addScript(String name, String script, String link);

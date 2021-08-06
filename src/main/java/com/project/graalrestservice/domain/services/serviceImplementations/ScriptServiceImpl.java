@@ -1,14 +1,14 @@
-package com.project.graalrestservice.services;
+package com.project.graalrestservice.domain.services.serviceImplementations;
 
 import com.project.graalrestservice.domain.models.ScriptInfo;
-import com.project.graalrestservice.repositories.ScriptList;
+import com.project.graalrestservice.domain.services.ScriptService;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class ScriptListService implements ScriptList {
+public class ScriptServiceImpl implements ScriptService {
 
     ConcurrentHashMap<String, ScriptInfo> list = new ConcurrentHashMap<>();
 
@@ -38,10 +38,10 @@ public class ScriptListService implements ScriptList {
         return result;
     }
 
-    public ScriptListService() {
+    public ScriptServiceImpl() {
     }
 
-    public ScriptListService(ConcurrentHashMap<String, ScriptInfo> list) {
+    public ScriptServiceImpl(ConcurrentHashMap<String, ScriptInfo> list) {
         this.list = list;
     }
 }

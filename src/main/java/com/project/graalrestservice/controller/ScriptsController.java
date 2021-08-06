@@ -1,6 +1,6 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.repositories.ScriptHandler;
+import com.project.graalrestservice.domain.services.ScriptHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

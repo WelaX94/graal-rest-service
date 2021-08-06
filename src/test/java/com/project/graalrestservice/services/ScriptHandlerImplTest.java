@@ -3,10 +3,12 @@ package com.project.graalrestservice.services;
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.domain.utils.CircularOutputStream;
+import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
-import com.project.graalrestservice.repositories.ScriptList;
+import com.project.graalrestservice.domain.services.serviceImplementations.ScriptHandlerImpl;
+import com.project.graalrestservice.domain.services.serviceImplementations.ScriptServiceImpl;
 import org.graalvm.polyglot.Context;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,11 +22,11 @@ import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ScriptHandlerServiceTest {
+class ScriptHandlerImplTest {
 
     private String link = "http://localhost:3030/scripts/";
 
-    private ScriptHandlerService scriptHandler;
+    private ScriptHandlerImpl scriptHandler;
     private ConcurrentHashMap<String, ScriptInfo> scriptInfoMap;
     private Context context;
     private static List<String> illegalNamespace;
@@ -76,8 +78,8 @@ class ScriptHandlerServiceTest {
         scriptInfoMap.put("s3_stopped", s3_stopped);
         scriptInfoMap.put("s4_running", s4_running);
 
-        ScriptList scriptList = new ScriptListService(scriptInfoMap);
-        scriptHandler = new ScriptHandlerService(scriptList, Executors.newFixedThreadPool(10));
+        ScriptService scriptService = new ScriptServiceImpl(scriptInfoMap);
+        scriptHandler = new ScriptHandlerImpl(scriptService, Executors.newFixedThreadPool(10));
     }
 
     @AfterEach
