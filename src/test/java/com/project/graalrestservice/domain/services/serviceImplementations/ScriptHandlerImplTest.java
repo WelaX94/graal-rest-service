@@ -1,4 +1,4 @@
-package com.project.graalrestservice.services;
+package com.project.graalrestservice.domain.services.serviceImplementations;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
@@ -40,7 +40,8 @@ class ScriptHandlerImplTest {
         illegalNamespace.add(")+=");
         illegalNamespace.add("ABCabc$");
         illegalNamespace.add("?abcVRTty");
-        illegalNamespace.add("AAAAAAAAAAbbbbbbbbbb" +
+        illegalNamespace.add(
+                "AAAAAAAAAAbbbbbbbbbb" +
                 "AAAAAAAAAAbbbbbbbbbb" +
                 "AAAAAAAAAAbbbbbbbbbb" +
                 "AAAAAAAAAAbbbbbbbbbb" +
