@@ -3,6 +3,8 @@ package com.project.graalrestservice.domain.services.serviceImplementations;
 import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
 import com.project.graalrestservice.domain.services.ScriptRepository;
+import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,15 +17,17 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public void put(String scriptName, ScriptInfo scriptInfo) {
-        map.put(scriptName, scriptInfo);
+        if (map.putIfAbsent(scriptName, scriptInfo) != null) throw new WrongNameException("Such a name is already in use");
     }
 
     @Override
     public ScriptInfo get(String scriptName) {
-        return map.get(scriptName);
+        ScriptInfo scriptInfo = map.get(scriptName);
+        if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
+        return scriptInfo;
     }
 
-    public Set<ScriptInfoForList> getAll() {
+    public Set<ScriptInfoForList> getAllScripts() {
         Set<ScriptInfoForList> set = new TreeSet<>();
         for(Map.Entry<String, ScriptInfo> entry: map.entrySet()) {
             set.add(new ScriptInfoForList(entry.getKey(), entry.getValue()));
@@ -32,19 +36,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     public void delete(String scriptName) {
-        map.remove(scriptName);
-    }
-
-    @Override
-    public String toString() {
-        String result = "";
-        for(Map.Entry<String, ScriptInfo> entry: map.entrySet()) {
-            result +=
-                    entry.getKey() + ":\n"
-                    + "\tStatus: " + entry.getValue().getScriptStatus() + "\n"
-                    + "\tLink: " + entry.getValue().getLink() + "\n\n";
-        }
-        return result;
+        if(map.remove(scriptName) == null) throw new ScriptNotFoundException(scriptName);
     }
 
     public ScriptRepositoryImpl() {

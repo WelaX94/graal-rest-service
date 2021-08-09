@@ -18,8 +18,8 @@ public class ScriptsController {
     ScriptService scriptService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Set<ScriptInfoForList> getScriptList() {
-        return scriptService.getAll();
+    public Set<ScriptInfoForList> getAllScripts() {
+        return scriptService.getAllScripts();
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

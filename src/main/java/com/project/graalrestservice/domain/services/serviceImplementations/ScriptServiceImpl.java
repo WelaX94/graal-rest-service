@@ -25,6 +25,8 @@ public class ScriptServiceImpl implements ScriptService {
     @Autowired
     private ExecutorService executorService;
 
+    private Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
+
     public String addScript(String scriptName, String script, String link) {
         checkName(scriptName);
         ScriptInfo scriptInfo = new ScriptInfo(script, link);
@@ -34,51 +36,40 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public String getAllScripts() {
-        return scriptRepository.toString();
-    }
-
-    @Override
     public ScriptInfoForSingle getScriptInfo(String scriptName) {
         ScriptInfo scriptInfo = scriptRepository.get(scriptName);
-        if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
         return new ScriptInfoForSingle(scriptName, scriptInfo);
     }
 
     @Override
     public void stopScript(String scriptName) {
         ScriptInfo scriptInfo = scriptRepository.get(scriptName);
-        if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
-        if (scriptInfo.getScriptStatus() != ScriptStatus.RUNNING) throw new WrongScriptStatusException
-                ("You cannot stop a script that is not running", scriptInfo.getScriptStatus());
-        scriptInfo.getContext().close(true);
+        scriptInfo.stopScriptExecution();
     }
 
     @Override
     public void deleteScript(String scriptName) {
         ScriptInfo scriptInfo = scriptRepository.get(scriptName);
-        if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
         if (scriptInfo.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("To delete a running script, you must first stop it", scriptInfo.getScriptStatus());
         scriptRepository.delete(scriptName);
     }
 
     private void checkName(String scriptName) {
-        if (!(scriptRepository.get(scriptName) == null)) throw new WrongNameException("Such a name is already in use");
-        Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
-        boolean checkName = correctlyScriptName.matcher(scriptName).matches();
-        if (!checkName) throw new WrongNameException("The name uses illegal characters or exceeds the allowed length");
+        if (!correctlyScriptName.matcher(scriptName).matches())
+            throw new WrongNameException("The name uses illegal characters or exceeds the allowed length");
     }
 
     public ScriptServiceImpl() {
     }
 
-    public Set<ScriptInfoForList> getAll() {
-        return scriptRepository.getAll();
+    public Set<ScriptInfoForList> getAllScripts() {
+        return scriptRepository.getAllScripts();
     }
 
     public ScriptServiceImpl(ScriptRepository scriptRepository, ExecutorService executorService) {
         this.scriptRepository = scriptRepository;
         this.executorService = executorService;
     }
+
 }

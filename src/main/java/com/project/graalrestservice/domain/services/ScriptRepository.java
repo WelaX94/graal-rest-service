@@ -13,8 +13,6 @@ public interface ScriptRepository {
 
     public void delete(String scriptName);
 
-    public String toString();
-
-    public Set<ScriptInfoForList> getAll();
+    public Set<ScriptInfoForList> getAllScripts();
 
 }

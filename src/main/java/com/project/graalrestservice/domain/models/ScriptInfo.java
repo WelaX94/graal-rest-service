@@ -2,6 +2,7 @@ package com.project.graalrestservice.domain.models;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.utils.CircularOutputStream;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 
@@ -60,23 +61,20 @@ public class ScriptInfo implements Runnable{
         }
     }
 
+    public void stopScriptExecution(){
+        if (status != ScriptStatus.RUNNING) throw new WrongScriptStatusException
+                ("You cannot stop a script that is not running", status);
+        context.close(true);
+    }
+
     public String getScript() {
         return script;
     }
     public ScriptStatus getScriptStatus() {
         return status;
     }
-    public void setScriptStatus(ScriptStatus status) {
-        this.status = status;
-    }
     public String getLink() {
         return link;
-    }
-    public Context getContext() {
-        return context;
-    }
-    public void setContext(Context context) {
-        this.context = context;
     }
     public OutputStream getLogStream() {
         return logStream;
@@ -86,9 +84,6 @@ public class ScriptInfo implements Runnable{
     }
     public String getOutputInfo() {
         return outputInfo;
-    }
-    public void setOutputInfo(String outputInfo) {
-        this.outputInfo = outputInfo;
     }
     public String getExecutionTime(){
         Duration duration = Duration.between(startTime, endTime);
@@ -100,13 +95,7 @@ public class ScriptInfo implements Runnable{
     public LocalDateTime getStartTime() {
         return startTime;
     }
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
     public LocalDateTime getEndTime() {
         return endTime;
-    }
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
     }
 }

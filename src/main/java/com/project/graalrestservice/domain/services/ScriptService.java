@@ -9,14 +9,12 @@ public interface ScriptService {
 
     public String addScript(String name, String script, String link);
 
-    public String getAllScripts();
-
     public ScriptInfoForSingle getScriptInfo(String scriptName);
 
     public void stopScript(String scriptName);
 
     public void deleteScript(String scriptName);
 
-    public Set<ScriptInfoForList> getAll();
+    public Set<ScriptInfoForList> getAllScripts();
 
 }
