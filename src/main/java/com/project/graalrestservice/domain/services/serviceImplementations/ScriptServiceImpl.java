@@ -5,7 +5,6 @@ import com.project.graalrestservice.domain.models.representation.ScriptInfoForLi
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.services.ScriptRepository;
-import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import com.project.graalrestservice.domain.models.ScriptInfo;
@@ -25,11 +24,17 @@ public class ScriptServiceImpl implements ScriptService {
     @Autowired
     private ExecutorService executorService;
 
-    private Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
+    private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
 
+    @Override
+    public Set<ScriptInfoForList> getAllScripts() {
+        return scriptRepository.getAllScripts();
+    }
+
+    @Override
     public String addScript(String scriptName, String script, String link) {
         checkName(scriptName);
-        ScriptInfo scriptInfo = new ScriptInfo(script, link);
+        final ScriptInfo scriptInfo = new ScriptInfo(script, link);
         scriptRepository.put(scriptName, scriptInfo);
         executorService.execute(scriptInfo);
         return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
@@ -37,19 +42,18 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public ScriptInfoForSingle getScriptInfo(String scriptName) {
-        ScriptInfo scriptInfo = scriptRepository.get(scriptName);
+        final ScriptInfo scriptInfo = scriptRepository.get(scriptName);
         return new ScriptInfoForSingle(scriptName, scriptInfo);
     }
 
     @Override
     public void stopScript(String scriptName) {
-        ScriptInfo scriptInfo = scriptRepository.get(scriptName);
-        scriptInfo.stopScriptExecution();
+        scriptRepository.get(scriptName).stopScriptExecution();
     }
 
     @Override
     public void deleteScript(String scriptName) {
-        ScriptInfo scriptInfo = scriptRepository.get(scriptName);
+        final ScriptInfo scriptInfo = scriptRepository.get(scriptName);
         if (scriptInfo.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("To delete a running script, you must first stop it", scriptInfo.getScriptStatus());
         scriptRepository.delete(scriptName);
@@ -61,10 +65,6 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     public ScriptServiceImpl() {
-    }
-
-    public Set<ScriptInfoForList> getAllScripts() {
-        return scriptRepository.getAllScripts();
     }
 
     public ScriptServiceImpl(ScriptRepository scriptRepository, ExecutorService executorService) {

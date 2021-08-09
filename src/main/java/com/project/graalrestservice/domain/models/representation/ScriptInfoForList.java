@@ -6,10 +6,10 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import java.time.LocalDateTime;
 
 public class ScriptInfoForList implements Comparable<ScriptInfoForList>{
-    private String name;
-    private ScriptStatus status;
-    private LocalDateTime createdTime;
-    private String link;
+    private final String name;
+    private final ScriptStatus status;
+    private final LocalDateTime createdTime;
+    private final String link;
 
     public ScriptInfoForList(String name, ScriptInfo scriptInfo) {
         this.name = name;

@@ -7,7 +7,7 @@ public enum ScriptStatus {
     EXECUTION_FAILED(0),
     EXECUTION_STOPPED(0);
 
-    private int value;
+    private final int value;
 
     ScriptStatus(int value) {
         this.value = value;

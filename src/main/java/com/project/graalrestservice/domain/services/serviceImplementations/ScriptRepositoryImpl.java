@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ScriptRepositoryImpl implements ScriptRepository {
 
-    ConcurrentHashMap<String, ScriptInfo> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ScriptInfo> map;
 
     @Override
     public void put(String scriptName, ScriptInfo scriptInfo) {
@@ -27,6 +27,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return scriptInfo;
     }
 
+    @Override
     public Set<ScriptInfoForList> getAllScripts() {
         Set<ScriptInfoForList> set = new TreeSet<>();
         for(Map.Entry<String, ScriptInfo> entry: map.entrySet()) {
@@ -35,11 +36,13 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return set;
     }
 
+    @Override
     public void delete(String scriptName) {
         if(map.remove(scriptName) == null) throw new ScriptNotFoundException(scriptName);
     }
 
     public ScriptRepositoryImpl() {
+        this.map = new ConcurrentHashMap<>();
     }
 
     public ScriptRepositoryImpl(ConcurrentHashMap<String, ScriptInfo> map) {
