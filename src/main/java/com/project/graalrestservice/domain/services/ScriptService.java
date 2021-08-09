@@ -15,6 +15,6 @@ public interface ScriptService {
 
     public void deleteScript(String scriptName);
 
-    public Set<ScriptInfoForList> getAllScripts();
+    public Set<ScriptInfoForList> getAllScripts(char ... filter);
 
 }

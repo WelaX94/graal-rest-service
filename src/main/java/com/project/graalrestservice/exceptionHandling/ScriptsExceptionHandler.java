@@ -1,6 +1,7 @@
 package com.project.graalrestservice.exceptionHandling;
 
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
+import com.project.graalrestservice.exceptionHandling.exceptions.UnknownFilterException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,11 @@ public class ScriptsExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<String> handleWrongScriptStatusException(WrongScriptStatusException exception) {
         return new ResponseEntity<String>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleUnknownFilterException(UnknownFilterException exception) {
+        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 }

@@ -1,19 +1,20 @@
 package com.project.graalrestservice.domain.enums;
 
 public enum ScriptStatus {
-    IN_QUEUE(2),
-    RUNNING(1),
-    EXECUTION_SUCCESSFUL(0),
-    EXECUTION_FAILED(0),
-    EXECUTION_STOPPED(0);
+    IN_QUEUE('q'),
+    RUNNING('r'),
+    EXECUTION_SUCCESSFUL('s'),
+    EXECUTION_FAILED('f'),
+    EXECUTION_CANCELED('c');
 
-    private final int value;
+    private final char letter;
 
-    ScriptStatus(int value) {
-        this.value = value;
+    ScriptStatus(char letter) {
+        this.letter = letter;
     }
 
-    public int getValue() {
-        return value;
+    public char getLetter() {
+        return letter;
     }
+
 }

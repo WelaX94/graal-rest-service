@@ -26,9 +26,11 @@ public class ScriptServiceImpl implements ScriptService {
 
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
 
+    private final String[] illegalNamespace = new String[]{"filter"};
+
     @Override
-    public Set<ScriptInfoForList> getAllScripts() {
-        return scriptRepository.getAllScripts();
+    public Set<ScriptInfoForList> getAllScripts(char ... filter) {
+        return scriptRepository.getAllScripts(filter);
     }
 
     @Override
@@ -62,6 +64,10 @@ public class ScriptServiceImpl implements ScriptService {
     private void checkName(String scriptName) {
         if (!correctlyScriptName.matcher(scriptName).matches())
             throw new WrongNameException("The name uses illegal characters or exceeds the allowed length");
+        for(String name: illegalNamespace) {
+            if (name.equals(scriptName))
+                throw new WrongNameException("This name is reserved and is forbidden for use");
+        }
     }
 
     public ScriptServiceImpl() {

@@ -47,7 +47,7 @@ public class ScriptInfo implements Runnable{
         }
         catch (PolyglotException e) {
             endTime = LocalDateTime.now();
-            if (e.isCancelled()) status = ScriptStatus.EXECUTION_STOPPED;
+            if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
             else status = ScriptStatus.EXECUTION_FAILED;
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

@@ -22,6 +22,11 @@ public class ScriptsController {
         return scriptService.getAllScripts();
     }
 
+    @RequestMapping(value = "/filter/{filters}", method = RequestMethod.GET)
+    public Set<ScriptInfoForList> getFilteredScripts(@PathVariable String filters) {
+        return scriptService.getAllScripts(filters.toLowerCase().toCharArray());
+    }
+
     @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
     public String runScript(@RequestBody String script, @PathVariable String scriptName, HttpServletRequest request) {
