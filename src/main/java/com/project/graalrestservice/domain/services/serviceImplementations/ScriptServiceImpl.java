@@ -1,6 +1,8 @@
 package com.project.graalrestservice.domain.services.serviceImplementations;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
+import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.services.ScriptRepository;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
@@ -10,6 +12,7 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
@@ -36,14 +39,10 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public String getScriptInfo(String scriptName) {
+    public ScriptInfoForSingle getScriptInfo(String scriptName) {
         ScriptInfo scriptInfo = scriptRepository.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
-        return "Script: " + scriptName + "\n"
-                + "Status: " + scriptInfo.getScriptStatus() + "\n"
-                + "Logs:\n\n"
-                + scriptInfo.getLogStream()
-                + scriptInfo.getOutputInfo();
+        return new ScriptInfoForSingle(scriptName, scriptInfo);
     }
 
     @Override
@@ -74,6 +73,10 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     public ScriptServiceImpl() {
+    }
+
+    public Set<ScriptInfoForList> getAll() {
+        return scriptRepository.getAll();
     }
 
     public ScriptServiceImpl(ScriptRepository scriptRepository, ExecutorService executorService) {

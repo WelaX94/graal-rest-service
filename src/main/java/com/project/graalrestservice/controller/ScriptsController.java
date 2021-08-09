@@ -1,11 +1,14 @@
 package com.project.graalrestservice.controller;
 
+import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
+import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.services.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/scripts")
@@ -15,8 +18,8 @@ public class ScriptsController {
     ScriptService scriptService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String getScriptList() {
-        return scriptService.getAllScripts();
+    public Set<ScriptInfoForList> getScriptList() {
+        return scriptService.getAll();
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -26,7 +29,7 @@ public class ScriptsController {
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)
-    public String getScriptInfo(@PathVariable String scriptName) {
+    public ScriptInfoForSingle getSingleScriptInfo(@PathVariable String scriptName) {
         return scriptService.getScriptInfo(scriptName);
     }
 
