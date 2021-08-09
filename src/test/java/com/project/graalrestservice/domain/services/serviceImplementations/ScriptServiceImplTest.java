@@ -28,7 +28,7 @@ class ScriptServiceImplTest {
     private ConcurrentHashMap<String, ScriptInfo> scriptInfoMap;
     private Context context;
     private static List<String> illegalNamespace;
-
+/*
     @BeforeAll
     static void SetUpIllegalNamespace() {
         illegalNamespace = new ArrayList<>();
@@ -161,6 +161,7 @@ class ScriptServiceImplTest {
     void deleteScript() {
         final String s0 = "s0_queue";
         String excepted = "Script '" + s0 + "' deleted";
+        asser
         assertEquals(excepted, scriptHandler.deleteScript(s0));
         assertThrows(ScriptNotFoundException.class, () -> scriptHandler.deleteScript(s0));
 
@@ -190,4 +191,5 @@ class ScriptServiceImplTest {
         assertThrows(ScriptNotFoundException.class, () -> scriptHandler.deleteScript(s4));
 
     }
+ */
 }

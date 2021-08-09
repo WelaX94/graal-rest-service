@@ -13,7 +13,7 @@ public class ScriptsExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<String> handleWrongNameException(WrongNameException exception) {
-        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler

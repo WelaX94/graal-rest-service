@@ -46,23 +46,21 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public String stopScript(String scriptName) {
+    public void stopScript(String scriptName) {
         ScriptInfo scriptInfo = scriptRepository.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
         if (scriptInfo.getScriptStatus() != ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("You cannot stop a script that is not running", scriptInfo.getScriptStatus());
         scriptInfo.getContext().close(true);
-        return "Script '" + scriptName + "' stopped";
     }
 
     @Override
-    public String deleteScript(String scriptName) {
+    public void deleteScript(String scriptName) {
         ScriptInfo scriptInfo = scriptRepository.get(scriptName);
         if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
         if (scriptInfo.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("To delete a running script, you must first stop it", scriptInfo.getScriptStatus());
         scriptRepository.delete(scriptName);
-        return "Script '" + scriptName + "' deleted";
     }
 
     private void checkName(String scriptName) {

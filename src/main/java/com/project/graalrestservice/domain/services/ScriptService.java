@@ -13,9 +13,9 @@ public interface ScriptService {
 
     public ScriptInfoForSingle getScriptInfo(String scriptName);
 
-    public String stopScript(String scriptName);
+    public void stopScript(String scriptName);
 
-    public String deleteScript(String scriptName);
+    public void deleteScript(String scriptName);
 
     public Set<ScriptInfoForList> getAll();
 

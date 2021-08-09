@@ -34,13 +34,13 @@ public class ScriptsController {
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
-    public String stopScript(@PathVariable String scriptName) {
-        return scriptService.stopScript(scriptName);
+    public void stopScript(@PathVariable String scriptName) {
+        scriptService.stopScript(scriptName);
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.DELETE)
-    public String deleteScript(@PathVariable String scriptName) {
-        return scriptService.deleteScript(scriptName);
+    public void deleteScript(@PathVariable String scriptName) {
+        scriptService.deleteScript(scriptName);
     }
 
 }
