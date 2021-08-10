@@ -5,12 +5,20 @@ import com.project.graalrestservice.domain.models.representation.ScriptInfoForLi
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.services.ScriptRepository;
+import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import com.project.graalrestservice.domain.models.ScriptInfo;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
+import org.graalvm.polyglot.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -42,10 +50,18 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public String addScript(String scriptName, String script, String link) {
         checkName(scriptName);
-        final ScriptInfo scriptInfo = new ScriptInfo(script, link);
-        scriptRepository.put(scriptName, scriptInfo);
-        executorService.execute(scriptInfo);
-        return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
+        OutputStream outputStream = new CircularOutputStream(65536);
+        Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
+        try {
+            Value value = context.parse("js", script);
+            ScriptInfo scriptInfo = new ScriptInfo(script, link, outputStream, value, context);
+            scriptRepository.put(scriptName, scriptInfo);
+            executorService.execute(scriptInfo);
+            return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
+        } catch (PolyglotException e) {
+            context.close();
+            throw new WrongScriptException(e.getMessage());
+        }
     }
 
     @Override

@@ -51,13 +51,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     private Set<ScriptInfoForList> getFilteredScripts(char[] filters) {
         checkFilter(filters);
+        ScriptStatusPriority scriptStatusPriority = new ScriptStatusPriority(filters);
         final Set<ScriptInfoForList> set = new TreeSet<>();
         OUTER:
         for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
             final char letterStatus = entry.getValue().getScriptStatus().getLetter();
             for (char filter: filters) {
                 if (letterStatus == filter) {
-                    set.add(new ScriptInfoForList(entry.getKey(), entry.getValue(), new ScriptStatusPriority(filters)));
+                    set.add(new ScriptInfoForList(entry.getKey(), entry.getValue(), scriptStatusPriority));
                     continue OUTER;
                 }
             }

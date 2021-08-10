@@ -5,6 +5,7 @@ import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
+import org.graalvm.polyglot.Value;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,32 +20,34 @@ public class ScriptInfo implements Runnable{
     private ScriptStatus status;
     final private String link;
     private OutputStream logStream;
-    private Context context;
     private String outputInfo = "";
     private final LocalDateTime createTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private final Value value;
+    private final Context context;
 
-    public ScriptInfo(String script, String link) {
+    public ScriptInfo(String script, String link, OutputStream logStream, Value value, Context context) {
         this.script = script;
         this.link = link;
         this.status = ScriptStatus.IN_QUEUE;
         this.createTime = LocalDateTime.now();
+        this.logStream = logStream;
+        this.value = value;
+        this.context = context;
     }
 
     @Override
     public void run() {
-        status = ScriptStatus.RUNNING;
-        logStream = new CircularOutputStream(65536);
-        context = Context.newBuilder().out(logStream).err(logStream).build();
         try {
+            status = ScriptStatus.RUNNING;
             startTime = LocalDateTime.now();
             logStream.write(startTime.toString().getBytes());
-            logStream.write(" Attempting to run a script\n".getBytes());
-            context.eval("js", getScript());
+            logStream.write("\tAttempting to run a script\n".getBytes());
+            value.execute();
             endTime = LocalDateTime.now();
             status = ScriptStatus.EXECUTION_SUCCESSFUL;
-            outputInfo = endTime + " Exited in " + getExecutionTime() + "s.";
+            outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.";
         }
         catch (PolyglotException e) {
             endTime = LocalDateTime.now();
@@ -65,7 +68,7 @@ public class ScriptInfo implements Runnable{
     public void stopScriptExecution(){
         if (status != ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("You cannot stop a script that is not running", status);
-        context.close(true);
+        value.getContext().close(true);
     }
 
     public String getScript() {
@@ -79,9 +82,6 @@ public class ScriptInfo implements Runnable{
     }
     public OutputStream getLogStream() {
         return logStream;
-    }
-    public void setLogStream(OutputStream logStream) {
-        this.logStream = logStream;
     }
     public String getOutputInfo() {
         return outputInfo;
@@ -98,5 +98,9 @@ public class ScriptInfo implements Runnable{
     }
     public LocalDateTime getEndTime() {
         return endTime;
+    }
+
+    public Value getValue() {
+        return value;
     }
 }
