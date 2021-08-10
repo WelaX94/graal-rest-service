@@ -11,6 +11,7 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
@@ -31,6 +32,11 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public Set<ScriptInfoForList> getAllScripts(char ... filter) {
         return scriptRepository.getAllScripts(filter);
+    }
+
+    @Override
+    public List<ScriptInfoForList> getPageScripts(char[] filters, int page) {
+        return scriptRepository.getPageScripts(filters, page);
     }
 
     @Override

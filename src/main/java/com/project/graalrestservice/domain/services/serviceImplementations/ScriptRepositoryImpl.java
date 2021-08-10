@@ -37,6 +37,18 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         else return getFilteredScripts(filters);
     }
 
+    @Override
+    public List<ScriptInfoForList> getPageScripts(char[] filters, int page) {
+        if (page < 0) throw new IllegalArgumentException("The page number cannot be negative");
+        List<ScriptInfoForList> list = new ArrayList<>(getFilteredScripts(filters));
+        int end = (page + 1) * 10;
+        List<ScriptInfoForList> output = new ArrayList<>(10);
+        for (int start = end - 10; start < end && start < list.size(); start++) {
+            output.add(list.get(start));
+        }
+        return output;
+    }
+
     private Set<ScriptInfoForList> getFilteredScripts(char[] filters) {
         checkFilter(filters);
         final Set<ScriptInfoForList> set = new TreeSet<>();

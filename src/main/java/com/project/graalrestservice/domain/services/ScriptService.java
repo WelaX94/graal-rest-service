@@ -3,6 +3,7 @@ package com.project.graalrestservice.domain.services;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 
+import java.util.List;
 import java.util.Set;
 
 public interface ScriptService {
@@ -16,5 +17,7 @@ public interface ScriptService {
     public void deleteScript(String scriptName);
 
     public Set<ScriptInfoForList> getAllScripts(char ... filter);
+
+    public List<ScriptInfoForList> getPageScripts(char[] filters, int page);
 
 }

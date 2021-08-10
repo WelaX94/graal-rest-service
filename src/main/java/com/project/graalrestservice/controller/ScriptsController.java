@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/scripts")
@@ -25,6 +25,11 @@ public class ScriptsController {
     @RequestMapping(value = "/filter/{filters}", method = RequestMethod.GET)
     public Set<ScriptInfoForList> getFilteredScripts(@PathVariable String filters) {
         return scriptService.getAllScripts(filters.toLowerCase().toCharArray());
+    }
+
+    @RequestMapping(value = "/filter/{filters}/{page}", method = RequestMethod.GET)
+    public List<ScriptInfoForList> getPageScripts(@PathVariable String filters, @PathVariable int page) {
+        return scriptService.getPageScripts(filters.toLowerCase().toCharArray(), page);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
