@@ -1,7 +1,6 @@
 package com.project.graalrestservice.domain.models;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 public class ScriptInfo implements Runnable{
 
     final private String script;
-    private ScriptStatus status;
+    private volatile ScriptStatus status;
     final private String link;
     private OutputStream logStream;
     private String outputInfo = "";
@@ -40,23 +39,29 @@ public class ScriptInfo implements Runnable{
     @Override
     public void run() {
         try {
-            status = ScriptStatus.RUNNING;
-            startTime = LocalDateTime.now();
-            logStream.write(startTime.toString().getBytes());
-            logStream.write("\tAttempting to run a script\n".getBytes());
+            synchronized (this) {
+                status = ScriptStatus.RUNNING;
+                startTime = LocalDateTime.now();
+                logStream.write(startTime.toString().getBytes());
+                logStream.write("\tAttempting to run a script\n".getBytes());
+            }
             value.execute();
-            endTime = LocalDateTime.now();
-            status = ScriptStatus.EXECUTION_SUCCESSFUL;
-            outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.";
+            synchronized (this) {
+                endTime = LocalDateTime.now();
+                status = ScriptStatus.EXECUTION_SUCCESSFUL;
+                outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.";
+            }
         }
         catch (PolyglotException e) {
-            endTime = LocalDateTime.now();
-            if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
-            else status = ScriptStatus.EXECUTION_FAILED;
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.";
+            synchronized (this) {
+                endTime = LocalDateTime.now();
+                if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
+                else status = ScriptStatus.EXECUTION_FAILED;
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.";
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,10 +70,10 @@ public class ScriptInfo implements Runnable{
         }
     }
 
-    public void stopScriptExecution(){
+    public synchronized void stopScriptExecution(){
         if (status != ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("You cannot stop a script that is not running", status);
-        value.getContext().close(true);
+        else closeContext();
     }
 
     public String getScript() {
@@ -99,8 +104,8 @@ public class ScriptInfo implements Runnable{
     public LocalDateTime getEndTime() {
         return endTime;
     }
-
-    public Value getValue() {
-        return value;
+    public void closeContext() {
+        context.close(true);
     }
+
 }

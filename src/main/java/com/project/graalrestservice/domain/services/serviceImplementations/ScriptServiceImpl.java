@@ -56,7 +56,9 @@ public class ScriptServiceImpl implements ScriptService {
             Value value = context.parse("js", script);
             ScriptInfo scriptInfo = new ScriptInfo(script, link, outputStream, value, context);
             scriptRepository.put(scriptName, scriptInfo);
-            executorService.execute(scriptInfo);
+            synchronized (scriptInfo) {
+                executorService.execute(scriptInfo);
+            }
             return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
         } catch (PolyglotException e) {
             context.close();
@@ -77,9 +79,12 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public void deleteScript(String scriptName) {
         final ScriptInfo scriptInfo = scriptRepository.get(scriptName);
-        if (scriptInfo.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
-                ("To delete a running script, you must first stop it", scriptInfo.getScriptStatus());
-        scriptRepository.delete(scriptName);
+        synchronized (scriptInfo) {
+            if (scriptInfo.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
+                    ("To delete a running script, you must first stop it", scriptInfo.getScriptStatus());
+            scriptInfo.closeContext();
+            scriptRepository.delete(scriptName);
+        }
     }
 
     private void checkName(String scriptName) {
