@@ -1,28 +1,34 @@
 package com.project.graalrestservice.domain.models.representation;
 
+import com.project.graalrestservice.controller.ScriptsController;
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.enums.ScriptStatusPriority;
 import com.project.graalrestservice.domain.models.ScriptInfo;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 
-public class ScriptInfoForList implements Comparable<ScriptInfoForList>{
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> implements Comparable<ScriptInfoForList>{
+
+    private final static ScriptStatusPriority defaultPriority = new ScriptStatusPriority();
     private final String name;
     private final ScriptStatus status;
     private final LocalDateTime createdTime;
-    private final String link;
     private final ScriptStatusPriority scriptStatusPriority;
 
     public ScriptInfoForList(String name, ScriptInfo scriptInfo, ScriptStatusPriority scriptStatusPriority) {
         this.name = name;
         this.status = scriptInfo.getScriptStatus();
         this.createdTime = scriptInfo.getCreateTime();
-        this.link = scriptInfo.getLink();
         this.scriptStatusPriority = scriptStatusPriority;
+        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
     }
 
     public ScriptInfoForList(String name, ScriptInfo scriptInfo) {
-        this(name, scriptInfo, new ScriptStatusPriority());
+        this(name, scriptInfo, defaultPriority);
     }
 
     @Override
@@ -45,7 +51,5 @@ public class ScriptInfoForList implements Comparable<ScriptInfoForList>{
     public LocalDateTime getCreatedTime() {
         return createdTime;
     }
-    public String getLink() {
-        return link;
-    }
+
 }

@@ -1,11 +1,16 @@
 package com.project.graalrestservice.domain.models.representation;
 
+import com.project.graalrestservice.controller.ScriptsController;
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 
-public class ScriptInfoForSingle {
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle> {
 
     private final String name;
     private final ScriptStatus status;
@@ -23,6 +28,10 @@ public class ScriptInfoForSingle {
         this.endTime = script.getEndTime();
         this.logs = script.getLink() + "/logs";
         this.fullScript = script;
+        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
+        add(linkTo(ScriptsController.class).withRel("scriptList"));
+        add(linkTo(methodOn(ScriptsController.class).getFilteredScripts("qrsfc")).withRel("filteredScriptList"));
+        add(linkTo(methodOn(ScriptsController.class).getPageScripts("qrsfc", 0)).withRel("filteredScriptListOnPages"));
     }
 
     public String getName() {
