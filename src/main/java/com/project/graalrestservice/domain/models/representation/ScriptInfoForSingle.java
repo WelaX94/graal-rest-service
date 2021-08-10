@@ -13,6 +13,7 @@ public class ScriptInfoForSingle {
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
     private final String logs;
+    private final ScriptInfo fullScript;
 
     public ScriptInfoForSingle(String name, ScriptInfo script) {
         this.name = name;
@@ -21,6 +22,7 @@ public class ScriptInfoForSingle {
         this.startTime = script.getStartTime();
         this.endTime = script.getEndTime();
         this.logs = script.getLink() + "/logs";
+        this.fullScript = script;
     }
 
     public String getName() {
@@ -40,6 +42,9 @@ public class ScriptInfoForSingle {
     }
     public String getLogs() {
         return logs;
+    }
+    public String returnFullLogs() {
+        return fullScript.getLogStream().toString() + fullScript.getOutputInfo();
     }
 
 }

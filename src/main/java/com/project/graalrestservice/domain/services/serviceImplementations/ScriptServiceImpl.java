@@ -50,8 +50,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public ScriptInfoForSingle getScriptInfo(String scriptName) {
-        final ScriptInfo scriptInfo = scriptRepository.get(scriptName);
-        return new ScriptInfoForSingle(scriptName, scriptInfo);
+        return new ScriptInfoForSingle(scriptName, scriptRepository.get(scriptName));
     }
 
     @Override

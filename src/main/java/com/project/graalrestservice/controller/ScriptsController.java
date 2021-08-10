@@ -43,6 +43,11 @@ public class ScriptsController {
         return scriptService.getScriptInfo(scriptName);
     }
 
+    @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.GET)
+    public String getScriptLogs(@PathVariable String scriptName) {
+        return scriptService.getScriptInfo(scriptName).returnFullLogs();
+    }
+
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
     public void stopScript(@PathVariable String scriptName) {
         scriptService.stopScript(scriptName);

@@ -38,12 +38,13 @@ public class ScriptInfo implements Runnable{
         logStream = new CircularOutputStream(65536);
         context = Context.newBuilder().out(logStream).err(logStream).build();
         try {
-            logStream.write("Attempting to run a script\n".getBytes());
             startTime = LocalDateTime.now();
+            logStream.write(startTime.toString().getBytes());
+            logStream.write(" Attempting to run a script\n".getBytes());
             context.eval("js", getScript());
             endTime = LocalDateTime.now();
             status = ScriptStatus.EXECUTION_SUCCESSFUL;
-            outputInfo = "Exited in " + getExecutionTime() + "s.";
+            outputInfo = endTime + " Exited in " + getExecutionTime() + "s.";
         }
         catch (PolyglotException e) {
             endTime = LocalDateTime.now();
@@ -52,7 +53,7 @@ public class ScriptInfo implements Runnable{
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            outputInfo += sw + "Exited in " + getExecutionTime() + "s.";
+            outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.";
         } catch (IOException e) {
             e.printStackTrace();
         }
