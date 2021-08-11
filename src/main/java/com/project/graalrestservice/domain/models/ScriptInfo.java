@@ -2,6 +2,8 @@ package com.project.graalrestservice.domain.models;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 
 public class ScriptInfo implements Runnable{
 
+    private final static Logger LOGGER = LogManager.getLogger(ScriptInfo.class);
+    private final String name;
     private final String script;
     private volatile ScriptStatus status;
     private final String link;
@@ -26,7 +30,8 @@ public class ScriptInfo implements Runnable{
     private final Value value;
     private final Context context;
 
-    public ScriptInfo(String script, String link, OutputStream logStream, Value value, Context context) {
+    public ScriptInfo(String name, String script, String link, OutputStream logStream, Value value, Context context) {
+        this.name = name;
         this.script = script;
         this.link = link;
         this.status = ScriptStatus.IN_QUEUE;
@@ -39,6 +44,7 @@ public class ScriptInfo implements Runnable{
     @Override
     public void run() {
         try {
+            LOGGER.info(String.format("Attempting to run a script [%s]", name));
             synchronized (this) {
                 status = ScriptStatus.RUNNING;
                 startTime = LocalDateTime.now();
@@ -51,6 +57,7 @@ public class ScriptInfo implements Runnable{
                 status = ScriptStatus.EXECUTION_SUCCESSFUL;
                 outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.";
             }
+            LOGGER.info(String.format("Script [%s] execution completed successfully", name));
         }
         catch (PolyglotException e) {
             synchronized (this) {
@@ -62,6 +69,7 @@ public class ScriptInfo implements Runnable{
                 e.printStackTrace(pw);
                 outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.";
             }
+            LOGGER.info(String.format("Script [%s] execution failed. %s", name, e.getMessage()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,6 +84,9 @@ public class ScriptInfo implements Runnable{
         else closeContext();
     }
 
+    public String getName() {
+        return name;
+    }
     public String getScript() {
         return script;
     }

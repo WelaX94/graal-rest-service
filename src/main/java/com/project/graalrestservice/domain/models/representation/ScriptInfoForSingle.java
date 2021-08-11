@@ -20,8 +20,8 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     private final String logs;
     private final ScriptInfo fullScript;
 
-    public ScriptInfoForSingle(String name, ScriptInfo script) {
-        this.name = name;
+    public ScriptInfoForSingle(ScriptInfo script) {
+        this.name = script.getName();
         this.status = script.getScriptStatus();
         this.createTime = script.getCreateTime();
         this.startTime = script.getStartTime();

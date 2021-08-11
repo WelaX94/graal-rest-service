@@ -42,7 +42,7 @@ public class ScriptServiceImpl implements ScriptService {
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
         try {
             Value value = context.parse("js", script);
-            ScriptInfo scriptInfo = new ScriptInfo(script, link, outputStream, value, context);
+            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, link, outputStream, value, context);
             scriptRepository.put(scriptName, scriptInfo);
             executorService.execute(scriptInfo);
             return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
@@ -54,7 +54,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public ScriptInfoForSingle getScriptInfo(String scriptName) {
-        return new ScriptInfoForSingle(scriptName, scriptRepository.get(scriptName));
+        return new ScriptInfoForSingle(scriptRepository.get(scriptName));
     }
 
     @Override
