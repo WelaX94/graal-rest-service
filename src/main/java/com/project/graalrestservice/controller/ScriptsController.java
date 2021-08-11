@@ -2,6 +2,7 @@ package com.project.graalrestservice.controller;
 
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
+import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class ScriptsController {
     }
 
     @RequestMapping(value = "/filter/{filters}/{page}", method = RequestMethod.GET)
-    public List<ScriptInfoForList> getPageScripts(@PathVariable String filters, @PathVariable int page) {
+    public ScriptListPage getPageScripts(@PathVariable String filters, @PathVariable int page) {
         return scriptService.getPageScripts(filters.toLowerCase().toCharArray(), page);
     }
 

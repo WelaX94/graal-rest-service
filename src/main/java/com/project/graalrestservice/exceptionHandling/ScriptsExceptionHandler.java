@@ -30,8 +30,11 @@ public class ScriptsExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
-        return new ResponseEntity<String>("The argument is entered incorrectly. " + exception.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleWrongPageException(WrongPageException exception) {
+        HttpStatus status;
+        if (exception.listIsOver) status = HttpStatus.NOT_FOUND;
+        else status = HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<String>(exception.getMessage(), status);
     }
 
     @ExceptionHandler

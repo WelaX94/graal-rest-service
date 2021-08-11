@@ -3,10 +3,12 @@ package com.project.graalrestservice.domain.services.serviceImplementations;
 import com.project.graalrestservice.domain.enums.ScriptStatusPriority;
 import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
+import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptRepository;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.UnknownFilterException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongPageException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,15 +40,18 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<ScriptInfoForList> getPageScripts(char[] filters, int page) {
-        if (page < 0) throw new IllegalArgumentException("The page number cannot be negative");
+    public ScriptListPage getPageScripts(char[] filters, int page) {
+        if (page < 1) throw new WrongPageException("The page number cannot be less than 1");
         List<ScriptInfoForList> list = new ArrayList<>(getFilteredScripts(filters));
-        int end = (page + 1) * 10;
+        int end = page * 10;
+        int start = end - 10;
+        int listSize = list.size();
+        if (start >= listSize) throw new WrongPageException(page);
         List<ScriptInfoForList> output = new ArrayList<>(10);
-        for (int start = end - 10; start < end && start < list.size(); start++) {
+        for ( ; start < end && start < listSize; start++) {
             output.add(list.get(start));
         }
-        return output;
+        return new ScriptListPage(output, page, listSize, String.copyValueOf(filters));
     }
 
     private Set<ScriptInfoForList> getFilteredScripts(char[] filters) {

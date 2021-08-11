@@ -4,8 +4,6 @@ import org.graalvm.polyglot.Context;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Map;
-
 @SpringBootApplication
 public class GraalRestServiceApplication {
 
@@ -13,7 +11,10 @@ public class GraalRestServiceApplication {
 		boolean jsDetected = false;
 		Context context = Context.newBuilder().build();
 		for(String s: context.getEngine().getLanguages().keySet()) {
-			if (s.equals("js")) jsDetected = true;
+			if (s.equals("js")) {
+				jsDetected = true;
+				break;
+			}
 		}
 		context.close();
 		if (jsDetected) {
