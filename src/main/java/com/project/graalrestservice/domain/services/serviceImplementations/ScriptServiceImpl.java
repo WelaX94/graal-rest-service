@@ -1,7 +1,6 @@
 package com.project.graalrestservice.domain.services.serviceImplementations;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
@@ -18,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
@@ -28,22 +25,14 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Autowired
     private ScriptRepository scriptRepository;
-
     @Autowired
     private ExecutorService executorService;
-
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
-
     private final String[] illegalNamespace = new String[]{"filter"};
 
     @Override
-    public Set<ScriptInfoForList> getAllScripts(char ... filter) {
-        return scriptRepository.getAllScripts(filter);
-    }
-
-    @Override
-    public ScriptListPage getPageScripts(char[] filters, int page) {
-        return scriptRepository.getPageScripts(filters, page);
+    public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page) {
+        return scriptRepository.getScriptListPage(filters, pageSize, page);
     }
 
     @Override

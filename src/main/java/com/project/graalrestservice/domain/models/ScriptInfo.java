@@ -15,10 +15,10 @@ import java.time.LocalDateTime;
 
 public class ScriptInfo implements Runnable{
 
-    final private String script;
+    private final String script;
     private volatile ScriptStatus status;
-    final private String link;
-    private OutputStream logStream;
+    private final String link;
+    private final OutputStream logStream;
     private String outputInfo = "";
     private final LocalDateTime createTime;
     private LocalDateTime startTime;

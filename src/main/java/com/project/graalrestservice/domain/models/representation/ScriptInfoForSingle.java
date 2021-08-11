@@ -30,8 +30,6 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
         this.fullScript = script;
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
-        add(linkTo(methodOn(ScriptsController.class).getFilteredScripts("qrsfc")).withRel("filteredScriptList"));
-        add(linkTo(methodOn(ScriptsController.class).getPageScripts("qrsfc", 0)).withRel("filteredScriptListOnPages"));
     }
 
     public String getName() {

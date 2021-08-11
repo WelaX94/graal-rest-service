@@ -25,12 +25,7 @@ public class ScriptsExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleUnknownFilterException(UnknownFilterException exception) {
-        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleWrongPageException(WrongPageException exception) {
+    public ResponseEntity<String> handleWrongArgumentException(WrongArgumentException exception) {
         HttpStatus status;
         if (exception.listIsOver) status = HttpStatus.NOT_FOUND;
         else status = HttpStatus.BAD_REQUEST;

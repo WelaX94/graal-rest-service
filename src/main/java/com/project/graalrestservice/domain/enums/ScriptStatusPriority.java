@@ -16,10 +16,10 @@ public class ScriptStatusPriority {
         queue = 2;
     }
 
-    public ScriptStatusPriority(char[] filters) {
+    public ScriptStatusPriority(String filters) {
         int count = 1;
-        for(char filter: filters) {
-            switch (filter) {
+        for(int f = 0; f < filters.length(); f++) {
+            switch (filters.charAt(f)) {
                 case 'q':
                     queue = count++;
                     break;

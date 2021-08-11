@@ -1,6 +1,5 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
@@ -9,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
 
 @RestController
 @RequestMapping("/scripts")
@@ -19,18 +17,11 @@ public class ScriptsController {
     ScriptService scriptService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Set<ScriptInfoForList> getAllScripts() {
-        return scriptService.getAllScripts();
-    }
-
-    @RequestMapping(value = "/filter/{filters}", method = RequestMethod.GET)
-    public Set<ScriptInfoForList> getFilteredScripts(@PathVariable String filters) {
-        return scriptService.getAllScripts(filters.toLowerCase().toCharArray());
-    }
-
-    @RequestMapping(value = "/filter/{filters}/{page}", method = RequestMethod.GET)
-    public ScriptListPage getPageScripts(@PathVariable String filters, @PathVariable int page) {
-        return scriptService.getPageScripts(filters.toLowerCase().toCharArray(), page);
+    public ScriptListPage getScriptListPage(
+            @RequestParam(required=false) String filters,
+            @RequestParam(required=false) Integer pageSize,
+            @RequestParam(required=false) Integer page) {
+        return scriptService.getScriptListPage(filters, pageSize, page);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
