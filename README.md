@@ -1,8 +1,19 @@
 # GraalJS REST Service
 This service allows you to run arbitrary JavaScript code and get the result of its execution.
 
-## Methods for working with the service
+## Tech assignment
+Write a REST API shell around GraalJs, which would allow through the api
 
+1) run arbitrary javascript code in graaljs, passed in the request body, and return in the response body the script output to the console or an error message;
+2) view the script's status (completed successfully, with error, running, queued) and its console output at the time of the request;
+3) stop hanging scripts forcibly;
+4) view the list of completed and running scripts;
+5) delete completed scripts from the list
+
+Requests can come in parallel. A script can run for a long time or freeze in an endless loop - we have no control over the scripts content.
+
+
+## Methods for working with the service
 
 ### Service location
 * GET http://localhost:3030
