@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
+import org.springframework.scheduling.annotation.Async;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +16,7 @@ import java.io.StringWriter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class ScriptInfo implements Runnable{
+public class ScriptInfo{
 
     private final static Logger LOGGER = LogManager.getLogger(ScriptInfo.class);
     private final String name;
@@ -41,8 +42,8 @@ public class ScriptInfo implements Runnable{
         this.context = context;
     }
 
-    @Override
-    public void run() {
+
+    public void runScript() {
         try {
             LOGGER.info(String.format("Attempting to run a script [%s]", name));
             synchronized (this) {

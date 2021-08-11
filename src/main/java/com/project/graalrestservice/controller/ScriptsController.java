@@ -1,5 +1,6 @@
 package com.project.graalrestservice.controller;
 
+import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
@@ -39,7 +40,8 @@ public class ScriptsController {
     public String runScript(@RequestBody String script, @PathVariable String scriptName, HttpServletRequest request) {
         int id = getId();
         LOGGER.info(String.format("A new script is requested[%d] to run", id));
-        String output = scriptService.addScript(scriptName, script, request.getRequestURL().toString());
+        ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString());
+        String output = scriptService.startScript(scriptInfo);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
         return output;
     }

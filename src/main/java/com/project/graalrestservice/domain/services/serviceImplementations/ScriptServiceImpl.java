@@ -14,6 +14,8 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.io.OutputStream;
@@ -25,8 +27,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Autowired
     private ScriptRepository scriptRepository;
-    @Autowired
-    private ExecutorService executorService;
+
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
     private final String[] illegalNamespace = new String[]{"filter"};
 
@@ -36,7 +37,7 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public String addScript(String scriptName, String script, String link) {
+    public ScriptInfo addScript(String scriptName, String script, String link) {
         checkName(scriptName);
         OutputStream outputStream = new CircularOutputStream(65536);
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
@@ -44,12 +45,18 @@ public class ScriptServiceImpl implements ScriptService {
             Value value = context.parse("js", script);
             ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, link, outputStream, value, context);
             scriptRepository.put(scriptName, scriptInfo);
-            executorService.execute(scriptInfo);
-            return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
+            return scriptInfo;
         } catch (PolyglotException e) {
             context.close();
             throw new WrongScriptException(e.getMessage());
         }
+    }
+
+    @Override
+    @Async
+    public String startScript(ScriptInfo scriptInfo) {
+        scriptInfo.runScript();
+        return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
     }
 
     @Override
@@ -85,9 +92,8 @@ public class ScriptServiceImpl implements ScriptService {
     public ScriptServiceImpl() {
     }
 
-    public ScriptServiceImpl(ScriptRepository scriptRepository, ExecutorService executorService) {
+    public ScriptServiceImpl(ScriptRepository scriptRepository) {
         this.scriptRepository = scriptRepository;
-        this.executorService = executorService;
     }
 
 }
