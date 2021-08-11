@@ -19,6 +19,8 @@ public interface ScriptService {
     public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page);
 
     @Async
-    public String startScript(ScriptInfo scriptInfo);
+    public String startScriptAsynchronously(ScriptInfo scriptInfo);
+
+    public String startScriptSynchronously(ScriptInfo scriptInfo);
 
 }

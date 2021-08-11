@@ -54,7 +54,12 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     @Async
-    public String startScript(ScriptInfo scriptInfo) {
+    public String startScriptAsynchronously(ScriptInfo scriptInfo) {
+        scriptInfo.runScript();
+        return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
+    }
+
+    public String startScriptSynchronously(ScriptInfo scriptInfo) {
         scriptInfo.runScript();
         return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
     }

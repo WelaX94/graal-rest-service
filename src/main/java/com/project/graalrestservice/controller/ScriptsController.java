@@ -4,6 +4,7 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,23 @@ public class ScriptsController {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
-    public String runScript(@RequestBody String script, @PathVariable String scriptName, HttpServletRequest request) {
+    public ScriptInfoForSingle runScript(
+            @RequestBody String script,
+            @PathVariable String scriptName,
+            @RequestParam(required=false) String api,
+            HttpServletRequest request) {
         int id = getId();
         LOGGER.info(String.format("A new script is requested[%d] to run", id));
-        ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString());
-        String output = scriptService.startScript(scriptInfo);
-        LOGGER.info(String.format("Request[%d] successfully processed", id));
-        return output;
+        if (api == null) api = "f";
+        api = api.toLowerCase();
+        if (api.equals("b") || api.equals("f") ) {
+            ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString());
+            if (api.equals("f")) scriptService.startScriptAsynchronously(scriptInfo);
+            else scriptService.startScriptSynchronously(scriptInfo);
+            LOGGER.info(String.format("Request[%d] successfully processed", id));
+            return new ScriptInfoForSingle(scriptInfo);
+        }
+        else throw new WrongArgumentException("Unknown API option: " + api);
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)

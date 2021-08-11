@@ -25,8 +25,7 @@ public class CommonConfig {
 
     @Value("${executor.threadNamePrefix}")
     private String threadNamePrefix;
-
-
+    
     @Bean
     public Executor scriptExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
