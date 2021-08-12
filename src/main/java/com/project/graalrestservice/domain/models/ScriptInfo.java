@@ -134,6 +134,8 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
                 }
 
             }
+            outputStream.write(outputInfo.getBytes());
+            outputStream.flush();
     }
 
 }
