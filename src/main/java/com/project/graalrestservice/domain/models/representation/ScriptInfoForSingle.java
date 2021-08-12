@@ -18,7 +18,6 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
     private final String logs;
-    private final ScriptInfo fullScript;
 
     public ScriptInfoForSingle(ScriptInfo script) {
         this.name = script.getName();
@@ -27,7 +26,6 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
         this.startTime = script.getStartTime();
         this.endTime = script.getEndTime();
         this.logs = script.getLink() + "/logs";
-        this.fullScript = script;
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
     }
@@ -49,9 +47,6 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     }
     public String getLogs() {
         return logs;
-    }
-    public String returnFullLogs() {
-        return fullScript.getLogStream().toString() + fullScript.getOutputInfo();
     }
 
 }

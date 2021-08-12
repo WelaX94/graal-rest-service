@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -70,9 +71,21 @@ public class ScriptsController {
     public String getScriptLogs(@PathVariable String scriptName) {
         int id = getId();
         LOGGER.info(String.format("Script logs request[%d] received", id));
-        String logs = scriptService.getScriptInfo(scriptName).returnFullLogs();
+        String logs = scriptService.getScriptLogs(scriptName);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
         return logs;
+    }
+
+    @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.PUT)
+    public StreamingResponseBody runScriptWithLogsStreaming(
+            @RequestBody String script,
+            @PathVariable String scriptName,
+            HttpServletRequest request) {
+        int id = getId();
+        LOGGER.info(String.format("Script run with logs streaming request[%d] received", id));
+        ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString());
+        LOGGER.info(String.format("Request[%d] successfully processed", id));
+        return scriptInfo;
     }
 
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
@@ -94,5 +107,37 @@ public class ScriptsController {
     private synchronized int getId() {
         return requestId++;
     }
+
+
+
+
+
+    @RequestMapping(value = "/{scriptName}/lo", method = RequestMethod.GET)
+    public StreamingResponseBody runScriptWithLogsStreamingAAAA(
+            @PathVariable String scriptName,
+            HttpServletRequest request) {
+        int id = getId();
+        LOGGER.info(String.format("Script run with logs streaming request[%d] received", id));
+        ScriptInfo scriptInfo = scriptService.addScript(scriptName, "function wait(ms){\n" +
+                "   var start = new Date().getTime();\n" +
+                "   var end = start;\n" +
+                "   while(end < start + ms) {\n" +
+                "     end = new Date().getTime();\n" +
+                "  }\n" +
+                "}\n" +
+                "\n" +
+                "for(let a = 0; a < 10; a++) {\n" +
+                "    console.log(a);\n" +
+                "    wait(100);\n" +
+                "}", request.getRequestURL().toString());
+        LOGGER.info(String.format("Request[%d] successfully processed", id));
+        return scriptInfo;
+    }
+
+
+
+
+
+
 
 }

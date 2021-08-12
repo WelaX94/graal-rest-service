@@ -1,37 +1,37 @@
 package com.project.graalrestservice.domain.models;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutorService;
 
-public class ScriptInfo{
+public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     private final static Logger LOGGER = LogManager.getLogger(ScriptInfo.class);
     private final String name;
     private final String script;
     private volatile ScriptStatus status;
     private final String link;
-    private final OutputStream logStream;
-    private String outputInfo = "";
+    private final CircularOutputStream logStream;
     private final LocalDateTime createTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private final Value value;
     private final Context context;
+    private final ExecutorService executorService;
+    private String outputInfo;
 
-    public ScriptInfo(String name, String script, String link, OutputStream logStream, Value value, Context context) {
+    public ScriptInfo(String name, String script, String link, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService) {
         this.name = name;
         this.script = script;
         this.link = link;
@@ -40,10 +40,11 @@ public class ScriptInfo{
         this.logStream = logStream;
         this.value = value;
         this.context = context;
+        this.executorService = executorService;
     }
 
-
-    public void runScript() {
+    @Override
+    public void run() {
         try {
             LOGGER.info(String.format("Attempting to run a script [%s]", name));
             synchronized (this) {
@@ -91,17 +92,14 @@ public class ScriptInfo{
     public String getScript() {
         return script;
     }
-    public ScriptStatus getScriptStatus() {
+    public synchronized ScriptStatus getScriptStatus() {
         return status;
     }
     public String getLink() {
         return link;
     }
-    public OutputStream getLogStream() {
-        return logStream;
-    }
-    public String getOutputInfo() {
-        return outputInfo;
+    public String getOutputLogs() {
+        return logStream.toString() + outputInfo;
     }
     public String getExecutionTime(){
         Duration duration = Duration.between(startTime, endTime);
@@ -118,6 +116,24 @@ public class ScriptInfo{
     }
     public void closeContext() {
         context.close(true);
+    }
+
+    @Override
+    public void writeTo(OutputStream outputStream) throws IOException {
+            executorService.execute(this);
+            while (getScriptStatus() == ScriptStatus.RUNNING || getScriptStatus() == ScriptStatus.IN_QUEUE || !logStream.isReadComplete()) {
+
+                while (!logStream.isReadComplete()) {
+                    outputStream.write(logStream.getCurrentByte());
+                    outputStream.flush();
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
     }
 
 }

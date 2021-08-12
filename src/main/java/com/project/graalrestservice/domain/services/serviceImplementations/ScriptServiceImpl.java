@@ -14,11 +14,8 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
-import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
@@ -27,6 +24,9 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Autowired
     private ScriptRepository scriptRepository;
+
+    @Autowired
+    private ExecutorService executorService;
 
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
     private final String[] illegalNamespace = new String[]{"filter"};
@@ -39,11 +39,12 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public ScriptInfo addScript(String scriptName, String script, String link) {
         checkName(scriptName);
-        OutputStream outputStream = new CircularOutputStream(65536);
+        CircularOutputStream outputStream = new CircularOutputStream(65536);
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
         try {
             Value value = context.parse("js", script);
-            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, link, outputStream, value, context);
+
+            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, link, outputStream, value, context, executorService);
             scriptRepository.put(scriptName, scriptInfo);
             return scriptInfo;
         } catch (PolyglotException e) {
@@ -53,20 +54,22 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    @Async
-    public String startScriptAsynchronously(ScriptInfo scriptInfo) {
-        scriptInfo.runScript();
-        return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
+    public void startScriptAsynchronously(ScriptInfo scriptInfo) {
+        executorService.execute(scriptInfo);
     }
 
-    public String startScriptSynchronously(ScriptInfo scriptInfo) {
-        scriptInfo.runScript();
-        return "The script is received and added to the execution queue.\nDetailed information: " + scriptInfo.getLink();
+    public void startScriptSynchronously(ScriptInfo scriptInfo) {
+        scriptInfo.run();
     }
 
     @Override
     public ScriptInfoForSingle getScriptInfo(String scriptName) {
         return new ScriptInfoForSingle(scriptRepository.get(scriptName));
+    }
+
+    @Override
+    public String getScriptLogs(String scriptName) {
+        return scriptRepository.get(scriptName).getOutputLogs();
     }
 
     @Override

@@ -6,9 +6,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 @ComponentScan("com.project.graalrestservice")
@@ -25,16 +24,10 @@ public class CommonConfig {
 
     @Value("${executor.threadNamePrefix}")
     private String threadNamePrefix;
-    
+
     @Bean
-    public Executor scriptExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePoolSize);
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setThreadNamePrefix(threadNamePrefix);
-        executor.initialize();
-        return executor;
+    public ExecutorService threadPoolTaskExecutor() {
+        return Executors.newFixedThreadPool(corePoolSize);
     }
 
 }
