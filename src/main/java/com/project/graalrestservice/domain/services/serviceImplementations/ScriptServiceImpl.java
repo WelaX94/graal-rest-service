@@ -43,7 +43,6 @@ public class ScriptServiceImpl implements ScriptService {
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
         try {
             Value value = context.parse("js", script);
-
             ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, logsLink, outputStream, value, context, executorService);
             scriptRepository.put(scriptName, scriptInfo);
             return scriptInfo;
@@ -58,6 +57,7 @@ public class ScriptServiceImpl implements ScriptService {
         executorService.execute(scriptInfo);
     }
 
+    @Override
     public void startScriptSynchronously(ScriptInfo scriptInfo) {
         scriptInfo.run();
     }

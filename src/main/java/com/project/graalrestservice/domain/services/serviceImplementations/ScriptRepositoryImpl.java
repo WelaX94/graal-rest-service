@@ -33,14 +33,6 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page) {
-        Set<ScriptInfoForList> scriptSet;
-        if (filters == null || filters.equalsIgnoreCase("basic")) {
-            filters = "basic";
-            scriptSet = getDefaultSortedScripts();
-        } else {
-            scriptSet = getFilteredAndSortedScripts(filters);
-        }
-
         if (page == null) {
             page = 1;
         } else {
@@ -53,15 +45,27 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             if (pageSize < 1) throw new WrongArgumentException("The page size cannot be less than 1");
         }
 
-        List<ScriptInfoForList> list = new ArrayList<>(scriptSet);
+        Set<ScriptInfoForList> scriptSet;
+        if (filters == null || filters.equalsIgnoreCase("basic")) {
+            filters = "basic";
+            scriptSet = getDefaultSortedScripts();
+        } else {
+            scriptSet = getFilteredAndSortedScripts(filters);
+        }
+
         int end = page * pageSize;
         int start = end - pageSize;
-        int listSize = list.size();
+        int listSize = scriptSet.size();
         if (start >= listSize) throw new WrongArgumentException(page);
+
+        int count = 0;
         List<ScriptInfoForList> output = new ArrayList<>(pageSize);
-        for ( ; start < end && start < listSize; start++) {
-            output.add(list.get(start));
+        for (ScriptInfoForList scriptInfoForList: scriptSet) {
+            if (count++ < start) continue;
+            output.add(scriptInfoForList);
+            if (count >= end || count >= listSize) break;
         }
+
         return new ScriptListPage(output, page, listSize, filters, pageSize);
     }
 
