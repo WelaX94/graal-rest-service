@@ -10,7 +10,7 @@ public class CircularOutputStream extends OutputStream{
     private int position = 0;
     private boolean completed = false;
     private int readPosition = 0;
-    private boolean readComplete;
+    private boolean readComplete = true;
 
     public CircularOutputStream(int capacity) {
         buf = new byte[capacity];
@@ -45,17 +45,12 @@ public class CircularOutputStream extends OutputStream{
         }
     }
 
-    public byte getCurrentByte() {
+    public byte getNextByte() {
+        if (readComplete) throw new ArrayIndexOutOfBoundsException("Read has already complete");
+        byte currentByte = buf[readPosition++];
         if (readPosition == capacity) readPosition = 0;
-        while (readPosition == position) {
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        if (readPosition + 1 == position) readComplete = true;
-        return buf[readPosition++];
+        if (readPosition == position) readComplete = true;
+        return currentByte;
     }
 
     public synchronized boolean isReadComplete() {

@@ -37,14 +37,14 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public ScriptInfo addScript(String scriptName, String script, String link) {
+    public ScriptInfo addScript(String scriptName, String script, String logsLink) {
         checkName(scriptName);
         CircularOutputStream outputStream = new CircularOutputStream(65536);
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
         try {
             Value value = context.parse("js", script);
 
-            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, link, outputStream, value, context, executorService);
+            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, logsLink, outputStream, value, context, executorService);
             scriptRepository.put(scriptName, scriptInfo);
             return scriptInfo;
         } catch (PolyglotException e) {

@@ -21,7 +21,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     private final String name;
     private final String script;
     private volatile ScriptStatus status;
-    private final String link;
+    private final String logsLink;
     private final CircularOutputStream logStream;
     private final LocalDateTime createTime;
     private LocalDateTime startTime;
@@ -29,18 +29,20 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     private final Value value;
     private final Context context;
     private final ExecutorService executorService;
+    private String inputInfo;
     private String outputInfo;
 
-    public ScriptInfo(String name, String script, String link, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService) {
+    public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService) {
         this.name = name;
         this.script = script;
-        this.link = link;
+        this.logsLink = logsLink;
         this.status = ScriptStatus.IN_QUEUE;
         this.createTime = LocalDateTime.now();
         this.logStream = logStream;
         this.value = value;
         this.context = context;
         this.executorService = executorService;
+        this.inputInfo = String.format("%s\tScript created and added to the execution queue\n", createTime);
     }
 
     @Override
@@ -50,14 +52,13 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
             synchronized (this) {
                 status = ScriptStatus.RUNNING;
                 startTime = LocalDateTime.now();
-                logStream.write(startTime.toString().getBytes());
-                logStream.write("\tAttempting to run a script\n".getBytes());
+                inputInfo += startTime + "\tAttempting to run a script\n";
             }
             value.execute();
             synchronized (this) {
                 endTime = LocalDateTime.now();
                 status = ScriptStatus.EXECUTION_SUCCESSFUL;
-                outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.";
+                outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.\n";
             }
             LOGGER.info(String.format("Script [%s] execution completed successfully", name));
         }
@@ -69,13 +70,10 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
-                outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.";
+                outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.\n";
             }
             LOGGER.info(String.format("Script [%s] execution failed. %s", name, e.getMessage()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
+        } finally {
             context.close();
         }
     }
@@ -95,11 +93,12 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     public synchronized ScriptStatus getScriptStatus() {
         return status;
     }
-    public String getLink() {
-        return link;
+    public String getLogsLink() {
+        return logsLink;
     }
     public String getOutputLogs() {
-        return logStream.toString() + outputInfo;
+        if (outputInfo == null) return inputInfo + logStream.toString();
+        else return inputInfo + logStream.toString() + outputInfo;
     }
     public String getExecutionTime(){
         Duration duration = Duration.between(startTime, endTime);
@@ -120,22 +119,31 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
-            executorService.execute(this);
-            while (getScriptStatus() == ScriptStatus.RUNNING || getScriptStatus() == ScriptStatus.IN_QUEUE || !logStream.isReadComplete()) {
-
-                while (!logStream.isReadComplete()) {
-                    outputStream.write(logStream.getCurrentByte());
-                    outputStream.flush();
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+        outputStream.write(inputInfo.getBytes());
+        outputStream.flush();
+        executorService.execute(this);
+        while (getScriptStatus() == ScriptStatus.IN_QUEUE) {
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            outputStream.write(outputInfo.getBytes());
-            outputStream.flush();
+        }
+        outputStream.write(String.format("%s\tAttempting to run a script\n", startTime).getBytes());
+        outputStream.flush();
+        while (getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
+            while (!logStream.isReadComplete()) {
+                outputStream.write(logStream.getNextByte());
+                outputStream.flush();
+            }
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        outputStream.write(outputInfo.getBytes());
+        outputStream.flush();
     }
 
 }
