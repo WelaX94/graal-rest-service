@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * Helpful class for displaying partial information about the script in the list
+ */
 public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> implements Comparable<ScriptInfoForList>{
 
     private final static ScriptStatus.Priority defaultPriority = new ScriptStatus.Priority();
@@ -18,6 +21,13 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
     private final LocalDateTime createdTime;
     private final ScriptStatus.Priority scriptStatusPriority;
 
+    /**
+     * Class constructor using custom script priority for sorting
+     * @param name script name (identifier)
+     * @param scriptInfo the main scriptInfo containing all the information about the script
+     * @param scriptStatusPriority custom script priority for sorting
+     * @see ScriptStatus.Priority
+     */
     public ScriptInfoForList(String name, ScriptInfo scriptInfo, ScriptStatus.Priority scriptStatusPriority) {
         this.name = name;
         this.status = scriptInfo.getScriptStatus();
@@ -26,10 +36,21 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
     }
 
+    /**
+     * Class constructor using default script priority for sorting
+     * @param name script name (identifier)
+     * @param scriptInfo the main scriptInfo containing all the information about the script
+     * @see ScriptStatus.Priority
+     */
     public ScriptInfoForList(String name, ScriptInfo scriptInfo) {
         this(name, scriptInfo, defaultPriority);
     }
 
+    /**
+     * The method calculates which of the two scripts is larger
+     * @param script the script with which you want to compare the current
+     * @return >0 if the current script is larger, <0 if the current script is smaller and 0 if they are equal
+     */
     @Override
     public int compareTo(ScriptInfoForList script) {
         if (scriptStatusPriority.getPriority(this.status) == scriptStatusPriority.getPriority(script.getStatus())) {

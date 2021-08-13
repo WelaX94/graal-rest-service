@@ -8,6 +8,9 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * Helpful class to display a list of scripts
+ */
 public class ScriptListPage extends RepresentationModel<ScriptListPage> {
 
     private final int page;
@@ -16,6 +19,14 @@ public class ScriptListPage extends RepresentationModel<ScriptListPage> {
     private final int scriptsOnPage;
     private final List<ScriptInfoForList> scriptList;
 
+    /**
+     * Basic constructor
+     * @param scriptList script sheet to display
+     * @param pageNumber desired page
+     * @param totalScripts the total number of scripts that match the specified filters
+     * @param filters filter list
+     * @param pageSize page size
+     */
     public ScriptListPage(List<ScriptInfoForList> scriptList, Integer pageNumber, int totalScripts, String filters, Integer pageSize) {
         this.scriptList = scriptList;
         this.totalScripts = totalScripts;

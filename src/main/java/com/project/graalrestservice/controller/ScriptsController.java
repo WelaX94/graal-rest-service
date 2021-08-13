@@ -48,7 +48,7 @@ public class ScriptsController {
     }
 
     /**
-     * Method for adding a new script to the run queue !!!SEE scriptService!!!
+     * Method for adding a new script to the run queue
      * @param script JS script
      * @param scriptName script name (identifier)
      * @param api selecting a blocking or non-blocking api

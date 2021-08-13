@@ -15,6 +15,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * A class that contains all the information about the script, as well as the code to run it
+ */
 public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     private final static Logger LOGGER = LogManager.getLogger(ScriptInfo.class);
@@ -32,6 +35,16 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     private String inputInfo;
     private String outputInfo;
 
+    /**
+     * Basic constructor
+     * @param name script name (identifier)
+     * @param script JS script
+     * @param logsLink link for script output logs
+     * @param logStream stream to record logs
+     * @param value Value used to run the script processing
+     * @param context Context, which handles the script
+     * @param executorService service to start a new thread
+     */
     public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService) {
         this.name = name;
         this.script = script;
@@ -45,6 +58,9 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         this.inputInfo = String.format("%s\tScript created and added to the execution queue\n", createTime);
     }
 
+    /**
+     * The method used to run the script processing. Can be executed asynchronously by passing the current object to the Executor Service
+     */
     @Override
     public void run() {
         try {
@@ -78,6 +94,9 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         }
     }
 
+    /**
+     * The method needed to stop the script
+     */
     public synchronized void stopScriptExecution(){
         if (status != ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("You cannot stop a script that is not running", status);
@@ -117,6 +136,11 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         context.close(true);
     }
 
+    /**
+     * The method required to run a script with the ability to stream logs in real time
+     * @param outputStream stream, through which the logs will be streamed
+     * @throws IOException
+     */
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
         outputStream.write(inputInfo.getBytes());

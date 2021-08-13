@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
+/**
+ * A class for processing commands over scripts
+ */
 @Service
 public class ScriptServiceImpl implements ScriptService {
 
@@ -31,11 +34,26 @@ public class ScriptServiceImpl implements ScriptService {
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
     private final String[] illegalNamespace = new String[]{"filter"};
 
+    /**
+     * A method to get a script page with specified parameters
+     * @param filters filter list
+     * @param pageSize page size
+     * @param page page
+     * @return ScriptListPage with specified parameters
+     */
     @Override
     public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page) {
         return scriptRepository.getScriptListPage(filters, pageSize, page);
     }
 
+    /**
+     * A method for checking a script for validity and adding it to the list of scripts
+     * @param scriptName script name (identifier)
+     * @param script JS script
+     * @param logsLink link to script output logs page
+     * @return ScriptInfo with information about the script
+     * @throws WrongScriptException if script has syntax error
+     */
     @Override
     public ScriptInfo addScript(String scriptName, String script, String logsLink) {
         checkName(scriptName);
@@ -52,31 +70,58 @@ public class ScriptServiceImpl implements ScriptService {
         }
     }
 
+    /**
+     * Method for running the script in asynchronous mode
+     * @param scriptInfo ScriptInfo of the script to run
+     */
     @Override
     public void startScriptAsynchronously(ScriptInfo scriptInfo) {
         executorService.execute(scriptInfo);
     }
 
+    /**
+     * Method for running the script in synchronous mode
+     * @param scriptInfo ScriptInfo of the script to run
+     */
     @Override
     public void startScriptSynchronously(ScriptInfo scriptInfo) {
         scriptInfo.run();
     }
 
+    /**
+     * A method to get information about the script you are looking for
+     * @param scriptName script name (identifier)
+     * @return ScriptInfoForSingle with information for a single display
+     */
     @Override
     public ScriptInfoForSingle getScriptInfo(String scriptName) {
         return new ScriptInfoForSingle(scriptRepository.get(scriptName));
     }
 
+    /**
+     * A method for retrieving the script logs
+     * @param scriptName script name (identifier)
+     * @return String with script logs
+     */
     @Override
     public String getScriptLogs(String scriptName) {
         return scriptRepository.get(scriptName).getOutputLogs();
     }
 
+    /**
+     * Method for stopping a running script
+     * @param scriptName script name (identifier)
+     */
     @Override
     public void stopScript(String scriptName) {
         scriptRepository.get(scriptName).stopScriptExecution();
     }
 
+    /**
+     * Method for removing a script from the list
+     * @param scriptName script name (identifier)
+     * @throws WrongScriptException if script is running
+     */
     @Override
     public void deleteScript(String scriptName) {
         final ScriptInfo scriptInfo = scriptRepository.get(scriptName);
@@ -88,6 +133,11 @@ public class ScriptServiceImpl implements ScriptService {
         }
     }
 
+    /**
+     * A method for checking a script name for forbidden words and characters
+     * @param scriptName script name (identifier)
+     * @throws WrongNameException if script name contains forbidden words and symbols
+     */
     private void checkName(String scriptName) {
         if (!correctlyScriptName.matcher(scriptName).matches())
             throw new WrongNameException("The name uses illegal characters or exceeds the allowed length");

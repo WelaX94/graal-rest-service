@@ -6,6 +6,9 @@ import org.springframework.hateoas.RepresentationModel;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
+/**
+ * A class for outputting single messages in JSON format
+ */
 public class Info extends RepresentationModel<Info> {
 
     private String info;

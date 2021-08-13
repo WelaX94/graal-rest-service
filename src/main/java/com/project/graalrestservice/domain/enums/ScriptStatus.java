@@ -21,7 +21,7 @@ public enum ScriptStatus {
     }
 
     /**
-     * A helpful class for setting the status priority
+     * A helpful subclass for setting the status priority
      */
     public static class Priority {
 
@@ -31,6 +31,9 @@ public enum ScriptStatus {
         private int failed;
         private int canceled;
 
+        /**
+         * Constructor to create a default priority type
+         */
         public Priority() {
             successful = 0;
             failed = 0;
@@ -39,6 +42,10 @@ public enum ScriptStatus {
             queue = 2;
         }
 
+        /**
+         * Constructor assigns "weight" to each status based on the serial number of the corresponding filter
+         * @param filters filter list
+         */
         public Priority(String filters) {
             int count = 1;
             for(int f = 0; f < filters.length(); f++) {
@@ -62,6 +69,11 @@ public enum ScriptStatus {
             }
         }
 
+        /**
+         * Method for obtaining the "weight" of the desired status
+         * @param scriptStatus desired status
+         * @return filter "weight"
+         */
         public int getPriority(ScriptStatus scriptStatus) {
             switch (scriptStatus) {
                 case IN_QUEUE:

@@ -13,17 +13,32 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A class for working with a list of scripts
+ */
 @Service
 public class ScriptRepositoryImpl implements ScriptRepository {
 
     private final ConcurrentHashMap<String, ScriptInfo> map;
     private final List<Character> correctFilters = new ArrayList<>(List.of('q', 'r', 's', 'f', 'c'));
 
+    /**
+     * Adds a new script to the map
+     * @param scriptName script name (identifier)
+     * @param scriptInfo script info, contains all the information about the script
+     * @throws WrongNameException if a script with this name already exists
+     */
     @Override
     public void put(String scriptName, ScriptInfo scriptInfo) {
         if (map.putIfAbsent(scriptName, scriptInfo) != null) throw new WrongNameException("Such a name is already in use");
     }
 
+    /**
+     * The method returns information about the script you are looking for
+     * @param scriptName script name (identifier)
+     * @return ScriptInfo with information about the script
+     * @throws ScriptNotFoundException if script not found
+     */
     @Override
     public ScriptInfo get(String scriptName) {
         ScriptInfo scriptInfo = map.get(scriptName);
@@ -31,6 +46,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return scriptInfo;
     }
 
+    /**
+     * A method to get the script list page
+     * @param filters filter list
+     * @param pageSize page size
+     * @param page page number
+     * @return ScriptListPage filtered and sorted by specified parameters
+     * @throws WrongArgumentException if page or pageSize less than 1. Also discarded if the list is empty for a given page
+     */
     @Override
     public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page) {
         if (page == null) {
@@ -69,6 +92,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return new ScriptListPage(output, page, listSize, filters, pageSize);
     }
 
+    /**
+     * A method to get a filtered and sorted set of scripts by specified parameters
+     * @param filters filter list
+     * @return TreeSet of scripts
+     */
     private Set<ScriptInfoForList> getFilteredAndSortedScripts(String filters) {
         checkFilter(filters);
         final ScriptStatus.Priority scriptStatusPriority = new ScriptStatus.Priority(filters);
@@ -86,6 +114,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return set;
     }
 
+    /**
+     * A method to get a set of filters in default sorted order
+     * @return TreeSet of scripts
+     */
     private Set<ScriptInfoForList> getDefaultSortedScripts() {
         final Set<ScriptInfoForList> set = new TreeSet<>();
         for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
@@ -94,6 +126,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return set;
     }
 
+    /**
+     * Method for checking the validity of the filter list
+     * @param filter filter list
+     * @throws WrongArgumentException if length of the filter list more than 5 characters or or if there is an invalid filter in the list
+     */
     private void checkFilter(String filter) {
         if (filter.length() > 5) throw new WrongArgumentException("The length of the filter can not exceed 5 characters");
         final List<Character> correctFiltersList = new ArrayList<>(correctFilters);
@@ -111,6 +148,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
     }
 
+    /**
+     * Method for removing a script from the list
+     * @param scriptName script name (identifier)
+     * @throws ScriptNotFoundException if script not found
+     */
     @Override
     public void delete(String scriptName) {
         if(map.remove(scriptName) == null) throw new ScriptNotFoundException(scriptName);

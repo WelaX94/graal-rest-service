@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * Helpful class for displaying information about one script
+ */
 public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle> {
 
     private final String name;
@@ -19,6 +22,10 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     private final LocalDateTime endTime;
     private final String logsLink;
 
+    /**
+     * Basic constructor
+     * @param script the main scriptInfo containing all the information about the script
+     */
     public ScriptInfoForSingle(ScriptInfo script) {
         this.name = script.getName();
         this.status = script.getScriptStatus();
