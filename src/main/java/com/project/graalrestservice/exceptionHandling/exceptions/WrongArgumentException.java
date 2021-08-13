@@ -1,6 +1,7 @@
 package com.project.graalrestservice.exceptionHandling.exceptions;
 
 public class WrongArgumentException extends RuntimeException{
+
     public final boolean listIsOver;
 
     public WrongArgumentException(String message) {
