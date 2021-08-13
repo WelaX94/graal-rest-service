@@ -108,36 +108,4 @@ public class ScriptsController {
         return requestId++;
     }
 
-
-
-
-
-    @RequestMapping(value = "/{scriptName}/lo", method = RequestMethod.GET)
-    public StreamingResponseBody runScriptWithLogsStreamingAAAA(
-            @PathVariable String scriptName,
-            HttpServletRequest request) {
-        int id = getId();
-        LOGGER.info(String.format("Script run with logs streaming request[%d] received", id));
-        ScriptInfo scriptInfo = scriptService.addScript(scriptName, "function wait(ms){\n" +
-                "   var start = new Date().getTime();\n" +
-                "   var end = start;\n" +
-                "   while(end < start + ms) {\n" +
-                "     end = new Date().getTime();\n" +
-                "  }\n" +
-                "}\n" +
-                "\n" +
-                "for(let a = 0; a < 10; a++) {\n" +
-                "    console.log(a);\n" +
-                "    wait(100);\n" +
-                "}", request.getRequestURL().toString());
-        LOGGER.info(String.format("Request[%d] successfully processed", id));
-        return scriptInfo;
-    }
-
-
-
-
-
-
-
 }
