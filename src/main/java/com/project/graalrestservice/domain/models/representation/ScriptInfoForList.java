@@ -2,7 +2,6 @@ package com.project.graalrestservice.domain.models.representation;
 
 import com.project.graalrestservice.controller.ScriptsController;
 import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.enums.ScriptStatusPriority;
 import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -13,13 +12,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> implements Comparable<ScriptInfoForList>{
 
-    private final static ScriptStatusPriority defaultPriority = new ScriptStatusPriority();
+    private final static ScriptStatus.Priority defaultPriority = new ScriptStatus.Priority();
     private final String name;
     private final ScriptStatus status;
     private final LocalDateTime createdTime;
-    private final ScriptStatusPriority scriptStatusPriority;
+    private final ScriptStatus.Priority scriptStatusPriority;
 
-    public ScriptInfoForList(String name, ScriptInfo scriptInfo, ScriptStatusPriority scriptStatusPriority) {
+    public ScriptInfoForList(String name, ScriptInfo scriptInfo, ScriptStatus.Priority scriptStatusPriority) {
         this.name = name;
         this.status = scriptInfo.getScriptStatus();
         this.createdTime = scriptInfo.getCreateTime();

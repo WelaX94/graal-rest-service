@@ -1,6 +1,6 @@
 package com.project.graalrestservice.domain.services.serviceImplementations;
 
-import com.project.graalrestservice.domain.enums.ScriptStatusPriority;
+import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
 import com.project.graalrestservice.domain.models.representation.ScriptListPage;
@@ -71,7 +71,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     private Set<ScriptInfoForList> getFilteredAndSortedScripts(String filters) {
         checkFilter(filters);
-        final ScriptStatusPriority scriptStatusPriority = new ScriptStatusPriority(filters);
+        final ScriptStatus.Priority scriptStatusPriority = new ScriptStatus.Priority(filters);
         final Set<ScriptInfoForList> set = new TreeSet<>();
         OUTER:
         for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
