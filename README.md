@@ -23,6 +23,9 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
 > GET http://localhost:3030
 * Additional Information: You can use it to check the status of the server. Returns its own link and a link to the list of scripts.
 
+### Swagger documentation
+> GET http://localhost:3030/swagger-ui
+
 ### List of all scripts
 > GET http://localhost:3030/scripts
 * Additional Information: You can see the list of all scripts in JSON format, their execution status, and assigned address

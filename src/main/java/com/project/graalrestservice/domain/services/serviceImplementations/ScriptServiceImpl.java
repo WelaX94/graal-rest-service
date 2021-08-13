@@ -32,7 +32,7 @@ public class ScriptServiceImpl implements ScriptService {
     private ExecutorService executorService;
 
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
-    private final String[] illegalNamespace = new String[]{"filter"};
+    private final String[] illegalNamespace = new String[]{"swagger-ui"};
 
     /**
      * A method to get a script page with specified parameters

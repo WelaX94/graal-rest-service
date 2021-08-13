@@ -28,7 +28,7 @@ public class ScriptsController {
     private ScriptService scriptService;
 
     /**
-     * A method to get a list of scripts    !!!SEE scriptService!!!
+     * A method to get a list of scripts
      * @param filters list of filters to filter and sort the list of scripts
      * @param pageSize maximum number of scripts per page
      * @param page number of page
