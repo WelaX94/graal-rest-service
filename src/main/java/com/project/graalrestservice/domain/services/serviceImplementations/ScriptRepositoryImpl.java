@@ -37,13 +37,22 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         if (filters == null || filters.equalsIgnoreCase("basic")) {
             filters = "basic";
             scriptSet = getDefaultSortedScripts();
-        }
-        else {
+        } else {
             scriptSet = getFilteredAndSortedScripts(filters);
         }
-        if (page == null) page = 1;
-        if (pageSize == null) pageSize = 10;
-        if (page < 1) throw new WrongArgumentException("The page number cannot be less than 1");
+
+        if (page == null) {
+            page = 1;
+        } else {
+            if (page < 1) throw new WrongArgumentException("The page number cannot be less than 1");
+        }
+
+        if (pageSize == null) {
+            pageSize = 10;
+        } else {
+            if (pageSize < 1) throw new WrongArgumentException("The page size cannot be less than 1");
+        }
+
         List<ScriptInfoForList> list = new ArrayList<>(scriptSet);
         int end = page * pageSize;
         int start = end - pageSize;
