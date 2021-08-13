@@ -16,7 +16,7 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
 1. Build service in Jar file
    > mvn cln package
 2. Run service
-   > java -jar //FILE//
+   > java -jar ./target/graal-rest-service-0.0.1-SNAPSHOT.jar
 
 
 ### Service location
