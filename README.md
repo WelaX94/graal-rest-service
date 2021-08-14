@@ -41,7 +41,7 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
           
           You can combine filters or use them individually. The order in which they are placed in the query is the order in which the scripts will be rendered. Scripts equal in state are sorted by time of addition.
           
-       **Default sorting**: stopped = successful = failed < running < queue
+       **Default value**: basic (stopped = successful = failed < running < queue)
           
        Query examples:
           > http://localhost:3030/scripts/?filters=rcq
