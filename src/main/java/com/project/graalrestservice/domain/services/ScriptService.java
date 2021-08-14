@@ -7,7 +7,7 @@ import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 public interface ScriptService {
 
 
-    public ScriptInfo addScript(String name, String script, String logsLink);
+    public ScriptInfo addScript(String name, String script, String logsLink, boolean readable);
 
     public ScriptInfoForSingle getScriptInfo(String scriptName);
 

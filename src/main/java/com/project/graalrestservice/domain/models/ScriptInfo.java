@@ -103,39 +103,6 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         else closeContext();
     }
 
-    public String getName() {
-        return name;
-    }
-    public String getScript() {
-        return script;
-    }
-    public synchronized ScriptStatus getScriptStatus() {
-        return status;
-    }
-    public String getLogsLink() {
-        return logsLink;
-    }
-    public String getOutputLogs() {
-        if (outputInfo == null) return inputInfo + logStream.toString();
-        else return inputInfo + logStream.toString() + outputInfo;
-    }
-    public String getExecutionTime(){
-        Duration duration = Duration.between(startTime, endTime);
-        return String.format("%d.%03d", duration.getSeconds(), (duration.getNano() / 1_000_000));
-    }
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-    public void closeContext() {
-        context.close(true);
-    }
-
     /**
      * The method required to run a script with the ability to stream logs in real time
      * @param outputStream stream, through which the logs will be streamed
@@ -157,17 +124,68 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         outputStream.flush();
         while (getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
             while (!logStream.isReadComplete()) {
-                outputStream.write(logStream.getNextByte());
+                try {
+                    outputStream.write(logStream.getNextBytes());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 outputStream.flush();
-            }
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
         outputStream.write(outputInfo.getBytes());
         outputStream.flush();
+    }
+
+    /**
+     * A method to get the current status of the script
+     * @return current status of the script
+     */
+    public synchronized ScriptStatus getScriptStatus() {
+        return status;
+    }
+
+    /**
+     * A method to get the full output logs
+     * @return full output logs
+     */
+    public String getOutputLogs() {
+        if (outputInfo == null) return inputInfo + logStream.toString();
+        else return inputInfo + logStream.toString() + outputInfo;
+    }
+
+    /**
+     * A method to get the execution time of the script
+     * @return execution time of the script
+     */
+    public String getExecutionTime(){
+        Duration duration = Duration.between(startTime, endTime);
+        return String.format("%d.%03d", duration.getSeconds(), (duration.getNano() / 1_000_000));
+    }
+
+    /**
+     * Method for closing the context
+     */
+    public void closeContext() {
+        context.close(true);
+    }
+
+    public String getName() {
+        return name;
+    }
+    public String getScript() {
+        return script;
+    }
+    public String getLogsLink() {
+        return logsLink;
+    }
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
 }

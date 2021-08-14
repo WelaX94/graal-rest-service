@@ -31,6 +31,9 @@ public class ScriptServiceImpl implements ScriptService {
     @Autowired
     private ExecutorService executorService;
 
+    @org.springframework.beans.factory.annotation.Value("${scriptOutputStream.capacity}")
+    private int streamCapacity;
+
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
     private final String[] illegalNamespace = new String[]{"swagger-ui"};
 
@@ -51,13 +54,14 @@ public class ScriptServiceImpl implements ScriptService {
      * @param scriptName script name (identifier)
      * @param script JS script
      * @param logsLink link to script output logs page
+     * @param readable parameter indicates whether the logs will be read in real time or not
      * @return ScriptInfo with information about the script
      * @throws WrongScriptException if script has syntax error
      */
     @Override
-    public ScriptInfo addScript(String scriptName, String script, String logsLink) {
+    public ScriptInfo addScript(String scriptName, String script, String logsLink, boolean readable) {
         checkName(scriptName);
-        CircularOutputStream outputStream = new CircularOutputStream(65536);
+        CircularOutputStream outputStream = new CircularOutputStream(streamCapacity, readable);
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
         try {
             Value value = context.parse("js", script);

@@ -68,7 +68,7 @@ public class ScriptsController {
         if (api == null) api = "f";
         api = api.toLowerCase();
         if (api.equals("b") || api.equals("f") ) {
-            ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString());
+            ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString(), false);
             if (api.equals("f")) scriptService.startScriptAsynchronously(scriptInfo);
             else scriptService.startScriptSynchronously(scriptInfo);
             LOGGER.info(String.format("Request[%d] successfully processed", id));
@@ -121,7 +121,7 @@ public class ScriptsController {
             HttpServletRequest request) {
         int id = getId();
         LOGGER.info(String.format("Script run with logs streaming request[%d] received", id));
-        ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString());
+        ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString(), true);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
         return scriptInfo;
     }
