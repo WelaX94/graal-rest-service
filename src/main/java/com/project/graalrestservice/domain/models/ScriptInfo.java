@@ -3,6 +3,7 @@ package com.project.graalrestservice.domain.models;
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
@@ -37,12 +38,13 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     /**
      * Basic constructor
-     * @param name script name (identifier)
-     * @param script JS script
-     * @param logsLink link for script output logs
-     * @param logStream stream to record logs
-     * @param value Value used to run the script processing
-     * @param context Context, which handles the script
+     *
+     * @param name            script name (identifier)
+     * @param script          JS script
+     * @param logsLink        link for script output logs
+     * @param logStream       stream to record logs
+     * @param value           Value used to run the script processing
+     * @param context         Context, which handles the script
      * @param executorService service to start a new thread
      */
     public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService) {
@@ -77,8 +79,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
                 outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.\n";
             }
             LOGGER.info(String.format("Script [%s] execution completed successfully", name));
-        }
-        catch (PolyglotException e) {
+        } catch (PolyglotException e) {
             synchronized (this) {
                 endTime = LocalDateTime.now();
                 if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
@@ -97,7 +98,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     /**
      * The method needed to stop the script
      */
-    public synchronized void stopScriptExecution(){
+    public synchronized void stopScriptExecution() {
         if (status != ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("You cannot stop a script that is not running", status);
         else closeContext();
@@ -105,11 +106,13 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     /**
      * The method required to run a script with the ability to stream logs in real time
+     *
      * @param outputStream stream, through which the logs will be streamed
      * @throws IOException
      */
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
+
         outputStream.write(inputInfo.getBytes());
         outputStream.flush();
         executorService.execute(this);
@@ -117,27 +120,29 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("Client connection breakage. The script continues its work. " + e.getMessage());
             }
         }
         outputStream.write(String.format("%s\tAttempting to run a script\n", startTime).getBytes());
         outputStream.flush();
         while (getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
-            while (!logStream.isReadComplete()) {
-                try {
-                    outputStream.write(logStream.getNextBytes());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                outputStream.write(logStream.getNextBytes());
                 outputStream.flush();
+            } catch (ClientAbortException | InterruptedException e) {
+                LOGGER.error("Client connection breakage. The script continues its work. " + e.getMessage());
+                break;
             }
         }
+        logStream.disableRealTimeReading();
         outputStream.write(outputInfo.getBytes());
         outputStream.flush();
+
     }
 
     /**
      * A method to get the current status of the script
+     *
      * @return current status of the script
      */
     public synchronized ScriptStatus getScriptStatus() {
@@ -146,6 +151,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     /**
      * A method to get the full output logs
+     *
      * @return full output logs
      */
     public String getOutputLogs() {
@@ -155,9 +161,10 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     /**
      * A method to get the execution time of the script
+     *
      * @return execution time of the script
      */
-    public String getExecutionTime(){
+    public String getExecutionTime() {
         Duration duration = Duration.between(startTime, endTime);
         return String.format("%d.%03d", duration.getSeconds(), (duration.getNano() / 1_000_000));
     }
@@ -172,18 +179,23 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     public String getName() {
         return name;
     }
+
     public String getScript() {
         return script;
     }
+
     public String getLogsLink() {
         return logsLink;
     }
+
     public LocalDateTime getCreateTime() {
         return createTime;
     }
+
     public LocalDateTime getStartTime() {
         return startTime;
     }
+
     public LocalDateTime getEndTime() {
         return endTime;
     }

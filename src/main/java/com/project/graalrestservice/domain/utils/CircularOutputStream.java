@@ -1,5 +1,9 @@
 package com.project.graalrestservice.domain.utils;
 
+import com.project.graalrestservice.domain.models.ScriptInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -9,23 +13,24 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class CircularOutputStream extends OutputStream {
 
+    private final static Logger LOGGER = LogManager.getLogger(CircularOutputStream.class);
     private final byte[] buf;
     private final int capacity;
     private int position = 0;
     private boolean completed = false;
-    private final boolean readable;
+    private boolean realTimeReading;
     private ArrayBlockingQueue<Byte> queue;
 
     /**
      * Basic constructor
      * @param capacity stream capacity
-     * @param readable parameter indicates whether the logs will be read in real time or not
+     * @param realTimeReading parameter indicates whether the logs will be read in real time or not
      */
-    public CircularOutputStream(int capacity, boolean readable) {
+    public CircularOutputStream(int capacity, boolean realTimeReading) {
         buf = new byte[capacity];
         this.capacity = capacity;
-        this.readable = readable;
-        if (readable) this.queue = new ArrayBlockingQueue<>(capacity);
+        this.realTimeReading = realTimeReading;
+        if (realTimeReading) this.queue = new ArrayBlockingQueue<>(capacity);
 
     }
 
@@ -43,11 +48,11 @@ public class CircularOutputStream extends OutputStream {
             }
             buf[position++] = (byte) b;
         }
-        if (readable) {
+        if (realTimeReading) {
             try {
                 queue.put((byte) b);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to make an entry in the broadcast queue. " + e.getMessage());
             }
         }
     }
@@ -101,6 +106,16 @@ public class CircularOutputStream extends OutputStream {
      */
     public synchronized boolean isReadComplete() {
         return queue.isEmpty();
+    }
+
+    /**
+     * A method for turning off live stream reading. Clears the auxiliary queue
+     */
+    public void disableRealTimeReading() {
+        if (realTimeReading) {
+            queue.clear();
+            realTimeReading = false;
+        }
     }
 
 }
