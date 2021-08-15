@@ -112,32 +112,26 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
      */
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
-
-        outputStream.write(inputInfo.getBytes());
-        outputStream.flush();
-        executorService.execute(this);
-        while (getScriptStatus() == ScriptStatus.IN_QUEUE) {
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                LOGGER.error("Client connection breakage. The script continues its work. " + e.getMessage());
+        try {
+            outputStream.write(inputInfo.getBytes());
+            outputStream.flush();
+            executorService.execute(this);
+            while (getScriptStatus() == ScriptStatus.IN_QUEUE) {
+                Thread.sleep(100);
             }
-        }
-        outputStream.write(String.format("%s\tAttempting to run a script\n", startTime).getBytes());
-        outputStream.flush();
-        while (getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
-            try {
+            outputStream.write(String.format("%s\tAttempting to run a script\n", startTime).getBytes());
+            outputStream.flush();
+            while (getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
                 outputStream.write(logStream.getNextBytes());
                 outputStream.flush();
-            } catch (ClientAbortException | InterruptedException e) {
-                LOGGER.error("Client connection breakage. The script continues its work. " + e.getMessage());
-                break;
             }
+            outputStream.write(outputInfo.getBytes());
+            outputStream.flush();
+        } catch (ClientAbortException | InterruptedException e) {
+            LOGGER.error("Client connection breakage. The script continues its work. " + e.getMessage());
+        } finally {
+            logStream.disableRealTimeReading();
         }
-        logStream.disableRealTimeReading();
-        outputStream.write(outputInfo.getBytes());
-        outputStream.flush();
-
     }
 
     /**

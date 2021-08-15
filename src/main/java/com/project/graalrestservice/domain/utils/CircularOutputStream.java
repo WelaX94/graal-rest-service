@@ -1,6 +1,5 @@
 package com.project.graalrestservice.domain.utils;
 
-import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
