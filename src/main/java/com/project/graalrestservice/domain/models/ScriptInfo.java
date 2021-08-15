@@ -112,10 +112,10 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
      */
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
+        executorService.execute(this);
         try {
             outputStream.write(inputInfo.getBytes());
             outputStream.flush();
-            executorService.execute(this);
             while (getScriptStatus() == ScriptStatus.IN_QUEUE) {
                 Thread.sleep(100);
             }
