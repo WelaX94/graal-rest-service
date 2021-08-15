@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -56,9 +57,8 @@ public class ScriptsController {
      * @return JSON information about script
      * @see ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletRequest)
      * */
-    @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
-    public ScriptInfoForSingle runScript(
+    public ResponseEntity<ScriptInfoForSingle> runScript(
             @RequestBody String script,
             @PathVariable String scriptName,
             @RequestParam(required=false) String api,
@@ -68,11 +68,14 @@ public class ScriptsController {
         if (api == null) api = "f";
         api = api.toLowerCase();
         if (api.equals("b") || api.equals("f") ) {
-            ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString(), false);
+            ScriptInfo scriptInfo =
+                    scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString(), false);
             if (api.equals("f")) scriptService.startScriptAsynchronously(scriptInfo);
             else scriptService.startScriptSynchronously(scriptInfo);
             LOGGER.info(String.format("Request[%d] successfully processed", id));
-            return new ScriptInfoForSingle(scriptInfo);
+            return (api.equals("f")) ?
+                    (new ResponseEntity<ScriptInfoForSingle>(new ScriptInfoForSingle(scriptInfo), HttpStatus.ACCEPTED)) :
+                    (new ResponseEntity<ScriptInfoForSingle>(new ScriptInfoForSingle(scriptInfo), HttpStatus.CREATED));
         }
         else throw new WrongArgumentException("Unknown API option: " + api);
     }
@@ -114,6 +117,7 @@ public class ScriptsController {
      * @return the log broadcast in real time
      * @see ScriptsController#runScript(String, String, String, HttpServletRequest)
      */
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.PUT)
     public StreamingResponseBody runScriptWithLogsStreaming(
             @RequestBody String script,
