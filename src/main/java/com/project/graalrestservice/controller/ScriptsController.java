@@ -162,4 +162,10 @@ public class ScriptsController {
         return requestId++;
     }
 
+    public ScriptsController(){}
+
+    protected ScriptsController(ScriptService scriptService) {
+        this.scriptService = scriptService;
+    }
+
 }

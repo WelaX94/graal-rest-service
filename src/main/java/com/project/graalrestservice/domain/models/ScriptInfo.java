@@ -194,4 +194,18 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         return endTime;
     }
 
+    public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService, ScriptStatus scriptStatus) {
+        this.name = name;
+        this.script = script;
+        this.logsLink = logsLink;
+        this.status = ScriptStatus.IN_QUEUE;
+        this.createTime = LocalDateTime.now();
+        this.logStream = logStream;
+        this.value = value;
+        this.context = context;
+        this.executorService = executorService;
+        this.inputInfo = String.format("%s\tScript created and added to the execution queue\n", createTime);
+        this.status = scriptStatus;
+    }
+
 }
