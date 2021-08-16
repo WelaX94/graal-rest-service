@@ -28,8 +28,8 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
      * @param scriptStatusPriority custom script priority for sorting
      * @see ScriptStatus.Priority
      */
-    public ScriptInfoForList(String name, ScriptInfo scriptInfo, ScriptStatus.Priority scriptStatusPriority) {
-        this.name = name;
+    public ScriptInfoForList(ScriptInfo scriptInfo, ScriptStatus.Priority scriptStatusPriority) {
+        this.name = scriptInfo.getName();
         this.status = scriptInfo.getScriptStatus();
         this.createdTime = scriptInfo.getCreateTime();
         this.scriptStatusPriority = scriptStatusPriority;
@@ -43,7 +43,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
      * @see ScriptStatus.Priority
      */
     public ScriptInfoForList(String name, ScriptInfo scriptInfo) {
-        this(name, scriptInfo, defaultPriority);
+        this(scriptInfo, defaultPriority);
     }
 
     /**

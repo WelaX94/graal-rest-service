@@ -154,8 +154,10 @@ public class ScriptServiceImpl implements ScriptService {
     public ScriptServiceImpl() {
     }
 
-    public ScriptServiceImpl(ScriptRepository scriptRepository) {
+    public ScriptServiceImpl(ScriptRepository scriptRepository, ExecutorService executorService, int streamCapacity) {
         this.scriptRepository = scriptRepository;
+        this.executorService = executorService;
+        this.streamCapacity = streamCapacity;
     }
 
 }

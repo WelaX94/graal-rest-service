@@ -106,7 +106,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             final char letterStatus = entry.getValue().getScriptStatus().getLetter();
             for (int f = 0; f < filters.length(); f++) {
                 if (letterStatus == filters.charAt(f)) {
-                    set.add(new ScriptInfoForList(entry.getKey(), entry.getValue(), scriptStatusPriority));
+                    set.add(new ScriptInfoForList(entry.getValue(), scriptStatusPriority));
                     continue OUTER;
                 }
             }
