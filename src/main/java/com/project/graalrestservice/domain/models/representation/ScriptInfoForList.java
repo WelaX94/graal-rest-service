@@ -42,7 +42,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
      * @param scriptInfo the main scriptInfo containing all the information about the script
      * @see ScriptStatus.Priority
      */
-    public ScriptInfoForList(String name, ScriptInfo scriptInfo) {
+    public ScriptInfoForList(ScriptInfo scriptInfo) {
         this(scriptInfo, defaultPriority);
     }
 

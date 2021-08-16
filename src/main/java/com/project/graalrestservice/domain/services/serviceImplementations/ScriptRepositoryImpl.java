@@ -121,7 +121,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private Set<ScriptInfoForList> getDefaultSortedScripts() {
         final Set<ScriptInfoForList> set = new TreeSet<>();
         for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
-            set.add(new ScriptInfoForList(entry.getKey(), entry.getValue()));
+            set.add(new ScriptInfoForList(entry.getValue()));
         }
         return set;
     }
