@@ -61,6 +61,14 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     }
 
     /**
+     * Constructor required for tests
+     */
+    public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService, ScriptStatus scriptStatus) {
+        this(name, script, logsLink, logStream, value, context, executorService);
+        this.status = scriptStatus;
+    }
+
+    /**
      * The method used to run the script processing. Can be executed asynchronously by passing the current object to the Executor Service
      */
     @Override
@@ -192,20 +200,6 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
 
     public LocalDateTime getEndTime() {
         return endTime;
-    }
-
-    public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService, ScriptStatus scriptStatus) {
-        this.name = name;
-        this.script = script;
-        this.logsLink = logsLink;
-        this.status = ScriptStatus.IN_QUEUE;
-        this.createTime = LocalDateTime.now();
-        this.logStream = logStream;
-        this.value = value;
-        this.context = context;
-        this.executorService = executorService;
-        this.inputInfo = String.format("%s\tScript created and added to the execution queue\n", createTime);
-        this.status = scriptStatus;
     }
 
 }

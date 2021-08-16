@@ -25,17 +25,21 @@ import java.util.regex.Pattern;
 @Service
 public class ScriptServiceImpl implements ScriptService {
 
-    @Autowired
-    private ScriptRepository scriptRepository;
-
-    @Autowired
-    private ExecutorService executorService;
-
-    @org.springframework.beans.factory.annotation.Value("${scriptOutputStream.capacity}")
-    private int streamCapacity;
-
+    private final ScriptRepository scriptRepository;
+    private final ExecutorService executorService;
+    private final int streamCapacity;
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
     private final String[] illegalNamespace = new String[]{"swagger-ui"};
+
+    @Autowired
+    public ScriptServiceImpl(
+            ScriptRepository scriptRepository,
+            ExecutorService executorService,
+            @org.springframework.beans.factory.annotation.Value("${scriptOutputStream.capacity}") int streamCapacity) {
+        this.scriptRepository = scriptRepository;
+        this.executorService = executorService;
+        this.streamCapacity = streamCapacity;
+    }
 
     /**
      * A method to get a script page with specified parameters
@@ -149,15 +153,6 @@ public class ScriptServiceImpl implements ScriptService {
             if (name.equals(scriptName))
                 throw new WrongNameException("This name is reserved and is forbidden for use");
         }
-    }
-
-    public ScriptServiceImpl() {
-    }
-
-    public ScriptServiceImpl(ScriptRepository scriptRepository, ExecutorService executorService, int streamCapacity) {
-        this.scriptRepository = scriptRepository;
-        this.executorService = executorService;
-        this.streamCapacity = streamCapacity;
     }
 
 }

@@ -20,13 +20,14 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/scripts")
 public class ScriptsController {
 
-    /** SelfJ logger responsible for this class*/
     private final static Logger LOGGER = LogManager.getLogger(ScriptsController.class);
     private int requestId = 0;
+    private final ScriptService scriptService;
 
-    /** ScriptService bean*/
     @Autowired
-    private ScriptService scriptService;
+    public ScriptsController(ScriptService scriptService) {
+        this.scriptService = scriptService;
+    }
 
     /**
      * A method to get a list of scripts
@@ -160,12 +161,6 @@ public class ScriptsController {
      */
     private synchronized int getId() {
         return requestId++;
-    }
-
-    public ScriptsController(){}
-
-    protected ScriptsController(ScriptService scriptService) {
-        this.scriptService = scriptService;
     }
 
 }

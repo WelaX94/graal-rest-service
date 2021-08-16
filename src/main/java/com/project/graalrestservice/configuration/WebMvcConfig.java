@@ -12,15 +12,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Value("${webmvc.executor.corePoolSize}")
-    private int corePoolSize;
-    @Value("${webmvc.executor.maxPoolSize}")
-    private int maxPoolSize;
-    @Value("${webmvc.executor.queueCapacity}")
-    private int queueCapacity;
 
-    @Value("${webmvc.executor.threadNamePrefix}")
-    private String threadNamePrefix;
+    private final int corePoolSize;
+    private final int maxPoolSize;
+    private final int queueCapacity;
+    private final String threadNamePrefix;
+
+    public WebMvcConfig(
+            @Value("${webmvc.executor.corePoolSize}") int corePoolSize,
+            @Value("${webmvc.executor.maxPoolSize}") int maxPoolSize,
+            @Value("${webmvc.executor.queueCapacity}") int queueCapacity,
+            @Value("${webmvc.executor.threadNamePrefix}") String threadNamePrefix) {
+        this.corePoolSize = corePoolSize;
+        this.maxPoolSize = maxPoolSize;
+        this.queueCapacity = queueCapacity;
+        this.threadNamePrefix = threadNamePrefix;
+    }
 
     /**
      * A method for creating a custom executor

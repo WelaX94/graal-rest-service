@@ -19,8 +19,11 @@ import java.util.concurrent.Executors;
 @EnableAsync
 public class CommonConfig {
 
-    @Value("${scripts.executor.corePoolSize}")
-    private int corePoolSize;
+    private final int corePoolSize;
+
+    public CommonConfig(@Value("${scripts.executor.corePoolSize}") int corePoolSize) {
+        this.corePoolSize = corePoolSize;
+    }
 
     /**
      * Method for creating executor service bean
@@ -31,6 +34,10 @@ public class CommonConfig {
         return Executors.newFixedThreadPool(corePoolSize);
     }
 
+    /**
+     * Method for swagger2 configuration
+     * @return Docket configuration
+     */
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
