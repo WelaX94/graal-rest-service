@@ -37,10 +37,7 @@ public class ScriptsExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<String> handleWrongArgumentException(WrongArgumentException exception) {
         LOGGER.info("Failed to process the request: " + exception.getMessage());
-        HttpStatus status;
-        if (exception.listIsOver) status = HttpStatus.NOT_FOUND;
-        else status = HttpStatus.BAD_REQUEST;
-        return new ResponseEntity<String>(exception.getMessage(), status);
+        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler

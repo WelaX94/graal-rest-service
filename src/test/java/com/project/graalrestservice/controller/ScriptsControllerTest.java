@@ -108,10 +108,10 @@ class ScriptsControllerTest {
 
     @Test
     void getScriptListPage() {
-        assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("basic", 10, 10));
-        assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("basic", -1, 10));
+        assertThrows(PageDoesNotExistException.class, () -> scriptService.getScriptListPage("basic", 10, 10));
+        assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("basic", -1, 1));
         assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("basic", 10, -10));
-        assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("qwerty", 10, 10));
+        assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("qwerty", 10, 1));
 
         ScriptListPage scriptListPage = scriptService.getScriptListPage("basic", 10, 1);
         assertEquals(scriptListPage.getScriptList().size(), 5);

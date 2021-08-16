@@ -5,6 +5,7 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.domain.models.representation.ScriptInfoForList;
 import com.project.graalrestservice.domain.models.representation.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptRepository;
+import com.project.graalrestservice.exceptionHandling.exceptions.PageDoesNotExistException;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongArgumentException;
@@ -79,7 +80,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         int end = page * pageSize;
         int start = end - pageSize;
         int listSize = scriptSet.size();
-        if (start >= listSize) throw new WrongArgumentException(page);
+        if (start >= listSize) throw new PageDoesNotExistException(page);
 
         int count = 0;
         List<ScriptInfoForList> output = new ArrayList<>(pageSize);
