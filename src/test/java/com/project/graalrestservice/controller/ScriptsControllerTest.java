@@ -114,47 +114,47 @@ class ScriptsControllerTest {
         assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("qwerty", 10, 1));
 
         Page<List<ScriptInfoForList>> scriptListPage = scriptService.getScriptListPage("basic", 10, 1);
-        assertEquals(scriptListPage.getList().size(), 5);
-        assertEquals(scriptListPage.getScriptsOnPage(), 5);
-        assertEquals(scriptListPage.getTotalScripts(), 5);
-        assertEquals(scriptListPage.getPage(), 1);
-        assertEquals(scriptListPage.getNumPages(), 1);
-        assertEquals(scriptListPage.getList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
-        assertEquals(scriptListPage.getList().get(1).getStatus(), ScriptStatus.EXECUTION_FAILED);
-        assertEquals(scriptListPage.getList().get(2).getStatus(), ScriptStatus.EXECUTION_CANCELED);
-        assertEquals(scriptListPage.getList().get(3).getStatus(), ScriptStatus.RUNNING);
-        assertEquals(scriptListPage.getList().get(4).getStatus(), ScriptStatus.IN_QUEUE);
+        assertEquals(5, scriptListPage.getList().size());
+        assertEquals(5, scriptListPage.getScriptsOnPage());
+        assertEquals(5, scriptListPage.getTotalScripts());
+        assertEquals(1, scriptListPage.getPage());
+        assertEquals(1, scriptListPage.getNumPages());
+        assertEquals(ScriptStatus.EXECUTION_CANCELED, scriptListPage.getList().get(0).getStatus());
+        assertEquals(ScriptStatus.EXECUTION_FAILED, scriptListPage.getList().get(1).getStatus());
+        assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptListPage.getList().get(2).getStatus());
+        assertEquals(ScriptStatus.RUNNING, scriptListPage.getList().get(3).getStatus());
+        assertEquals(ScriptStatus.IN_QUEUE, scriptListPage.getList().get(4).getStatus());
 
         scriptListPage = scriptService.getScriptListPage("basic", 2, 2);
-        assertEquals(scriptListPage.getList().size(), 2);
-        assertEquals(scriptListPage.getScriptsOnPage(), 2);
-        assertEquals(scriptListPage.getTotalScripts(), 5);
-        assertEquals(scriptListPage.getPage(), 2);
-        assertEquals(scriptListPage.getNumPages(), 3);
+        assertEquals(2, scriptListPage.getList().size());
+        assertEquals(2, scriptListPage.getScriptsOnPage());
+        assertEquals(5, scriptListPage.getTotalScripts());
+        assertEquals(2, scriptListPage.getPage());
+        assertEquals(3, scriptListPage.getNumPages());
 
         scriptListPage = scriptService.getScriptListPage("basic", 2, 3);
-        assertEquals(scriptListPage.getList().size(), 1);
-        assertEquals(scriptListPage.getScriptsOnPage(), 1);
-        assertEquals(scriptListPage.getTotalScripts(), 5);
-        assertEquals(scriptListPage.getPage(), 3);
-        assertEquals(scriptListPage.getNumPages(), 3);
+        assertEquals(1, scriptListPage.getList().size());
+        assertEquals(1, scriptListPage.getScriptsOnPage());
+        assertEquals(5, scriptListPage.getTotalScripts());
+        assertEquals(3, scriptListPage.getPage());
+        assertEquals(3, scriptListPage.getNumPages());
 
         scriptListPage = scriptService.getScriptListPage("fr", 1, 2);
-        assertEquals(scriptListPage.getList().size(), 1);
-        assertEquals(scriptListPage.getScriptsOnPage(), 1);
-        assertEquals(scriptListPage.getTotalScripts(), 2);
-        assertEquals(scriptListPage.getPage(), 2);
-        assertEquals(scriptListPage.getNumPages(), 2);
-        assertEquals(scriptListPage.getList().get(0).getStatus(), ScriptStatus.RUNNING);
+        assertEquals(1, scriptListPage.getList().size());
+        assertEquals(1, scriptListPage.getScriptsOnPage());
+        assertEquals(2, scriptListPage.getTotalScripts());
+        assertEquals(2, scriptListPage.getPage());
+        assertEquals(2, scriptListPage.getNumPages());
+        assertEquals(ScriptStatus.RUNNING, scriptListPage.getList().get(0).getStatus());
 
         scriptListPage = scriptService.getScriptListPage("rqsc", 2, 2);
-        assertEquals(scriptListPage.getList().size(), 2);
-        assertEquals(scriptListPage.getScriptsOnPage(), 2);
-        assertEquals(scriptListPage.getTotalScripts(), 4);
-        assertEquals(scriptListPage.getPage(), 2);
-        assertEquals(scriptListPage.getNumPages(), 2);
-        assertEquals(scriptListPage.getList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
-        assertEquals(scriptListPage.getList().get(1).getStatus(), ScriptStatus.EXECUTION_CANCELED);
+        assertEquals(2, scriptListPage.getList().size());
+        assertEquals(2, scriptListPage.getScriptsOnPage());
+        assertEquals(4, scriptListPage.getTotalScripts());
+        assertEquals(2, scriptListPage.getPage());
+        assertEquals(2, scriptListPage.getNumPages());
+        assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptListPage.getList().get(0).getStatus());
+        assertEquals(ScriptStatus.EXECUTION_CANCELED, scriptListPage.getList().get(1).getStatus());
 
     }
 
@@ -298,4 +298,5 @@ class ScriptsControllerTest {
                 ScriptNotFoundException.class,
                 () -> scriptsController.deleteScript("c_script"));
     }
+
 }

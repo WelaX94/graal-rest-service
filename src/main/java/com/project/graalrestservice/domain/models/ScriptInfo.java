@@ -181,23 +181,18 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     public String getName() {
         return name;
     }
-
     public String getScript() {
         return script;
     }
-
     public String getLogsLink() {
         return logsLink;
     }
-
     public LocalDateTime getCreateTime() {
         return createTime;
     }
-
     public LocalDateTime getStartTime() {
         return startTime;
     }
-
     public LocalDateTime getEndTime() {
         return endTime;
     }

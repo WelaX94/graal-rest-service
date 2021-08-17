@@ -101,7 +101,12 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private Set<ScriptInfoForList> getFilteredAndSortedScripts(String filters) {
         checkFilter(filters);
         final ScriptStatus.Priority scriptStatusPriority = new ScriptStatus.Priority(filters);
-        final Set<ScriptInfoForList> set = new TreeSet<>();
+        final Set<ScriptInfoForList> set = new TreeSet<>(
+                (s1, s2) -> Comparator
+                        .comparing(ScriptInfoForList::returnPriority)
+                        .thenComparing(ScriptInfoForList::getCreatedTime)
+                        .thenComparing(ScriptInfoForList::getName)
+                        .compare(s1,s2));
         OUTER:
         for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
             final char letterStatus = entry.getValue().getScriptStatus().getLetter();
@@ -120,7 +125,12 @@ public class ScriptRepositoryImpl implements ScriptRepository {
      * @return TreeSet of scripts
      */
     private Set<ScriptInfoForList> getDefaultSortedScripts() {
-        final Set<ScriptInfoForList> set = new TreeSet<>();
+        final Set<ScriptInfoForList> set = new TreeSet<>(
+                (s1, s2) -> Comparator
+                        .comparing(ScriptInfoForList::returnPriority)
+                        .thenComparing(ScriptInfoForList::getCreatedTime)
+                        .thenComparing(ScriptInfoForList::getName)
+                        .compare(s1,s2));
         for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
             set.add(new ScriptInfoForList(entry.getValue()));
         }

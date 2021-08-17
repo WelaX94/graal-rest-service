@@ -13,7 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 /**
  * Helpful class for displaying partial information about the script in the list
  */
-public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> implements Comparable<ScriptInfoForList>{
+public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
 
     private final static ScriptStatus.Priority defaultPriority = new ScriptStatus.Priority();
     private final String name;
@@ -23,7 +23,6 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
 
     /**
      * Class constructor using custom script priority for sorting
-     * @param name script name (identifier)
      * @param scriptInfo the main scriptInfo containing all the information about the script
      * @param scriptStatusPriority custom script priority for sorting
      * @see ScriptStatus.Priority
@@ -38,28 +37,11 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
 
     /**
      * Class constructor using default script priority for sorting
-     * @param name script name (identifier)
      * @param scriptInfo the main scriptInfo containing all the information about the script
      * @see ScriptStatus.Priority
      */
     public ScriptInfoForList(ScriptInfo scriptInfo) {
         this(scriptInfo, defaultPriority);
-    }
-
-    /**
-     * The method calculates which of the two scripts is larger
-     * @param script the script with which you want to compare the current
-     * @return >0 if the current script is larger, <0 if the current script is smaller and 0 if they are equal
-     */
-    @Override
-    public int compareTo(ScriptInfoForList script) {
-        if (scriptStatusPriority.getPriority(this.status) == scriptStatusPriority.getPriority(script.getStatus())) {
-            if (this.createdTime.isEqual(script.createdTime)) {
-                return this.name.compareTo(script.name);
-            }
-            return script.createdTime.compareTo(this.createdTime);
-        }
-        return scriptStatusPriority.getPriority(this.status) - scriptStatusPriority.getPriority(script.getStatus());
     }
 
     public String getName() {
@@ -70,6 +52,9 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> im
     }
     public LocalDateTime getCreatedTime() {
         return createdTime;
+    }
+    public int returnPriority() {
+        return scriptStatusPriority.getPriority(status);
     }
 
 }
