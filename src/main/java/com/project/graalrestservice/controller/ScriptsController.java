@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /** Controller class responsible for "/scripts" */
 @RestController
@@ -23,7 +24,7 @@ import java.util.List;
 public class ScriptsController {
 
     private final static Logger LOGGER = LogManager.getLogger(ScriptsController.class);
-    private int requestId = 0;
+    private volatile AtomicInteger requestId = new AtomicInteger(0);
     private final ScriptService scriptService;
 
     @Autowired
@@ -43,7 +44,7 @@ public class ScriptsController {
             @RequestParam(required=false) String filters,
             @RequestParam(required=false) Integer pageSize,
             @RequestParam(required=false) Integer page) {
-        int id = getId();
+        int id = requestId.getAndAdd(1);
         LOGGER.info(String.format
                 ("Script list request[%d] received: filters=%s, pageSize=%d, page=%d", id, filters, pageSize, page));
         Page<List<ScriptInfoForList>> scriptListPage = scriptService.getScriptListPage(filters, pageSize, page);
@@ -66,7 +67,7 @@ public class ScriptsController {
             @PathVariable String scriptName,
             @RequestParam(required=false) String api,
             HttpServletRequest request) {
-        int id = getId();
+        int id = requestId.getAndAdd(1);
         LOGGER.info(String.format("A new script is requested[%d] to run", id));
         if (api == null) api = "f";
         api = api.toLowerCase();
@@ -90,7 +91,7 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)
     public ScriptInfoForSingle getSingleScriptInfo(@PathVariable String scriptName) {
-        int id = getId();
+        int id = requestId.getAndAdd(1);
         LOGGER.info(String.format("Single script info request[%d] received", id));
         ScriptInfoForSingle scriptInfoForSingle = scriptService.getScriptInfo(scriptName);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
@@ -104,7 +105,7 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.GET)
     public String getScriptLogs(@PathVariable String scriptName) {
-        int id = getId();
+        int id = requestId.getAndAdd(1);
         LOGGER.info(String.format("Script logs request[%d] received", id));
         String logs = scriptService.getScriptLogs(scriptName);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
@@ -126,7 +127,7 @@ public class ScriptsController {
             @RequestBody String script,
             @PathVariable String scriptName,
             HttpServletRequest request) {
-        int id = getId();
+        int id = requestId.getAndAdd(1);
         LOGGER.info(String.format("Script run with logs streaming request[%d] received", id));
         ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString(), true);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
@@ -139,7 +140,7 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
     public void stopScript(@PathVariable String scriptName) {
-        int id = getId();
+        int id = requestId.getAndAdd(1);
         LOGGER.info(String.format("Stop script request[%d] received", id));
         scriptService.stopScript(scriptName);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
@@ -151,18 +152,10 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.DELETE)
     public void deleteScript(@PathVariable String scriptName) {
-        int id = getId();
+        int id = requestId.getAndAdd(1);
         LOGGER.info(String.format("Delete script request[%d] received", id));
         scriptService.deleteScript(scriptName);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
-    }
-
-    /**
-     * Method for getting request id. Used for logging
-     * @return unique id
-     */
-    private synchronized int getId() {
-        return requestId++;
     }
 
 }
