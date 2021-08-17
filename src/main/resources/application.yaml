@@ -1,0 +1,21 @@
+server:
+  port: '3030'
+
+scripts:
+  executor:
+    corePoolSize: '10'
+
+webmvc:
+  executor:
+    corePoolSize: '10'
+    maxPoolSize: '20'
+    queueCapacity: '50'
+    threadNamePrefix: mvc-exec-
+
+spring:
+  mvc:
+    async:
+      request-timeout: '0'
+
+scriptOutputStream:
+  capacity: '65536'
