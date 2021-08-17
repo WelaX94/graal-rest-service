@@ -46,4 +46,9 @@ public class ScriptsExceptionHandler {
         return new ResponseEntity<String>(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<String> handlePageDoesNotExistException(PageDoesNotExistException exception) {
+        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
 }
