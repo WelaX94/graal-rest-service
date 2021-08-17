@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -27,9 +28,9 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     private volatile ScriptStatus status;
     private final String logsLink;
     private final CircularOutputStream logStream;
-    private final LocalDateTime createTime;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private final OffsetDateTime createTime;
+    private OffsetDateTime startTime;
+    private OffsetDateTime endTime;
     private final Value value;
     private final Context context;
     private final ExecutorService executorService;
@@ -52,7 +53,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         this.script = script;
         this.logsLink = logsLink;
         this.status = ScriptStatus.IN_QUEUE;
-        this.createTime = LocalDateTime.now();
+        this.createTime = OffsetDateTime.now();
         this.logStream = logStream;
         this.value = value;
         this.context = context;
@@ -77,19 +78,19 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
             LOGGER.info(String.format("Attempting to run a script [%s]", name));
             synchronized (this) {
                 status = ScriptStatus.RUNNING;
-                startTime = LocalDateTime.now();
+                startTime = OffsetDateTime.now();
                 inputInfo += startTime + "\tAttempting to run a script\n";
             }
             value.execute();
             synchronized (this) {
-                endTime = LocalDateTime.now();
+                endTime = OffsetDateTime.now();
                 status = ScriptStatus.EXECUTION_SUCCESSFUL;
                 outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.\n";
             }
             LOGGER.info(String.format("Script [%s] execution completed successfully", name));
         } catch (PolyglotException e) {
             synchronized (this) {
-                endTime = LocalDateTime.now();
+                endTime = OffsetDateTime.now();
                 if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
                 else status = ScriptStatus.EXECUTION_FAILED;
                 StringWriter sw = new StringWriter();
@@ -187,13 +188,13 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     public String getLogsLink() {
         return logsLink;
     }
-    public LocalDateTime getCreateTime() {
+    public OffsetDateTime getCreateTime() {
         return createTime;
     }
-    public LocalDateTime getStartTime() {
+    public OffsetDateTime getStartTime() {
         return startTime;
     }
-    public LocalDateTime getEndTime() {
+    public OffsetDateTime getEndTime() {
         return endTime;
     }
 

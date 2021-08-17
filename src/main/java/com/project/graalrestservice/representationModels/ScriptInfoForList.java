@@ -6,6 +6,7 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -18,7 +19,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
     private final static ScriptStatus.Priority defaultPriority = new ScriptStatus.Priority();
     private final String name;
     private final ScriptStatus status;
-    private final LocalDateTime createdTime;
+    private final OffsetDateTime createdTime;
     private final ScriptStatus.Priority scriptStatusPriority;
 
     /**
@@ -50,7 +51,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
     public ScriptStatus getStatus() {
         return status;
     }
-    public LocalDateTime getCreatedTime() {
+    public OffsetDateTime getCreatedTime() {
         return createdTime;
     }
     public int returnPriority() {

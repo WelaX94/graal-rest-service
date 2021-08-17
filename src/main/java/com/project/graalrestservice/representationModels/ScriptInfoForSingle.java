@@ -6,6 +6,7 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -17,9 +18,9 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
 
     private final String name;
     private final ScriptStatus status;
-    private final LocalDateTime createTime;
-    private final LocalDateTime startTime;
-    private final LocalDateTime endTime;
+    private final OffsetDateTime createTime;
+    private final OffsetDateTime startTime;
+    private final OffsetDateTime endTime;
     private final String logsLink;
 
     /**
@@ -43,13 +44,13 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     public ScriptStatus getStatus() {
         return status;
     }
-    public LocalDateTime getCreateTime() {
+    public OffsetDateTime getCreateTime() {
         return createTime;
     }
-    public LocalDateTime getStartTime() {
+    public OffsetDateTime getStartTime() {
         return startTime;
     }
-    public LocalDateTime getEndTime() {
+    public OffsetDateTime getEndTime() {
         return endTime;
     }
     public String getLogsLink() {
