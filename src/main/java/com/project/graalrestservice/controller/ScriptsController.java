@@ -1,8 +1,9 @@
 package com.project.graalrestservice.controller;
 
 import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.representationModels.Page;
+import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.representationModels.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongArgumentException;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /** Controller class responsible for "/scripts" */
 @RestController
@@ -37,14 +39,14 @@ public class ScriptsController {
      * @return page with filtered and sorted scripts
      * */
     @RequestMapping(method = RequestMethod.GET)
-    public ScriptListPage getScriptListPage(
+    public Page<List<ScriptInfoForList>> getScriptListPage(
             @RequestParam(required=false) String filters,
             @RequestParam(required=false) Integer pageSize,
             @RequestParam(required=false) Integer page) {
         int id = getId();
         LOGGER.info(String.format
                 ("Script list request[%d] received: filters=%s, pageSize=%d, page=%d", id, filters, pageSize, page));
-        ScriptListPage scriptListPage = scriptService.getScriptListPage(filters, pageSize, page);
+        Page<List<ScriptInfoForList>> scriptListPage = scriptService.getScriptListPage(filters, pageSize, page);
         LOGGER.info(String.format("Request[%d] successfully processed", id));
         return scriptListPage;
     }

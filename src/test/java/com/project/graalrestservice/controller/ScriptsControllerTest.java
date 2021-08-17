@@ -2,8 +2,9 @@ package com.project.graalrestservice.controller;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.representationModels.Page;
+import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.representationModels.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptRepository;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.services.serviceImplementations.ScriptRepositoryImpl;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -111,48 +113,48 @@ class ScriptsControllerTest {
         assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("basic", 10, -10));
         assertThrows(WrongArgumentException.class, () -> scriptService.getScriptListPage("qwerty", 10, 1));
 
-        ScriptListPage scriptListPage = scriptService.getScriptListPage("basic", 10, 1);
-        assertEquals(scriptListPage.getScriptList().size(), 5);
+        Page<List<ScriptInfoForList>> scriptListPage = scriptService.getScriptListPage("basic", 10, 1);
+        assertEquals(scriptListPage.getList().size(), 5);
         assertEquals(scriptListPage.getScriptsOnPage(), 5);
         assertEquals(scriptListPage.getTotalScripts(), 5);
         assertEquals(scriptListPage.getPage(), 1);
         assertEquals(scriptListPage.getNumPages(), 1);
-        assertEquals(scriptListPage.getScriptList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
-        assertEquals(scriptListPage.getScriptList().get(1).getStatus(), ScriptStatus.EXECUTION_FAILED);
-        assertEquals(scriptListPage.getScriptList().get(2).getStatus(), ScriptStatus.EXECUTION_CANCELED);
-        assertEquals(scriptListPage.getScriptList().get(3).getStatus(), ScriptStatus.RUNNING);
-        assertEquals(scriptListPage.getScriptList().get(4).getStatus(), ScriptStatus.IN_QUEUE);
+        assertEquals(scriptListPage.getList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
+        assertEquals(scriptListPage.getList().get(1).getStatus(), ScriptStatus.EXECUTION_FAILED);
+        assertEquals(scriptListPage.getList().get(2).getStatus(), ScriptStatus.EXECUTION_CANCELED);
+        assertEquals(scriptListPage.getList().get(3).getStatus(), ScriptStatus.RUNNING);
+        assertEquals(scriptListPage.getList().get(4).getStatus(), ScriptStatus.IN_QUEUE);
 
         scriptListPage = scriptService.getScriptListPage("basic", 2, 2);
-        assertEquals(scriptListPage.getScriptList().size(), 2);
+        assertEquals(scriptListPage.getList().size(), 2);
         assertEquals(scriptListPage.getScriptsOnPage(), 2);
         assertEquals(scriptListPage.getTotalScripts(), 5);
         assertEquals(scriptListPage.getPage(), 2);
         assertEquals(scriptListPage.getNumPages(), 3);
 
         scriptListPage = scriptService.getScriptListPage("basic", 2, 3);
-        assertEquals(scriptListPage.getScriptList().size(), 1);
+        assertEquals(scriptListPage.getList().size(), 1);
         assertEquals(scriptListPage.getScriptsOnPage(), 1);
         assertEquals(scriptListPage.getTotalScripts(), 5);
         assertEquals(scriptListPage.getPage(), 3);
         assertEquals(scriptListPage.getNumPages(), 3);
 
         scriptListPage = scriptService.getScriptListPage("fr", 1, 2);
-        assertEquals(scriptListPage.getScriptList().size(), 1);
+        assertEquals(scriptListPage.getList().size(), 1);
         assertEquals(scriptListPage.getScriptsOnPage(), 1);
         assertEquals(scriptListPage.getTotalScripts(), 2);
         assertEquals(scriptListPage.getPage(), 2);
         assertEquals(scriptListPage.getNumPages(), 2);
-        assertEquals(scriptListPage.getScriptList().get(0).getStatus(), ScriptStatus.RUNNING);
+        assertEquals(scriptListPage.getList().get(0).getStatus(), ScriptStatus.RUNNING);
 
         scriptListPage = scriptService.getScriptListPage("rqsc", 2, 2);
-        assertEquals(scriptListPage.getScriptList().size(), 2);
+        assertEquals(scriptListPage.getList().size(), 2);
         assertEquals(scriptListPage.getScriptsOnPage(), 2);
         assertEquals(scriptListPage.getTotalScripts(), 4);
         assertEquals(scriptListPage.getPage(), 2);
         assertEquals(scriptListPage.getNumPages(), 2);
-        assertEquals(scriptListPage.getScriptList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
-        assertEquals(scriptListPage.getScriptList().get(1).getStatus(), ScriptStatus.EXECUTION_CANCELED);
+        assertEquals(scriptListPage.getList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
+        assertEquals(scriptListPage.getList().get(1).getStatus(), ScriptStatus.EXECUTION_CANCELED);
 
     }
 

@@ -1,8 +1,11 @@
 package com.project.graalrestservice.domain.services;
 
 import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.representationModels.ScriptListPage;
+import com.project.graalrestservice.representationModels.Page;
+
+import java.util.List;
 
 public interface ScriptService {
 
@@ -17,7 +20,7 @@ public interface ScriptService {
 
     public void deleteScript(String scriptName);
 
-    public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page);
+    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, Integer pageSize, Integer page);
 
     public void startScriptAsynchronously(ScriptInfo scriptInfo);
 

@@ -2,8 +2,8 @@ package com.project.graalrestservice.domain.services.serviceImplementations;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
-import com.project.graalrestservice.representationModels.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptRepository;
 import com.project.graalrestservice.exceptionHandling.exceptions.PageDoesNotExistException;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
@@ -52,11 +52,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
      * @param filters filter list
      * @param pageSize page size
      * @param page page number
-     * @return ScriptListPage filtered and sorted by specified parameters
+     * @return Page filtered and sorted by specified parameters
      * @throws WrongArgumentException if page or pageSize less than 1. Also discarded if the list is empty for a given page
      */
     @Override
-    public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page) {
+    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, Integer pageSize, Integer page) {
         if (page == null) {
             page = 1;
         } else {
@@ -90,7 +90,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             if (count >= end || count >= listSize) break;
         }
 
-        return new ScriptListPage(output, page, listSize, filters, pageSize);
+        return new Page<>(output, page, listSize, filters, pageSize);
     }
 
     /**

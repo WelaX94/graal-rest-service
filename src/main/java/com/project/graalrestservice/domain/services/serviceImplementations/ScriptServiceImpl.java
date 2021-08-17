@@ -1,8 +1,9 @@
 package com.project.graalrestservice.domain.services.serviceImplementations;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.representationModels.Page;
+import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.representationModels.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.services.ScriptRepository;
 import com.project.graalrestservice.domain.utils.CircularOutputStream;
@@ -16,6 +17,7 @@ import org.graalvm.polyglot.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
@@ -46,10 +48,10 @@ public class ScriptServiceImpl implements ScriptService {
      * @param filters filter list
      * @param pageSize page size
      * @param page page
-     * @return ScriptListPage with specified parameters
+     * @return Page with specified parameters
      */
     @Override
-    public ScriptListPage getScriptListPage(String filters, Integer pageSize, Integer page) {
+    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, Integer pageSize, Integer page) {
         return scriptRepository.getScriptListPage(filters, pageSize, page);
     }
 
