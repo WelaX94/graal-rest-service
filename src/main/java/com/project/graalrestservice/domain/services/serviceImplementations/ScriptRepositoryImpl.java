@@ -9,6 +9,7 @@ import com.project.graalrestservice.exceptionHandling.exceptions.PageDoesNotExis
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongArgumentException;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -56,22 +57,12 @@ public class ScriptRepositoryImpl implements ScriptRepository {
      * @throws WrongArgumentException if page or pageSize less than 1. Also discarded if the list is empty for a given page
      */
     @Override
-    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, Integer pageSize, Integer page) {
-        if (page == null) {
-            page = 1;
-        } else {
-            if (page < 1) throw new WrongArgumentException("The page number cannot be less than 1");
-        }
-
-        if (pageSize == null) {
-            pageSize = 10;
-        } else {
-            if (pageSize < 1) throw new WrongArgumentException("The page size cannot be less than 1");
-        }
+    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page) {
+        if (page < 1) throw new WrongArgumentException("The page number cannot be less than 1");
+        if (pageSize < 1) throw new WrongArgumentException("The page size cannot be less than 1");
 
         Set<ScriptInfoForList> scriptSet;
-        if (filters == null || filters.equalsIgnoreCase("basic")) {
-            filters = "basic";
+        if (filters.equalsIgnoreCase("basic")) {
             scriptSet = getDefaultSortedScripts();
         } else {
             scriptSet = getFilteredAndSortedScripts(filters);

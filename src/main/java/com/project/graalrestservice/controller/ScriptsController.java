@@ -5,7 +5,6 @@ import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.services.ScriptService;
-import com.project.graalrestservice.exceptionHandling.exceptions.WrongArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +40,9 @@ public class ScriptsController {
      * */
     @RequestMapping(method = RequestMethod.GET)
     public Page<List<ScriptInfoForList>> getScriptListPage(
-            @RequestParam(required=false) String filters,
-            @RequestParam(required=false) Integer pageSize,
-            @RequestParam(required=false) Integer page) {
+            @RequestParam(defaultValue = "basic") String filters,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "1") int page) {
         int id = requestId.getAndAdd(1);
         LOGGER.info(String.format
                 ("Script list request[%d] received: filters=%s, pageSize=%d, page=%d", id, filters, pageSize, page));
@@ -56,7 +55,7 @@ public class ScriptsController {
      * Method for adding a new script to the run queue
      * @param script JS script
      * @param scriptName script name (identifier)
-     * @param api selecting a blocking or non-blocking api
+     * @param sync run script type - asynchronous (true) or synchronous (false)
      * @param request Http Servlet Request
      * @return JSON information about script
      * @see ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletRequest)
@@ -65,23 +64,18 @@ public class ScriptsController {
     public ResponseEntity<ScriptInfoForSingle> runScript(
             @RequestBody String script,
             @PathVariable String scriptName,
-            @RequestParam(required=false) String api,
+            @RequestParam(defaultValue = "true") boolean sync,
             HttpServletRequest request) {
         int id = requestId.getAndAdd(1);
         LOGGER.info(String.format("A new script is requested[%d] to run", id));
-        if (api == null) api = "f";
-        api = api.toLowerCase();
-        if (api.equals("b") || api.equals("f") ) {
-            ScriptInfo scriptInfo =
-                    scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString(), false);
-            if (api.equals("f")) scriptService.startScriptAsynchronously(scriptInfo);
-            else scriptService.startScriptSynchronously(scriptInfo);
-            LOGGER.info(String.format("Request[%d] successfully processed", id));
-            return (api.equals("f")) ?
-                    (new ResponseEntity<ScriptInfoForSingle>(new ScriptInfoForSingle(scriptInfo), HttpStatus.ACCEPTED)) :
-                    (new ResponseEntity<ScriptInfoForSingle>(new ScriptInfoForSingle(scriptInfo), HttpStatus.CREATED));
-        }
-        else throw new WrongArgumentException("Unknown API option: " + api);
+        ScriptInfo scriptInfo =
+                scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString(), false);
+        if (sync) scriptService.startScriptAsynchronously(scriptInfo);
+        else scriptService.startScriptSynchronously(scriptInfo);
+        LOGGER.info(String.format("Request[%d] successfully processed", id));
+        return (sync) ?
+                (new ResponseEntity<>(new ScriptInfoForSingle(scriptInfo), HttpStatus.ACCEPTED)) :
+                (new ResponseEntity<>(new ScriptInfoForSingle(scriptInfo), HttpStatus.CREATED));
     }
 
     /**
@@ -113,13 +107,13 @@ public class ScriptsController {
     }
 
     /**
-     * Another option for adding a new script to the run queue in the blocking variant ({@link ScriptsController#runScript(String, String, String, HttpServletRequest) first option})
+     * Another option for adding a new script to the run queue in the blocking variant ({@link ScriptsController#runScript(String, String, boolean, HttpServletRequest) first option})
      *
      * @param script JS script
      * @param scriptName script name (identifier)
      * @param request HttpServletRequest
      * @return the log broadcast in real time
-     * @see ScriptsController#runScript(String, String, String, HttpServletRequest)
+     * @see ScriptsController#runScript(String, String, boolean, HttpServletRequest)
      */
     @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.PUT)

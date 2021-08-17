@@ -14,6 +14,6 @@ public interface ScriptRepository {
 
     public void delete(String scriptName);
 
-    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, Integer pageSize, Integer page);
+    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page);
 
 }

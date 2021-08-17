@@ -20,7 +20,7 @@ public interface ScriptService {
 
     public void deleteScript(String scriptName);
 
-    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, Integer pageSize, Integer page);
+    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page);
 
     public void startScriptAsynchronously(ScriptInfo scriptInfo);
 

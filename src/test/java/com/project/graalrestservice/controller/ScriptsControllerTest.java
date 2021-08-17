@@ -161,46 +161,43 @@ class ScriptsControllerTest {
     @Test
     void runScript() throws InterruptedException {
         assertThrows(
-                WrongArgumentException.class,
-                () -> scriptsController.runScript("", "abc", "s", servletRequest));
+                WrongNameException.class,
+                () -> scriptsController.runScript("", "q_script", true, servletRequest));
         assertThrows(
                 WrongNameException.class,
-                () -> scriptsController.runScript("", "q_script", "f", servletRequest));
+                () -> scriptsController.runScript("", "s_script", true, servletRequest));
         assertThrows(
                 WrongNameException.class,
-                () -> scriptsController.runScript("", "s_script", "f", servletRequest));
+                () -> scriptsController.runScript("", "qw@rty", true, servletRequest));
         assertThrows(
                 WrongNameException.class,
-                () -> scriptsController.runScript("", "qw@rty", "f", servletRequest));
+                () -> scriptsController.runScript("", "!@#", true, servletRequest));
         assertThrows(
                 WrongNameException.class,
-                () -> scriptsController.runScript("", "!@#", "f", servletRequest));
+                () -> scriptsController.runScript("", "$%^", true, servletRequest));
         assertThrows(
                 WrongNameException.class,
-                () -> scriptsController.runScript("", "$%^", "f", servletRequest));
-        assertThrows(
-                WrongNameException.class,
-                () -> scriptsController.runScript("", "&*(", "f", servletRequest));
+                () -> scriptsController.runScript("", "&*(", true, servletRequest));
         String longName = "aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee" +
                 "ffffffffffgggggggggghhhhhhhhhhiiiiiiiiiijjjjjjjjjjk";
         assertThrows(
                 WrongNameException.class,
-                () -> scriptsController.runScript("", longName, "f", servletRequest));
+                () -> scriptsController.runScript("", longName, true, servletRequest));
         assertThrows(
                 WrongScriptException.class,
-                () -> scriptsController.runScript("leta a = 0;", "abc", "f", servletRequest));
+                () -> scriptsController.runScript("leta a = 0;", "abc", true, servletRequest));
 
-        ResponseEntity<ScriptInfoForSingle> response = scriptsController.runScript("let a = 0;", "s0", "b", servletRequest);
+        ResponseEntity<ScriptInfoForSingle> response = scriptsController.runScript("let a = 0;", "s0", false, servletRequest);
         assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, response.getBody().getStatus());
-        assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "s0", "b", servletRequest));
-        response = scriptsController.runScript("console.qwerty()", "s1", "b", servletRequest);
+        assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "s0", false, servletRequest));
+        response = scriptsController.runScript("console.qwerty()", "s1", false, servletRequest);
         assertEquals(ScriptStatus.EXECUTION_FAILED, response.getBody().getStatus());
-        response = scriptsController.runScript("while(true){}", "sr0", "f", servletRequest);
-        Thread.sleep(1000);
+        response = scriptsController.runScript("while(true){}", "sr0", true, servletRequest);
+        Thread.sleep(2000);
         ScriptInfo scriptInfo = map.get("sr0");
         assertEquals(ScriptStatus.RUNNING, scriptInfo.getScriptStatus());
         scriptInfo.stopScriptExecution();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         assertEquals(ScriptStatus.EXECUTION_CANCELED, scriptInfo.getScriptStatus());
 
     }
@@ -264,7 +261,7 @@ class ScriptsControllerTest {
                 executorService);
         map.put(scriptInfo.getName(), scriptInfo);
         executorService.execute(scriptInfo);
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         assertDoesNotThrow(
                 () -> scriptsController.stopScript("stopTest"));
         assertEquals(ScriptStatus.EXECUTION_CANCELED, scriptInfo.getScriptStatus());

@@ -51,7 +51,7 @@ public class ScriptServiceImpl implements ScriptService {
      * @return Page with specified parameters
      */
     @Override
-    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, Integer pageSize, Integer page) {
+    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page) {
         return scriptRepository.getScriptListPage(filters, pageSize, page);
     }
 
