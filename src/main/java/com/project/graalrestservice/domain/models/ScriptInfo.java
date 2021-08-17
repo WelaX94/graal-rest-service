@@ -1,6 +1,7 @@
 package com.project.graalrestservice.domain.models;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.apache.catalina.connector.ClientAbortException;
@@ -13,16 +14,14 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.io.*;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.concurrent.ExecutorService;
 
 /**
  * A class that contains all the information about the script, as well as the code to run it
  */
 public class ScriptInfo implements StreamingResponseBody, Runnable {
 
-    private final static Logger LOGGER = LogManager.getLogger(ScriptInfo.class);
+    private static final Logger LOGGER = LogManager.getLogger(ScriptInfo.class);
     private final String name;
     private final String script;
     private volatile ScriptStatus status;
@@ -33,7 +32,6 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     private OffsetDateTime endTime;
     private final Value value;
     private final Context context;
-    private final ExecutorService executorService;
     private String inputInfo;
     private String outputInfo;
 
@@ -46,9 +44,10 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
      * @param logStream       stream to record logs
      * @param value           Value used to run the script processing
      * @param context         Context, which handles the script
-     * @param executorService service to start a new thread
      */
-    public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService) {
+    public ScriptInfo(
+            String name, String script, String logsLink,
+            CircularOutputStream logStream, Value value, Context context) {
         this.name = name;
         this.script = script;
         this.logsLink = logsLink;
@@ -57,15 +56,17 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
         this.logStream = logStream;
         this.value = value;
         this.context = context;
-        this.executorService = executorService;
         this.inputInfo = String.format("%s\tScript created and added to the execution queue\n", createTime);
     }
 
     /**
      * Constructor required for tests
      */
-    public ScriptInfo(String name, String script, String logsLink, CircularOutputStream logStream, Value value, Context context, ExecutorService executorService, ScriptStatus scriptStatus) {
-        this(name, script, logsLink, logStream, value, context, executorService);
+    public ScriptInfo(
+            String name, String script, String logsLink,
+            CircularOutputStream logStream, Value value, Context context,
+            ScriptStatus scriptStatus) {
+        this(name, script, logsLink, logStream, value, context);
         this.status = scriptStatus;
     }
 
@@ -121,7 +122,6 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
      */
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
-        executorService.execute(this);
         try {
             outputStream.write(inputInfo.getBytes());
             outputStream.flush();

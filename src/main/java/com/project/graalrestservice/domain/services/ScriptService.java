@@ -4,6 +4,7 @@ import com.project.graalrestservice.domain.models.ScriptInfo;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
 import com.project.graalrestservice.representationModels.Page;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public interface ScriptService {
 
     public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page);
 
+    @Async
     public void startScriptAsynchronously(ScriptInfo scriptInfo);
 
     public void startScriptSynchronously(ScriptInfo scriptInfo);

@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
 /**
@@ -28,7 +27,6 @@ import java.util.regex.Pattern;
 public class ScriptServiceImpl implements ScriptService {
 
     private final ScriptRepository scriptRepository;
-    private final ExecutorService executorService;
     private final int streamCapacity;
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
     private final String[] illegalNamespace = new String[]{"swagger-ui"};
@@ -36,10 +34,8 @@ public class ScriptServiceImpl implements ScriptService {
     @Autowired
     public ScriptServiceImpl(
             ScriptRepository scriptRepository,
-            ExecutorService executorService,
-            @org.springframework.beans.factory.annotation.Value("${scriptOutputStream.capacity}") int streamCapacity) {
+            @org.springframework.beans.factory.annotation.Value("${scripts.outputStream.capacity}") int streamCapacity) {
         this.scriptRepository = scriptRepository;
-        this.executorService = executorService;
         this.streamCapacity = streamCapacity;
     }
 
@@ -71,7 +67,7 @@ public class ScriptServiceImpl implements ScriptService {
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
         try {
             Value value = context.parse("js", script);
-            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, logsLink, outputStream, value, context, executorService);
+            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, logsLink, outputStream, value, context);
             scriptRepository.put(scriptName, scriptInfo);
             return scriptInfo;
         } catch (PolyglotException e) {
@@ -86,7 +82,7 @@ public class ScriptServiceImpl implements ScriptService {
      */
     @Override
     public void startScriptAsynchronously(ScriptInfo scriptInfo) {
-        executorService.execute(scriptInfo);
+        scriptInfo.run();
     }
 
     /**

@@ -117,6 +117,7 @@ public class ScriptsController {
             HttpServletRequest request) {
         LOGGER.info("Script run with logs streaming request received");
         ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString(), true);
+        scriptService.startScriptAsynchronously(scriptInfo);
         LOGGER.info("Request successfully processed");
         return scriptInfo;
     }
