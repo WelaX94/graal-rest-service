@@ -1,6 +1,6 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.domain.models.representation.Info;
+import com.project.graalrestservice.representationModels.Info;
 import org.springframework.web.bind.annotation.*;
 
 /** Controller class responsible for "/" */

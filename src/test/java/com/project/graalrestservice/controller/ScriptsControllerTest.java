@@ -2,8 +2,8 @@ package com.project.graalrestservice.controller;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
-import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
-import com.project.graalrestservice.domain.models.representation.ScriptListPage;
+import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
+import com.project.graalrestservice.representationModels.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptRepository;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.services.serviceImplementations.ScriptRepositoryImpl;
@@ -17,10 +17,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.http.HttpRequest;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

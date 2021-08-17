@@ -1,8 +1,8 @@
 package com.project.graalrestservice.controller;
 
 import com.project.graalrestservice.domain.models.ScriptInfo;
-import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
-import com.project.graalrestservice.domain.models.representation.ScriptListPage;
+import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
+import com.project.graalrestservice.representationModels.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongArgumentException;
 import org.apache.logging.log4j.LogManager;

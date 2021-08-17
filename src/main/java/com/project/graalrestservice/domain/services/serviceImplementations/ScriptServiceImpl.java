@@ -1,8 +1,8 @@
 package com.project.graalrestservice.domain.services.serviceImplementations;
 
 import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.models.representation.ScriptInfoForSingle;
-import com.project.graalrestservice.domain.models.representation.ScriptListPage;
+import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
+import com.project.graalrestservice.representationModels.ScriptListPage;
 import com.project.graalrestservice.domain.services.ScriptService;
 import com.project.graalrestservice.domain.services.ScriptRepository;
 import com.project.graalrestservice.domain.utils.CircularOutputStream;

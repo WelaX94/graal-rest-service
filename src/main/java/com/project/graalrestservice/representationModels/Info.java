@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.models.representation;
+package com.project.graalrestservice.representationModels;
 
 import com.project.graalrestservice.controller.Controller;
 import com.project.graalrestservice.controller.ScriptsController;

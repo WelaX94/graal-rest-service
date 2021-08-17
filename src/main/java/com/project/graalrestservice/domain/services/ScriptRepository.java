@@ -1,7 +1,7 @@
 package com.project.graalrestservice.domain.services;
 
 import com.project.graalrestservice.domain.models.ScriptInfo;
-import com.project.graalrestservice.domain.models.representation.ScriptListPage;
+import com.project.graalrestservice.representationModels.ScriptListPage;
 
 public interface ScriptRepository {
 
