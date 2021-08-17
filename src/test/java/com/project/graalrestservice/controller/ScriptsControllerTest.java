@@ -115,7 +115,8 @@ class ScriptsControllerTest {
         assertEquals(scriptListPage.getScriptList().size(), 5);
         assertEquals(scriptListPage.getScriptsOnPage(), 5);
         assertEquals(scriptListPage.getTotalScripts(), 5);
-        assertEquals(scriptListPage.getPage(), "1 of 1");
+        assertEquals(scriptListPage.getPage(), 1);
+        assertEquals(scriptListPage.getNumPages(), 1);
         assertEquals(scriptListPage.getScriptList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
         assertEquals(scriptListPage.getScriptList().get(1).getStatus(), ScriptStatus.EXECUTION_FAILED);
         assertEquals(scriptListPage.getScriptList().get(2).getStatus(), ScriptStatus.EXECUTION_CANCELED);
@@ -126,26 +127,30 @@ class ScriptsControllerTest {
         assertEquals(scriptListPage.getScriptList().size(), 2);
         assertEquals(scriptListPage.getScriptsOnPage(), 2);
         assertEquals(scriptListPage.getTotalScripts(), 5);
-        assertEquals(scriptListPage.getPage(), "2 of 3");
+        assertEquals(scriptListPage.getPage(), 2);
+        assertEquals(scriptListPage.getNumPages(), 3);
 
         scriptListPage = scriptService.getScriptListPage("basic", 2, 3);
         assertEquals(scriptListPage.getScriptList().size(), 1);
         assertEquals(scriptListPage.getScriptsOnPage(), 1);
         assertEquals(scriptListPage.getTotalScripts(), 5);
-        assertEquals(scriptListPage.getPage(), "3 of 3");
+        assertEquals(scriptListPage.getPage(), 3);
+        assertEquals(scriptListPage.getNumPages(), 3);
 
         scriptListPage = scriptService.getScriptListPage("fr", 1, 2);
         assertEquals(scriptListPage.getScriptList().size(), 1);
         assertEquals(scriptListPage.getScriptsOnPage(), 1);
         assertEquals(scriptListPage.getTotalScripts(), 2);
-        assertEquals(scriptListPage.getPage(), "2 of 2");
+        assertEquals(scriptListPage.getPage(), 2);
+        assertEquals(scriptListPage.getNumPages(), 2);
         assertEquals(scriptListPage.getScriptList().get(0).getStatus(), ScriptStatus.RUNNING);
 
         scriptListPage = scriptService.getScriptListPage("rqsc", 2, 2);
         assertEquals(scriptListPage.getScriptList().size(), 2);
         assertEquals(scriptListPage.getScriptsOnPage(), 2);
         assertEquals(scriptListPage.getTotalScripts(), 4);
-        assertEquals(scriptListPage.getPage(), "2 of 2");
+        assertEquals(scriptListPage.getPage(), 2);
+        assertEquals(scriptListPage.getNumPages(), 2);
         assertEquals(scriptListPage.getScriptList().get(0).getStatus(), ScriptStatus.EXECUTION_SUCCESSFUL);
         assertEquals(scriptListPage.getScriptList().get(1).getStatus(), ScriptStatus.EXECUTION_CANCELED);
 

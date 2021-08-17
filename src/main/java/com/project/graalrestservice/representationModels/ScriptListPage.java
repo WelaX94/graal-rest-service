@@ -14,7 +14,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ScriptListPage extends RepresentationModel<ScriptListPage> {
 
     private final int page;
-    private final int pages;
+    private final int numPages;
     private final int totalScripts;
     private final int scriptsOnPage;
     private final List<ScriptInfoForList> scriptList;
@@ -31,10 +31,10 @@ public class ScriptListPage extends RepresentationModel<ScriptListPage> {
         this.scriptList = scriptList;
         this.totalScripts = totalScripts;
         this.page = pageNumber;
-        this.pages = (totalScripts % pageSize == 0) ? (totalScripts / pageSize) : (totalScripts / pageSize + 1);
+        this.numPages = (totalScripts % pageSize == 0) ? (totalScripts / pageSize) : (totalScripts / pageSize + 1);
         this.scriptsOnPage = scriptList.size();
         if (pageNumber > 1) add(linkTo(methodOn(ScriptsController.class).getScriptListPage(filters, pageSize, pageNumber - 1)).withRel("previousPage"));
-        if (page < pages) add(linkTo(methodOn(ScriptsController.class).getScriptListPage(filters, pageSize, pageNumber + 1)).withRel("nextPage"));
+        if (page < numPages) add(linkTo(methodOn(ScriptsController.class).getScriptListPage(filters, pageSize, pageNumber + 1)).withRel("nextPage"));
     }
 
     public int getTotalScripts() {
@@ -43,8 +43,11 @@ public class ScriptListPage extends RepresentationModel<ScriptListPage> {
     public int getScriptsOnPage() {
         return scriptsOnPage;
     }
-    public String getPage() {
-        return String.format("%d of %d", page, pages);
+    public int getPage() {
+        return page;
+    }
+    public int getNumPages() {
+        return numPages;
     }
     public List<ScriptInfoForList> getScriptList() {
         return scriptList;
