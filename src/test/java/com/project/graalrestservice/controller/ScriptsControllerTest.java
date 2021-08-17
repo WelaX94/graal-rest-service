@@ -33,18 +33,15 @@ class ScriptsControllerTest {
     private ScriptsController scriptsController;
     private ScriptService scriptService;
     private ScriptRepository scriptRepository;
-    private ExecutorService executorService;
-    private int executorServiceNumberOfThreads = 10;
     private int logStreamCapacity = 65536;
     private String scriptsLink = "http://localhost:3030/scripts";
     private HttpServletRequest servletRequest = new MockHttpServletRequest();
-/*
+
     @BeforeEach
     void setUp() {
         map = new ConcurrentHashMap<>();
         scriptRepository = new ScriptRepositoryImpl(map);
-        executorService = Executors.newFixedThreadPool(executorServiceNumberOfThreads);
-        scriptService = new ScriptServiceImpl(scriptRepository, executorService, logStreamCapacity);
+        scriptService = new ScriptServiceImpl(scriptRepository, logStreamCapacity);
         scriptsController = new ScriptsController(scriptService);
 
         ScriptInfo s0 = new ScriptInfo(
@@ -54,7 +51,6 @@ class ScriptsControllerTest {
                 new CircularOutputStream(logStreamCapacity,false),
                 null,
                 Context.newBuilder().build(),
-                executorService,
                 ScriptStatus.IN_QUEUE);
         ScriptInfo s1 = new ScriptInfo(
                 "r_script",
@@ -63,7 +59,6 @@ class ScriptsControllerTest {
                 new CircularOutputStream(logStreamCapacity,false),
                 null,
                 Context.newBuilder().build(),
-                executorService,
                 ScriptStatus.RUNNING);
         ScriptInfo s2 = new ScriptInfo(
                 "c_script",
@@ -72,7 +67,6 @@ class ScriptsControllerTest {
                 new CircularOutputStream(logStreamCapacity,false),
                 null,
                 Context.newBuilder().build(),
-                executorService,
                 ScriptStatus.EXECUTION_CANCELED);
         ScriptInfo s3 = new ScriptInfo(
                 "f_script",
@@ -81,7 +75,6 @@ class ScriptsControllerTest {
                 new CircularOutputStream(logStreamCapacity,false),
                 null,
                 Context.newBuilder().build(),
-                executorService,
                 ScriptStatus.EXECUTION_FAILED);
         ScriptInfo s4 = new ScriptInfo(
                 "s_script",
@@ -90,7 +83,6 @@ class ScriptsControllerTest {
                 new CircularOutputStream(logStreamCapacity,false),
                 null,
                 Context.newBuilder().build(),
-                executorService,
                 ScriptStatus.EXECUTION_SUCCESSFUL);
 
         map.put(s0.getName(), s0);
@@ -103,7 +95,6 @@ class ScriptsControllerTest {
 
     @AfterEach
     void tearDown() {
-        executorService.shutdown();
     }
 
     @Test
@@ -257,10 +248,8 @@ class ScriptsControllerTest {
                 "",
                 new CircularOutputStream(logStreamCapacity, false),
                 value,
-                context,
-                executorService);
+                context);
         map.put(scriptInfo.getName(), scriptInfo);
-        executorService.execute(scriptInfo);
         Thread.sleep(2000);
         assertDoesNotThrow(
                 () -> scriptsController.stopScript("stopTest"));
@@ -295,5 +284,5 @@ class ScriptsControllerTest {
                 ScriptNotFoundException.class,
                 () -> scriptsController.deleteScript("c_script"));
     }
-*/
+
 }
