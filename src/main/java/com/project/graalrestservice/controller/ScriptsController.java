@@ -1,7 +1,7 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.domain.models.ScriptInfo;
-import com.project.graalrestservice.domain.services.ScriptService;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
+import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/scripts")
 public class ScriptsController {
 
-    private static final Logger LOGGER = LogManager.getLogger(ScriptsController.class);
+    private static final Logger logger = LogManager.getLogger(ScriptsController.class);
     private final ScriptService scriptService;
 
     @Autowired
@@ -41,10 +41,10 @@ public class ScriptsController {
             @RequestParam(defaultValue = "basic") String filters,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "1") int page) {
-        LOGGER.info(String.format
+        logger.info(String.format
                 ("Script list request received: filters=%s, pageSize=%d, page=%d", filters, pageSize, page));
         Page<List<ScriptInfoForList>> scriptListPage = scriptService.getScriptListPage(filters, pageSize, page);
-        LOGGER.info("Request successfully processed");
+        logger.info("Request successfully processed");
         return scriptListPage;
     }
 
@@ -63,12 +63,12 @@ public class ScriptsController {
             @PathVariable String scriptName,
             @RequestParam(defaultValue = "true") boolean sync,
             HttpServletRequest request) {
-        LOGGER.info("A new script is requested to run");
-        ScriptInfo scriptInfo =
+        logger.info("A new script is requested to run");
+        Script scriptInfo =
                 scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString(), false);
         if (sync) scriptService.startScriptAsynchronously(scriptInfo);
         else scriptService.startScriptSynchronously(scriptInfo);
-        LOGGER.info("Request successfully processed");
+        logger.info("Request successfully processed");
         return (sync) ?
                 (new ResponseEntity<>(new ScriptInfoForSingle(scriptInfo), HttpStatus.ACCEPTED)) :
                 (new ResponseEntity<>(new ScriptInfoForSingle(scriptInfo), HttpStatus.CREATED));
@@ -81,9 +81,9 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)
     public ScriptInfoForSingle getSingleScriptInfo(@PathVariable String scriptName) {
-        LOGGER.info("Single script info request received");
+        logger.info("Single script info request received");
         ScriptInfoForSingle scriptInfoForSingle = scriptService.getScriptInfo(scriptName);
-        LOGGER.info("Request successfully processed");
+        logger.info("Request successfully processed");
         return scriptInfoForSingle;
     }
 
@@ -94,9 +94,9 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.GET)
     public String getScriptLogs(@PathVariable String scriptName) {
-        LOGGER.info("Script logs request received");
+        logger.info("Script logs request received");
         String logs = scriptService.getScriptLogs(scriptName);
-        LOGGER.info("Request successfully processed");
+        logger.info("Request successfully processed");
         return logs;
     }
 
@@ -115,10 +115,10 @@ public class ScriptsController {
             @RequestBody String script,
             @PathVariable String scriptName,
             HttpServletRequest request) {
-        LOGGER.info("Script run with logs streaming request received");
-        ScriptInfo scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString(), true);
+        logger.info("Script run with logs streaming request received");
+        Script scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString(), true);
         scriptService.startScriptAsynchronously(scriptInfo);
-        LOGGER.info("Request successfully processed");
+        logger.info("Request successfully processed");
         return scriptInfo;
     }
 
@@ -128,9 +128,9 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
     public void stopScript(@PathVariable String scriptName) {
-        LOGGER.info("Stop script request received");
+        logger.info("Stop script request received");
         scriptService.stopScript(scriptName);
-        LOGGER.info("Request successfully processed");
+        logger.info("Request successfully processed");
     }
 
     /**
@@ -139,9 +139,9 @@ public class ScriptsController {
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.DELETE)
     public void deleteScript(@PathVariable String scriptName) {
-        LOGGER.info("Delete script request received");
+        logger.info("Delete script request received");
         scriptService.deleteScript(scriptName);
-        LOGGER.info("Request successfully processed");
+        logger.info("Request successfully processed");
     }
 
 }

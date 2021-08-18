@@ -1,6 +1,6 @@
-package com.project.graalrestservice.domain.services;
+package com.project.graalrestservice.domain.scriptHandler.services;
 
-import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 
@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface ScriptRepository {
 
-    public void put(String scriptName, ScriptInfo scriptInfo);
+    public void put(String scriptName, Script script);
 
-    public ScriptInfo get(String scriptName);
+    public Script get(String scriptName);
 
     public void delete(String scriptName);
 

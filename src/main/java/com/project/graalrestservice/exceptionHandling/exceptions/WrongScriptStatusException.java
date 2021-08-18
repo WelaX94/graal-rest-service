@@ -1,6 +1,6 @@
 package com.project.graalrestservice.exceptionHandling.exceptions;
 
-import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import org.zalando.problem.AbstractThrowableProblem;
 import org.zalando.problem.Status;
 

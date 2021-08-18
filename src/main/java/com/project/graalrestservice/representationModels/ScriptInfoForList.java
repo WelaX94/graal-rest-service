@@ -1,8 +1,8 @@
 package com.project.graalrestservice.representationModels;
 
 import com.project.graalrestservice.controller.ScriptsController;
-import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.OffsetDateTime;
@@ -23,25 +23,25 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
 
     /**
      * Class constructor using custom script priority for sorting
-     * @param scriptInfo the main scriptInfo containing all the information about the script
+     * @param script the main script containing all the information about the script
      * @param scriptStatusPriority custom script priority for sorting
      * @see ScriptStatus.Priority
      */
-    public ScriptInfoForList(ScriptInfo scriptInfo, ScriptStatus.Priority scriptStatusPriority) {
-        this.name = scriptInfo.getName();
-        this.status = scriptInfo.getScriptStatus();
-        this.createdTime = scriptInfo.getCreateTime();
+    public ScriptInfoForList(Script script, ScriptStatus.Priority scriptStatusPriority) {
+        this.name = script.getName();
+        this.status = script.getScriptStatus();
+        this.createdTime = script.getCreateTime();
         this.scriptStatusPriority = scriptStatusPriority;
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
     }
 
     /**
      * Class constructor using default script priority for sorting
-     * @param scriptInfo the main scriptInfo containing all the information about the script
+     * @param script the main script containing all the information about the script
      * @see ScriptStatus.Priority
      */
-    public ScriptInfoForList(ScriptInfo scriptInfo) {
-        this(scriptInfo, defaultPriority);
+    public ScriptInfoForList(Script script) {
+        this(script, defaultPriority);
     }
 
     public String getName() {

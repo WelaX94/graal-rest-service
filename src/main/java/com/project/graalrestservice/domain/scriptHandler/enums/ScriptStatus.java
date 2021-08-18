@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.enums;
+package com.project.graalrestservice.domain.scriptHandler.enums;
 
 /**
  * Enum script status flag class. Also used for sorting.

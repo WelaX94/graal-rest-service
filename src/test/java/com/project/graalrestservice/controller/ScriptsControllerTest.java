@@ -1,15 +1,15 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.domain.services.ScriptRepository;
-import com.project.graalrestservice.domain.services.ScriptService;
-import com.project.graalrestservice.domain.services.serviceImplementations.ScriptRepositoryImpl;
-import com.project.graalrestservice.domain.services.serviceImplementations.ScriptServiceImpl;
-import com.project.graalrestservice.domain.utils.CircularOutputStream;
+import com.project.graalrestservice.domain.scriptHandler.services.ScriptRepository;
+import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
+import com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations.ScriptRepositoryImpl;
+import com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations.ScriptServiceImpl;
+import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.*;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
@@ -22,14 +22,12 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ScriptsControllerTest {
 
-    private ConcurrentHashMap<String, ScriptInfo> map;
+    private ConcurrentHashMap<String, Script> map;
     private ScriptsController scriptsController;
     private ScriptService scriptService;
     private ScriptRepository scriptRepository;
@@ -44,7 +42,7 @@ class ScriptsControllerTest {
         scriptService = new ScriptServiceImpl(scriptRepository, logStreamCapacity);
         scriptsController = new ScriptsController(scriptService);
 
-        ScriptInfo s0 = new ScriptInfo(
+        Script s0 = new Script(
                 "q_script",
                 "let a = 0;",
                 scriptsLink + "/q_script",
@@ -52,7 +50,7 @@ class ScriptsControllerTest {
                 null,
                 Context.newBuilder().build(),
                 ScriptStatus.IN_QUEUE);
-        ScriptInfo s1 = new ScriptInfo(
+        Script s1 = new Script(
                 "r_script",
                 "let a = 0;",
                 scriptsLink + "/r_script",
@@ -60,7 +58,7 @@ class ScriptsControllerTest {
                 null,
                 Context.newBuilder().build(),
                 ScriptStatus.RUNNING);
-        ScriptInfo s2 = new ScriptInfo(
+        Script s2 = new Script(
                 "c_script",
                 "let a = 0;",
                 scriptsLink + "/c_script",
@@ -68,7 +66,7 @@ class ScriptsControllerTest {
                 null,
                 Context.newBuilder().build(),
                 ScriptStatus.EXECUTION_CANCELED);
-        ScriptInfo s3 = new ScriptInfo(
+        Script s3 = new Script(
                 "f_script",
                 "let a = 0;",
                 scriptsLink + "/f_script",
@@ -76,7 +74,7 @@ class ScriptsControllerTest {
                 null,
                 Context.newBuilder().build(),
                 ScriptStatus.EXECUTION_FAILED);
-        ScriptInfo s4 = new ScriptInfo(
+        Script s4 = new Script(
                 "s_script",
                 "let a = 0;",
                 scriptsLink + "/s_script",
@@ -185,11 +183,11 @@ class ScriptsControllerTest {
         assertEquals(ScriptStatus.EXECUTION_FAILED, response.getBody().getStatus());
         response = scriptsController.runScript("while(true){}", "sr0", true, servletRequest);
         Thread.sleep(2000);
-        ScriptInfo scriptInfo = map.get("sr0");
-        assertEquals(ScriptStatus.RUNNING, scriptInfo.getScriptStatus());
-        scriptInfo.stopScriptExecution();
+        Script script = map.get("sr0");
+        assertEquals(ScriptStatus.RUNNING, script.getScriptStatus());
+        script.stopScriptExecution();
         Thread.sleep(2000);
-        assertEquals(ScriptStatus.EXECUTION_CANCELED, scriptInfo.getScriptStatus());
+        assertEquals(ScriptStatus.EXECUTION_CANCELED, script.getScriptStatus());
 
     }
 
@@ -242,18 +240,18 @@ class ScriptsControllerTest {
 
         Context context = Context.newBuilder().build();
         Value value = context.parse("js", "while(true){}");
-        ScriptInfo scriptInfo = new ScriptInfo(
+        Script script = new Script(
                 "stopTest",
                 "while(true){}",
                 "",
                 new CircularOutputStream(logStreamCapacity, false),
                 value,
                 context);
-        map.put(scriptInfo.getName(), scriptInfo);
+        map.put(script.getName(), script);
         Thread.sleep(2000);
         assertDoesNotThrow(
                 () -> scriptsController.stopScript("stopTest"));
-        assertEquals(ScriptStatus.EXECUTION_CANCELED, scriptInfo.getScriptStatus());
+        assertEquals(ScriptStatus.EXECUTION_CANCELED, script.getScriptStatus());
 
     }
 

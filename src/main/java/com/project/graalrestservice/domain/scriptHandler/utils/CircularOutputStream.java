@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.utils;
+package com.project.graalrestservice.domain.scriptHandler.utils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +12,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class CircularOutputStream extends OutputStream {
 
-    private final static Logger LOGGER = LogManager.getLogger(CircularOutputStream.class);
+    private static final Logger logger = LogManager.getLogger(CircularOutputStream.class);
     private final byte[] buf;
     private final int capacity;
     private int position = 0;
@@ -51,7 +51,7 @@ public class CircularOutputStream extends OutputStream {
             try {
                 queue.put((byte) b);
             } catch (InterruptedException e) {
-                LOGGER.error("Failed to make an entry in the broadcast queue. " + e.getMessage());
+                logger.error("Failed to make an entry in the broadcast queue. " + e.getMessage());
             }
         }
     }

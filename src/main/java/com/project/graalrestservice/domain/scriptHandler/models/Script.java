@@ -1,8 +1,7 @@
-package com.project.graalrestservice.domain.models;
+package com.project.graalrestservice.domain.scriptHandler.models;
 
-import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.services.ScriptService;
-import com.project.graalrestservice.domain.utils.CircularOutputStream;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.LogManager;
@@ -19,11 +18,11 @@ import java.time.OffsetDateTime;
 /**
  * A class that contains all the information about the script, as well as the code to run it
  */
-public class ScriptInfo implements StreamingResponseBody, Runnable {
+public class Script implements StreamingResponseBody, Runnable {
 
-    private static final Logger LOGGER = LogManager.getLogger(ScriptInfo.class);
+    private static final Logger logger = LogManager.getLogger(Script.class);
     private final String name;
-    private final String script;
+    private final String scriptCode;
     private volatile ScriptStatus status;
     private final String logsLink;
     private final CircularOutputStream logStream;
@@ -39,17 +38,17 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
      * Basic constructor
      *
      * @param name            script name (identifier)
-     * @param script          JS script
+     * @param scriptCode          JS script
      * @param logsLink        link for script output logs
      * @param logStream       stream to record logs
      * @param value           Value used to run the script processing
      * @param context         Context, which handles the script
      */
-    public ScriptInfo(
-            String name, String script, String logsLink,
+    public Script(
+            String name, String scriptCode, String logsLink,
             CircularOutputStream logStream, Value value, Context context) {
         this.name = name;
-        this.script = script;
+        this.scriptCode = scriptCode;
         this.logsLink = logsLink;
         this.status = ScriptStatus.IN_QUEUE;
         this.createTime = OffsetDateTime.now();
@@ -62,11 +61,11 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     /**
      * Constructor required for tests
      */
-    public ScriptInfo(
-            String name, String script, String logsLink,
+    public Script(
+            String name, String scriptCode, String logsLink,
             CircularOutputStream logStream, Value value, Context context,
             ScriptStatus scriptStatus) {
-        this(name, script, logsLink, logStream, value, context);
+        this(name, scriptCode, logsLink, logStream, value, context);
         this.status = scriptStatus;
     }
 
@@ -76,7 +75,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     @Override
     public void run() {
         try {
-            LOGGER.info(String.format("Attempting to run a script [%s]", name));
+            logger.info(String.format("Attempting to run a script [%s]", name));
             synchronized (this) {
                 status = ScriptStatus.RUNNING;
                 startTime = OffsetDateTime.now();
@@ -88,7 +87,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
                 status = ScriptStatus.EXECUTION_SUCCESSFUL;
                 outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.\n";
             }
-            LOGGER.info(String.format("Script [%s] execution completed successfully", name));
+            logger.info(String.format("Script [%s] execution completed successfully", name));
         } catch (PolyglotException e) {
             synchronized (this) {
                 endTime = OffsetDateTime.now();
@@ -99,7 +98,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
                 e.printStackTrace(pw);
                 outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.\n";
             }
-            LOGGER.info(String.format("Script [%s] execution failed. %s", name, e.getMessage()));
+            logger.info(String.format("Script [%s] execution failed. %s", name, e.getMessage()));
         } finally {
             context.close();
         }
@@ -137,7 +136,7 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
             outputStream.write(outputInfo.getBytes());
             outputStream.flush();
         } catch (ClientAbortException | InterruptedException e) {
-            LOGGER.error("Client connection breakage. The script continues its work. " + e.getMessage());
+            logger.error("Client connection breakage. The script continues its work. " + e.getMessage());
         } finally {
             logStream.disableRealTimeReading();
         }
@@ -182,8 +181,8 @@ public class ScriptInfo implements StreamingResponseBody, Runnable {
     public String getName() {
         return name;
     }
-    public String getScript() {
-        return script;
+    public String getScriptCode() {
+        return scriptCode;
     }
     public String getLogsLink() {
         return logsLink;

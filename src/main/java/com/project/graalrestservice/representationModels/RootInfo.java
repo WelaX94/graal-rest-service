@@ -9,11 +9,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 /**
  * A class for outputting single messages in JSON format
  */
-public class Info extends RepresentationModel<Info> {
+public class RootInfo extends RepresentationModel<RootInfo> {
 
     private String info;
 
-    public Info(String info) {
+    public RootInfo(String info) {
         this.info = info;
         add(linkTo(Controller.class).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
@@ -22,4 +22,5 @@ public class Info extends RepresentationModel<Info> {
     public String getInfo() {
         return info;
     }
+
 }

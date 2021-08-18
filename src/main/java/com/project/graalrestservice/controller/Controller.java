@@ -1,6 +1,6 @@
 package com.project.graalrestservice.controller;
 
-import com.project.graalrestservice.representationModels.Info;
+import com.project.graalrestservice.representationModels.RootInfo;
 import org.springframework.web.bind.annotation.*;
 
 /** Controller class responsible for "/" */
@@ -12,8 +12,8 @@ public class Controller {
      * @return JSON with application status, self link and link to script list
      * */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public Info appStatus() {
-        return new Info("The application is running");
+    public RootInfo appStatus() {
+        return new RootInfo("The application is running");
     }
 
 }

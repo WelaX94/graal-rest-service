@@ -1,16 +1,16 @@
-package com.project.graalrestservice.domain.services.serviceImplementations;
+package com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations;
 
-import com.project.graalrestservice.domain.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
+import com.project.graalrestservice.domain.scriptHandler.services.ScriptRepository;
+import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.domain.services.ScriptService;
-import com.project.graalrestservice.domain.services.ScriptRepository;
-import com.project.graalrestservice.domain.utils.CircularOutputStream;
+import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
-import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
@@ -57,17 +57,17 @@ public class ScriptServiceImpl implements ScriptService {
      * @param script JS script
      * @param logsLink link to script output logs page
      * @param readable parameter indicates whether the logs will be read in real time or not
-     * @return ScriptInfo with information about the script
+     * @return Script with information about the script
      * @throws WrongScriptException if script has syntax error
      */
     @Override
-    public ScriptInfo addScript(String scriptName, String script, String logsLink, boolean readable) {
+    public Script addScript(String scriptName, String script, String logsLink, boolean readable) {
         checkName(scriptName);
         CircularOutputStream outputStream = new CircularOutputStream(streamCapacity, readable);
         Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
         try {
             Value value = context.parse("js", script);
-            ScriptInfo scriptInfo = new ScriptInfo(scriptName, script, logsLink, outputStream, value, context);
+            Script scriptInfo = new Script(scriptName, script, logsLink, outputStream, value, context);
             scriptRepository.put(scriptName, scriptInfo);
             return scriptInfo;
         } catch (PolyglotException e) {
@@ -78,20 +78,20 @@ public class ScriptServiceImpl implements ScriptService {
 
     /**
      * Method for running the script in asynchronous mode
-     * @param scriptInfo ScriptInfo of the script to run
+     * @param script Script of the script to run
      */
     @Override
-    public void startScriptAsynchronously(ScriptInfo scriptInfo) {
-        scriptInfo.run();
+    public void startScriptAsynchronously(Script script) {
+        script.run();
     }
 
     /**
      * Method for running the script in synchronous mode
-     * @param scriptInfo ScriptInfo of the script to run
+     * @param script Script of the script to run
      */
     @Override
-    public void startScriptSynchronously(ScriptInfo scriptInfo) {
-        scriptInfo.run();
+    public void startScriptSynchronously(Script script) {
+        script.run();
     }
 
     /**
@@ -130,11 +130,11 @@ public class ScriptServiceImpl implements ScriptService {
      */
     @Override
     public void deleteScript(String scriptName) {
-        final ScriptInfo scriptInfo = scriptRepository.get(scriptName);
-        synchronized (scriptInfo) {
-            if (scriptInfo.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
-                    ("To delete a running script, you must first stop it", scriptInfo.getScriptStatus());
-            scriptInfo.closeContext();
+        final Script script = scriptRepository.get(scriptName);
+        synchronized (script) {
+            if (script.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
+                    ("To delete a running script, you must first stop it", script.getScriptStatus());
+            script.closeContext();
             scriptRepository.delete(scriptName);
         }
     }

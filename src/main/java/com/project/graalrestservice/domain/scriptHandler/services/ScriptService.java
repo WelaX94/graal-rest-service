@@ -1,6 +1,6 @@
-package com.project.graalrestservice.domain.services;
+package com.project.graalrestservice.domain.scriptHandler.services;
 
-import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
 import com.project.graalrestservice.representationModels.Page;
@@ -11,7 +11,7 @@ import java.util.List;
 public interface ScriptService {
 
 
-    public ScriptInfo addScript(String name, String script, String logsLink, boolean readable);
+    public Script addScript(String name, String script, String logsLink, boolean readable);
 
     public ScriptInfoForSingle getScriptInfo(String scriptName);
 
@@ -24,8 +24,8 @@ public interface ScriptService {
     public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page);
 
     @Async
-    public void startScriptAsynchronously(ScriptInfo scriptInfo);
+    public void startScriptAsynchronously(Script script);
 
-    public void startScriptSynchronously(ScriptInfo scriptInfo);
+    public void startScriptSynchronously(Script script);
 
 }

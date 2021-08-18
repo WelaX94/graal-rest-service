@@ -1,10 +1,10 @@
-package com.project.graalrestservice.domain.services.serviceImplementations;
+package com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations;
 
-import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
-import com.project.graalrestservice.domain.services.ScriptRepository;
+import com.project.graalrestservice.domain.scriptHandler.services.ScriptRepository;
 import com.project.graalrestservice.exceptionHandling.exceptions.PageDoesNotExistException;
 import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
@@ -20,31 +20,31 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ScriptRepositoryImpl implements ScriptRepository {
 
-    private final ConcurrentHashMap<String, ScriptInfo> map;
+    private final ConcurrentHashMap<String, Script> map;
     private final List<Character> correctFilters = new ArrayList<>(List.of('q', 'r', 's', 'f', 'c'));
 
     /**
      * Adds a new script to the map
      * @param scriptName script name (identifier)
-     * @param scriptInfo script info, contains all the information about the script
+     * @param script script info, contains all the information about the script
      * @throws WrongNameException if a script with this name already exists
      */
     @Override
-    public void put(String scriptName, ScriptInfo scriptInfo) {
-        if (map.putIfAbsent(scriptName, scriptInfo) != null) throw new WrongNameException("Such a name is already in use");
+    public void put(String scriptName, Script script) {
+        if (map.putIfAbsent(scriptName, script) != null) throw new WrongNameException("Such a name is already in use");
     }
 
     /**
      * The method returns information about the script you are looking for
      * @param scriptName script name (identifier)
-     * @return ScriptInfo with information about the script
+     * @return Script with information about the script
      * @throws ScriptNotFoundException if script not found
      */
     @Override
-    public ScriptInfo get(String scriptName) {
-        ScriptInfo scriptInfo = map.get(scriptName);
-        if (scriptInfo == null) throw new ScriptNotFoundException(scriptName);
-        return scriptInfo;
+    public Script get(String scriptName) {
+        Script script = map.get(scriptName);
+        if (script == null) throw new ScriptNotFoundException(scriptName);
+        return script;
     }
 
     /**
@@ -98,7 +98,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                         .thenComparing(ScriptInfoForList::getName)
                         .compare(s1,s2));
         OUTER:
-        for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
+        for (Map.Entry<String, Script> entry : map.entrySet()) {
             final char letterStatus = entry.getValue().getScriptStatus().getLetter();
             for (int f = 0; f < filters.length(); f++) {
                 if (letterStatus == filters.charAt(f)) {
@@ -121,7 +121,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                         .thenComparing(ScriptInfoForList::getCreatedTime)
                         .thenComparing(ScriptInfoForList::getName)
                         .compare(s1,s2));
-        for (Map.Entry<String, ScriptInfo> entry : map.entrySet()) {
+        for (Map.Entry<String, Script> entry : map.entrySet()) {
             set.add(new ScriptInfoForList(entry.getValue()));
         }
         return set;
@@ -163,7 +163,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         this.map = new ConcurrentHashMap<>();
     }
 
-    public ScriptRepositoryImpl(ConcurrentHashMap<String, ScriptInfo> map) {
+    public ScriptRepositoryImpl(ConcurrentHashMap<String, Script> map) {
         this.map = map;
     }
 

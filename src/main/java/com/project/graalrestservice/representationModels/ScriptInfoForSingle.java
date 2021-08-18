@@ -1,8 +1,8 @@
 package com.project.graalrestservice.representationModels;
 
 import com.project.graalrestservice.controller.ScriptsController;
-import com.project.graalrestservice.domain.enums.ScriptStatus;
-import com.project.graalrestservice.domain.models.ScriptInfo;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.OffsetDateTime;
@@ -26,7 +26,7 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
      * Basic constructor
      * @param script the main scriptInfo containing all the information about the script
      */
-    public ScriptInfoForSingle(ScriptInfo script) {
+    public ScriptInfoForSingle(Script script) {
         this.name = script.getName();
         this.status = script.getScriptStatus();
         this.createTime = script.getCreateTime();
