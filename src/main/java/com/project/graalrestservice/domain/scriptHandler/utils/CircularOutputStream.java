@@ -20,7 +20,6 @@ public class CircularOutputStream extends OutputStream {
     /**
      * Basic constructor
      * @param capacity stream capacity
-     * @param realTimeReading parameter indicates whether the logs will be read in real time or not
      */
     public CircularOutputStream(int capacity) {
         buf = new byte[capacity];
