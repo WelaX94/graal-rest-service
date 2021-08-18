@@ -3,11 +3,11 @@ package com.project.graalrestservice.domain.scriptHandler.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class OutputStreamSplitter extends OutputStream {
 
-    private final Set<OutputStream> streamSet = new ConcurrentHashMap<OutputStream, Object>().keySet();
+    private final Set<OutputStream> streamSet = new CopyOnWriteArraySet<>();
 
     @Override
     public void write(int b) throws IOException {

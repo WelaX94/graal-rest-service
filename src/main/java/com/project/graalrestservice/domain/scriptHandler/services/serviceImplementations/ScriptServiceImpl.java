@@ -54,24 +54,20 @@ public class ScriptServiceImpl implements ScriptService {
     /**
      * A method for checking a script for validity and adding it to the list of scripts
      * @param scriptName script name (identifier)
-     * @param script JS script
+     * @param scriptCode JS script
      * @param logsLink link to script output logs page
-     * @param readable parameter indicates whether the logs will be read in real time or not
      * @return Script with information about the script
      * @throws WrongScriptException if script has syntax error
      */
     @Override
-    public Script addScript(String scriptName, String script, String logsLink, boolean readable) {
+    public Script addScript(String scriptName, String scriptCode, String logsLink) {
         checkName(scriptName);
-        CircularOutputStream outputStream = new CircularOutputStream(streamCapacity, readable);
-        Context context = Context.newBuilder().out(outputStream).err(outputStream).allowCreateThread(true).build();
-        try {
-            Value value = context.parse("js", script);
-            Script scriptInfo = new Script(scriptName, script, logsLink, outputStream, value, context);
-            scriptRepository.put(scriptName, scriptInfo);
-            return scriptInfo;
+        try (Context context = Context.create("js")){
+            context.parse("js", scriptCode);
+            Script script = new Script(scriptName, scriptCode, logsLink, streamCapacity);
+            scriptRepository.put(scriptName, script);
+            return script;
         } catch (PolyglotException e) {
-            context.close();
             throw new WrongScriptException(e.getMessage());
         }
     }

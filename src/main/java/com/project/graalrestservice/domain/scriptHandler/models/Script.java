@@ -2,12 +2,12 @@ package com.project.graalrestservice.domain.scriptHandler.models;
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
+import com.project.graalrestservice.domain.scriptHandler.utils.OutputStreamSplitter;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
-import org.graalvm.polyglot.Value;
 
 import java.io.*;
 import java.time.Duration;
@@ -23,14 +23,15 @@ public class Script implements Runnable {
     private final String scriptCode;
     private volatile ScriptStatus status;
     private final String logsLink;
-    private final CircularOutputStream logStream;
+    private final OutputStream logStorageStream;
+    private final OutputStreamSplitter streamSplitter;
     private final OffsetDateTime createTime;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
-    private final Value value;
-    private final Context context;
+    private Context context;
     private String inputInfo;
     private String outputInfo;
+
 
     /**
      * Basic constructor
@@ -38,22 +39,18 @@ public class Script implements Runnable {
      * @param name            script name (identifier)
      * @param scriptCode          JS script
      * @param logsLink        link for script output logs
-     * @param logStream       stream to record logs
-     * @param value           Value used to run the script processing
-     * @param context         Context, which handles the script
      */
     public Script(
-            String name, String scriptCode, String logsLink,
-            CircularOutputStream logStream, Value value, Context context) {
+            String name, String scriptCode, String logsLink, int streamBufferCapacity) {
         this.name = name;
         this.scriptCode = scriptCode;
         this.logsLink = logsLink;
         this.status = ScriptStatus.IN_QUEUE;
         this.createTime = OffsetDateTime.now();
-        this.logStream = logStream;
-        this.value = value;
-        this.context = context;
         this.inputInfo = String.format("%s\tScript created and added to the execution queue\n", createTime);
+        this.logStorageStream = new CircularOutputStream(streamBufferCapacity);
+        this.streamSplitter = new OutputStreamSplitter();
+        this.streamSplitter.addStream(logStorageStream);
     }
 
     /**
@@ -61,9 +58,8 @@ public class Script implements Runnable {
      */
     public Script(
             String name, String scriptCode, String logsLink,
-            CircularOutputStream logStream, Value value, Context context,
-            ScriptStatus scriptStatus) {
-        this(name, scriptCode, logsLink, logStream, value, context);
+            int streamBufferCapacity, ScriptStatus scriptStatus) {
+        this(name, scriptCode, logsLink, streamBufferCapacity);
         this.status = scriptStatus;
     }
 
@@ -72,14 +68,15 @@ public class Script implements Runnable {
      */
     @Override
     public void run() {
-        try {
+        try (Context context = Context.newBuilder().out(streamSplitter).err(streamSplitter).allowCreateThread(true).build()){
+            this.context = context;
             logger.info(String.format("Attempting to run a script [%s]", name));
             synchronized (this) {
                 status = ScriptStatus.RUNNING;
                 startTime = OffsetDateTime.now();
                 inputInfo += startTime + "\tAttempting to run a script\n";
             }
-            value.execute();
+            context.eval("js", scriptCode);
             synchronized (this) {
                 endTime = OffsetDateTime.now();
                 status = ScriptStatus.EXECUTION_SUCCESSFUL;
@@ -97,8 +94,6 @@ public class Script implements Runnable {
                 outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.\n";
             }
             logger.info(String.format("Script [%s] execution failed. %s", name, e.getMessage()));
-        } finally {
-            context.close();
         }
     }
 
@@ -126,8 +121,8 @@ public class Script implements Runnable {
      * @return full output logs
      */
     public String getOutputLogs() {
-        if (outputInfo == null) return inputInfo + logStream.toString();
-        else return inputInfo + logStream.toString() + outputInfo;
+        if (outputInfo == null) return inputInfo + logStorageStream.toString();
+        else return inputInfo + logStorageStream.toString() + outputInfo;
     }
 
     /**
@@ -147,6 +142,14 @@ public class Script implements Runnable {
         context.close(true);
     }
 
+    public void addStreamForRecording(OutputStream outputStream) {
+        streamSplitter.addStream(outputStream);
+    }
+    public void deleteStreamForRecording(OutputStream outputStream) {
+        streamSplitter.deleteStream(outputStream);
+    }
+
+
     public String getName() {
         return name;
     }
@@ -165,8 +168,8 @@ public class Script implements Runnable {
     public OffsetDateTime getEndTime() {
         return endTime;
     }
-    public CircularOutputStream getLogStream() {
-        return logStream;
+    public OutputStream getLogStorageStream() {
+        return logStorageStream;
     }
     public String getInputInfo() {
         return inputInfo;

@@ -4,13 +4,16 @@ import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
+import com.project.graalrestservice.domain.scriptHandler.utils.QueueOutputStream;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.catalina.connector.CoyoteAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +30,12 @@ public class ScriptsController {
 
     private static final Logger logger = LogManager.getLogger(ScriptsController.class);
     private final ScriptService scriptService;
+    private final int streamCapacity;
 
     @Autowired
-    public ScriptsController(ScriptService scriptService) {
+    public ScriptsController(ScriptService scriptService, @Value("${scripts.outputStream.capacity}") int streamCapacity) {
         this.scriptService = scriptService;
+        this.streamCapacity = streamCapacity;
     }
 
     /**
@@ -69,7 +74,7 @@ public class ScriptsController {
             HttpServletRequest request) {
         logger.info("A new script is requested to run");
         Script scriptInfo =
-                scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString(), false);
+                scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString());
         if (sync) scriptService.startScriptAsynchronously(scriptInfo);
         else scriptService.startScriptSynchronously(scriptInfo);
         logger.info("Request successfully processed");
@@ -120,29 +125,23 @@ public class ScriptsController {
             @PathVariable String scriptName,
             HttpServletRequest request) {
         logger.info("Script run with logs streaming request received");
-        Script script = scriptService.addScript(scriptName, scriptCode, request.getRequestURL().toString(), true);
-        scriptService.startScriptAsynchronously(script);
+        Script script = scriptService.addScript(scriptName, scriptCode, request.getRequestURL().toString());
         logger.info("Request successfully processed");
         return (OutputStream outputStream) -> {
-            CircularOutputStream logStream = script.getLogStream();
+            QueueOutputStream queueOutputStream = new QueueOutputStream(streamCapacity);
+            script.addStreamForRecording(queueOutputStream);
+            scriptService.startScriptAsynchronously(script);
+            outputStream.flush();
             try {
-                outputStream.write(script.getInputInfo().getBytes());
-                outputStream.flush();
-                while (script.getScriptStatus() == ScriptStatus.IN_QUEUE) {
-                    Thread.sleep(100);
-                }
-                outputStream.write(String.format("%s\tAttempting to run a script\n", script.getStartTime()).getBytes());
-                outputStream.flush();
-                while (script.getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
-                    outputStream.write(logStream.getNextBytes());
+                while (script.getScriptStatus() == ScriptStatus.IN_QUEUE || script.getScriptStatus() == ScriptStatus.RUNNING || queueOutputStream.hasNextByte()) {
+                    outputStream.write(queueOutputStream.readBytes());
                     outputStream.flush();
                 }
-                outputStream.write(script.getOutputInfo().getBytes());
-                outputStream.flush();
-            } catch (ClientAbortException | InterruptedException e) {
-                logger.error("Client connection breakage. The script continues its work. " + e.getMessage());
+            } catch (ClientAbortException e) {
+                System.out.println("CLIENT ABORT EXCEPTION");
             } finally {
-                logStream.disableRealTimeReading();
+                queueOutputStream.clearStream();
+                script.deleteStreamForRecording(queueOutputStream);
             }
         };
     }

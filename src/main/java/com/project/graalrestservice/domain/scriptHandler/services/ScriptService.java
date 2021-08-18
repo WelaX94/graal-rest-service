@@ -11,7 +11,7 @@ import java.util.List;
 public interface ScriptService {
 
 
-    public Script addScript(String name, String script, String logsLink, boolean readable);
+    public Script addScript(String name, String script, String logsLink);
 
     public ScriptInfoForSingle getScriptInfo(String scriptName);
 
