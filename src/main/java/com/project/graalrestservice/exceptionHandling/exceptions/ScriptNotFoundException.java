@@ -1,9 +1,12 @@
 package com.project.graalrestservice.exceptionHandling.exceptions;
 
-public class ScriptNotFoundException extends RuntimeException{
+import org.zalando.problem.AbstractThrowableProblem;
+import org.zalando.problem.Status;
+
+public class ScriptNotFoundException extends AbstractThrowableProblem {
 
     public ScriptNotFoundException(String scriptName) {
-        super("Script '" + scriptName + "' not found");
+        super(null, "Not found", Status.NOT_FOUND, "Script '" + scriptName + "' not found");
     }
 
 }

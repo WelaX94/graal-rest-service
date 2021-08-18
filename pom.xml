@@ -49,6 +49,12 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.zalando/problem-spring-web -->
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>problem-spring-web</artifactId>
+			<version>0.26.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

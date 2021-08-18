@@ -3,11 +3,12 @@ package com.project.graalrestservice;
 import org.graalvm.polyglot.Context;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 
 /**
  * Class with main method
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
 public class GraalRestServiceApplication {
 
 	/**
@@ -27,7 +28,7 @@ public class GraalRestServiceApplication {
 			SpringApplication.run(GraalRestServiceApplication.class, args);
 		}
 		else {
-			System.out.println("JS Engine not found. The program is closing");
+			System.err.println("JS Engine not found. The program is closing");
 		}
 	}
 

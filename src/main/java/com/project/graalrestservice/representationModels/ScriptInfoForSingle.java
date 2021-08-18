@@ -5,7 +5,6 @@ import com.project.graalrestservice.domain.enums.ScriptStatus;
 import com.project.graalrestservice.domain.models.ScriptInfo;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -44,14 +43,14 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     public ScriptStatus getStatus() {
         return status;
     }
-    public OffsetDateTime getCreateTime() {
-        return createTime;
+    public String getCreateTime() {
+        return createTime.toString();
     }
-    public OffsetDateTime getStartTime() {
-        return startTime;
+    public String getStartTime() {
+        return (startTime == null) ? null : startTime.toString();
     }
-    public OffsetDateTime getEndTime() {
-        return endTime;
+    public String getEndTime() {
+        return (endTime == null) ? null : endTime.toString();
     }
     public String getLogsLink() {
         return logsLink;

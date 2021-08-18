@@ -1,9 +1,12 @@
 package com.project.graalrestservice.exceptionHandling.exceptions;
 
-public class WrongScriptException extends RuntimeException{
+import org.zalando.problem.AbstractThrowableProblem;
+import org.zalando.problem.Status;
+
+public class WrongScriptException extends AbstractThrowableProblem {
 
     public WrongScriptException (String message) {
-        super("Script parsing error. " + message);
+        super(null, "Unprocessable entity", Status.UNPROCESSABLE_ENTITY, message);
     }
 
 }
