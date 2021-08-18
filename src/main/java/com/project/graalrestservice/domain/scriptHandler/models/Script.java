@@ -3,13 +3,11 @@ package com.project.graalrestservice.domain.scriptHandler.models;
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
-import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.*;
 import java.time.Duration;
@@ -18,7 +16,7 @@ import java.time.OffsetDateTime;
 /**
  * A class that contains all the information about the script, as well as the code to run it
  */
-public class Script implements StreamingResponseBody, Runnable {
+public class Script implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(Script.class);
     private final String name;
@@ -114,35 +112,6 @@ public class Script implements StreamingResponseBody, Runnable {
     }
 
     /**
-     * The method required to run a script with the ability to stream logs in real time
-     *
-     * @param outputStream stream, through which the logs will be streamed
-     * @throws IOException
-     */
-    @Override
-    public void writeTo(OutputStream outputStream) throws IOException {
-        try {
-            outputStream.write(inputInfo.getBytes());
-            outputStream.flush();
-            while (getScriptStatus() == ScriptStatus.IN_QUEUE) {
-                Thread.sleep(100);
-            }
-            outputStream.write(String.format("%s\tAttempting to run a script\n", startTime).getBytes());
-            outputStream.flush();
-            while (getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
-                outputStream.write(logStream.getNextBytes());
-                outputStream.flush();
-            }
-            outputStream.write(outputInfo.getBytes());
-            outputStream.flush();
-        } catch (ClientAbortException | InterruptedException e) {
-            logger.error("Client connection breakage. The script continues its work. " + e.getMessage());
-        } finally {
-            logStream.disableRealTimeReading();
-        }
-    }
-
-    /**
      * A method to get the current status of the script
      *
      * @return current status of the script
@@ -195,6 +164,15 @@ public class Script implements StreamingResponseBody, Runnable {
     }
     public OffsetDateTime getEndTime() {
         return endTime;
+    }
+    public CircularOutputStream getLogStream() {
+        return logStream;
+    }
+    public String getInputInfo() {
+        return inputInfo;
+    }
+    public String getOutputInfo() {
+        return outputInfo;
     }
 
 }

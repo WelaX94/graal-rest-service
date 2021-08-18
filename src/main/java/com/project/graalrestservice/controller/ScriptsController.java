@@ -1,10 +1,13 @@
 package com.project.graalrestservice.controller;
 
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
+import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.OutputStream;
 import java.util.List;
 
 /** Controller class responsible for "/scripts" */
@@ -103,7 +107,7 @@ public class ScriptsController {
     /**
      * Another option for adding a new script to the run queue in the blocking variant ({@link ScriptsController#runScript(String, String, boolean, HttpServletRequest) first option})
      *
-     * @param script JS script
+     * @param scriptCode JS script
      * @param scriptName script name (identifier)
      * @param request HttpServletRequest
      * @return the log broadcast in real time
@@ -112,14 +116,35 @@ public class ScriptsController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.PUT)
     public StreamingResponseBody runScriptWithLogsStreaming(
-            @RequestBody String script,
+            @RequestBody String scriptCode,
             @PathVariable String scriptName,
             HttpServletRequest request) {
         logger.info("Script run with logs streaming request received");
-        Script scriptInfo = scriptService.addScript(scriptName, script, request.getRequestURL().toString(), true);
-        scriptService.startScriptAsynchronously(scriptInfo);
+        Script script = scriptService.addScript(scriptName, scriptCode, request.getRequestURL().toString(), true);
+        scriptService.startScriptAsynchronously(script);
         logger.info("Request successfully processed");
-        return scriptInfo;
+        return (OutputStream outputStream) -> {
+            CircularOutputStream logStream = script.getLogStream();
+            try {
+                outputStream.write(script.getInputInfo().getBytes());
+                outputStream.flush();
+                while (script.getScriptStatus() == ScriptStatus.IN_QUEUE) {
+                    Thread.sleep(100);
+                }
+                outputStream.write(String.format("%s\tAttempting to run a script\n", script.getStartTime()).getBytes());
+                outputStream.flush();
+                while (script.getScriptStatus() == ScriptStatus.RUNNING || !logStream.isReadComplete()) {
+                    outputStream.write(logStream.getNextBytes());
+                    outputStream.flush();
+                }
+                outputStream.write(script.getOutputInfo().getBytes());
+                outputStream.flush();
+            } catch (ClientAbortException | InterruptedException e) {
+                logger.error("Client connection breakage. The script continues its work. " + e.getMessage());
+            } finally {
+                logStream.disableRealTimeReading();
+            }
+        };
     }
 
     /**
