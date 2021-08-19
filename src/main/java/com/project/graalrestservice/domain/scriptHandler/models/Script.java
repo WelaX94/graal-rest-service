@@ -29,8 +29,6 @@ public class Script implements Runnable {
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private Context context;
-    private String inputInfo;
-    private String outputInfo;
 
 
     /**
@@ -47,7 +45,6 @@ public class Script implements Runnable {
         this.logsLink = logsLink;
         this.status = ScriptStatus.IN_QUEUE;
         this.createTime = OffsetDateTime.now();
-        this.inputInfo = String.format("%s\tScript created and added to the execution queue\n", createTime);
         this.logStorageStream = new CircularOutputStream(streamBufferCapacity);
         this.streamSplitter = new OutputStreamSplitter();
         this.streamSplitter.addStream(logStorageStream);
@@ -71,29 +68,37 @@ public class Script implements Runnable {
         try (Context context = Context.newBuilder().out(streamSplitter).err(streamSplitter).allowCreateThread(true).build()){
             this.context = context;
             logger.info(String.format("Attempting to run a script [%s]", name));
-            synchronized (this) {
-                status = ScriptStatus.RUNNING;
-                startTime = OffsetDateTime.now();
-                inputInfo += startTime + "\tAttempting to run a script\n";
-            }
+            prepareScriptExecution();
             context.eval("js", scriptCode);
-            synchronized (this) {
-                endTime = OffsetDateTime.now();
-                status = ScriptStatus.EXECUTION_SUCCESSFUL;
-                outputInfo = endTime + "\tExited in " + getExecutionTime() + "s.\n";
-            }
+            processingSuccessfulExecution();
             logger.info(String.format("Script [%s] execution completed successfully", name));
         } catch (PolyglotException e) {
-            synchronized (this) {
-                endTime = OffsetDateTime.now();
-                if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
-                else status = ScriptStatus.EXECUTION_FAILED;
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                outputInfo += sw + endTime.toString() + " Exited in " + getExecutionTime() + "s.\n";
-            }
+            processingFailedOrCanceledExecution(e);
             logger.info(String.format("Script [%s] execution failed. %s", name, e.getMessage()));
+        }
+    }
+
+    private synchronized void prepareScriptExecution() {
+        status = ScriptStatus.RUNNING;
+        startTime = OffsetDateTime.now();
+    }
+
+    private synchronized void processingSuccessfulExecution() {
+        endTime = OffsetDateTime.now();
+        status = ScriptStatus.EXECUTION_SUCCESSFUL;
+    }
+
+    private synchronized void processingFailedOrCanceledExecution(PolyglotException e) {
+        endTime = OffsetDateTime.now();
+        if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
+        else status = ScriptStatus.EXECUTION_FAILED;
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        try {
+            streamSplitter.write(sw.toString().getBytes());
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -121,8 +126,7 @@ public class Script implements Runnable {
      * @return full output logs
      */
     public String getOutputLogs() {
-        if (outputInfo == null) return inputInfo + logStorageStream.toString();
-        else return inputInfo + logStorageStream.toString() + outputInfo;
+        return logStorageStream.toString();
     }
 
     /**
@@ -170,12 +174,6 @@ public class Script implements Runnable {
     }
     public OutputStream getLogStorageStream() {
         return logStorageStream;
-    }
-    public String getInputInfo() {
-        return inputInfo;
-    }
-    public String getOutputInfo() {
-        return outputInfo;
     }
 
 }
