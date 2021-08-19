@@ -99,7 +99,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                         .compare(s1,s2));
         OUTER:
         for (Map.Entry<String, Script> entry : map.entrySet()) {
-            final char letterStatus = entry.getValue().getScriptStatus().getLetter();
+            final char letterStatus = entry.getValue().getStatus().getLetter();
             for (int f = 0; f < filters.length(); f++) {
                 if (letterStatus == filters.charAt(f)) {
                     set.add(new ScriptInfoForList(entry.getValue(), scriptStatusPriority));

@@ -15,24 +15,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  */
 public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle> {
 
-    private final String name;
-    private final ScriptStatus status;
-    private final OffsetDateTime createTime;
-    private final OffsetDateTime startTime;
-    private final OffsetDateTime endTime;
-    private final String logsLink;
+    private String name;
+    private ScriptStatus status;
+    private OffsetDateTime createTime;
+    private OffsetDateTime startTime;
+    private OffsetDateTime endTime;
+    private String logsLink;
 
-    /**
-     * Basic constructor
-     * @param script the main scriptInfo containing all the information about the script
-     */
-    public ScriptInfoForSingle(Script script) {
-        this.name = script.getName();
-        this.status = script.getScriptStatus();
-        this.createTime = script.getCreateTime();
-        this.startTime = script.getStartTime();
-        this.endTime = script.getEndTime();
-        this.logsLink = null;
+    public ScriptInfoForSingle() {
+    }
+
+    private void setLinks() {
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
     }
@@ -56,4 +49,23 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
         return logsLink;
     }
 
+    public void setName(String name) {
+        this.name = name;
+        setLinks();
+    }
+    public void setStatus(ScriptStatus status) {
+        this.status = status;
+    }
+    public void setCreateTime(OffsetDateTime createTime) {
+        this.createTime = createTime;
+    }
+    public void setStartTime(OffsetDateTime startTime) {
+        this.startTime = startTime;
+    }
+    public void setEndTime(OffsetDateTime endTime) {
+        this.endTime = endTime;
+    }
+    public void setLogsLink(String logsLink) {
+        this.logsLink = logsLink;
+    }
 }

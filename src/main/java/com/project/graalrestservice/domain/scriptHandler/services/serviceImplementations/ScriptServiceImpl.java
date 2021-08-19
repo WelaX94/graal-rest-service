@@ -10,6 +10,7 @@ import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptStatusException;
+import com.project.graalrestservice.representationModels.mappers.SingleScriptMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,6 @@ public class ScriptServiceImpl implements ScriptService {
      * A method for checking a script for validity and adding it to the list of scripts
      * @param scriptName script name (identifier)
      * @param scriptCode JS script
-     * @param logsLink link to script output logs page
      * @return Script with information about the script
      * @throws WrongScriptException if script has syntax error
      */
@@ -88,7 +88,8 @@ public class ScriptServiceImpl implements ScriptService {
      */
     @Override
     public ScriptInfoForSingle getScriptInfo(String scriptName) {
-        return new ScriptInfoForSingle(scriptRepository.get(scriptName));
+        SingleScriptMapper.forSingle.map(scriptRepository.get(scriptName));
+        return SingleScriptMapper.forSingle.map(scriptRepository.get(scriptName));
     }
 
     /**
@@ -119,8 +120,8 @@ public class ScriptServiceImpl implements ScriptService {
     public void deleteScript(String scriptName) {
         final Script script = scriptRepository.get(scriptName);
         synchronized (script) {
-            if (script.getScriptStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
-                    ("To delete a running script, you must first stop it", script.getScriptStatus());
+            if (script.getStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
+                    ("To delete a running script, you must first stop it", script.getStatus());
             script.closeContext();
             scriptRepository.delete(scriptName);
         }

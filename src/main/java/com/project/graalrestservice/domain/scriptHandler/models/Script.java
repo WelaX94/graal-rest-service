@@ -122,7 +122,7 @@ public class Script implements Runnable {
      *
      * @return current status of the script
      */
-    public synchronized ScriptStatus getScriptStatus() {
+    public synchronized ScriptStatus getStatus() {
         return status;
     }
 

@@ -3,13 +3,12 @@ package com.project.graalrestservice.controller;
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
-import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.domain.scriptHandler.utils.QueueOutputStream;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
+import com.project.graalrestservice.representationModels.mappers.SingleScriptMapper;
 import org.apache.catalina.connector.ClientAbortException;
-import org.apache.catalina.connector.CoyoteAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public class ScriptsController {
 
     /**
      * Method for adding a new script to the run queue
-     * @param script JS script
+     * @param scriptCode JS script
      * @param scriptName script name (identifier)
      * @param sync run script type - asynchronous (true) or synchronous (false)
      * @param request Http Servlet Request
@@ -68,19 +67,19 @@ public class ScriptsController {
      * */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
     public ResponseEntity<ScriptInfoForSingle> runScript(
-            @RequestBody String script,
+            @RequestBody String scriptCode,
             @PathVariable String scriptName,
             @RequestParam(defaultValue = "true") boolean sync,
             HttpServletRequest request) {
         logger.info("A new script is requested to run");
-        Script scriptInfo =
-                scriptService.addScript(scriptName, script);
-        if (sync) scriptService.startScriptAsynchronously(scriptInfo);
-        else scriptService.startScriptSynchronously(scriptInfo);
+        Script script =
+                scriptService.addScript(scriptName, scriptCode);
+        if (sync) scriptService.startScriptAsynchronously(script);
+        else scriptService.startScriptSynchronously(script);
         logger.info("Request successfully processed");
         return (sync) ?
-                (new ResponseEntity<>(new ScriptInfoForSingle(scriptInfo), HttpStatus.ACCEPTED)) :
-                (new ResponseEntity<>(new ScriptInfoForSingle(scriptInfo), HttpStatus.CREATED));
+                (new ResponseEntity<>(SingleScriptMapper.forSingle.map(script), HttpStatus.ACCEPTED)) :
+                (new ResponseEntity<>(SingleScriptMapper.forSingle.map(script), HttpStatus.CREATED));
     }
 
     /**
@@ -133,7 +132,7 @@ public class ScriptsController {
             scriptService.startScriptAsynchronously(script);
             outputStream.flush();
             try {
-                while (script.getScriptStatus() == ScriptStatus.IN_QUEUE || script.getScriptStatus() == ScriptStatus.RUNNING || queueOutputStream.hasNextByte()) {
+                while (script.getStatus() == ScriptStatus.IN_QUEUE || script.getStatus() == ScriptStatus.RUNNING || queueOutputStream.hasNextByte()) {
                     outputStream.write(queueOutputStream.readBytes());
                     outputStream.flush();
                 }

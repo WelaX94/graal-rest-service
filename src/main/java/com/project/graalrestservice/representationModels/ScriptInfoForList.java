@@ -29,7 +29,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
      */
     public ScriptInfoForList(Script script, ScriptStatus.Priority scriptStatusPriority) {
         this.name = script.getName();
-        this.status = script.getScriptStatus();
+        this.status = script.getStatus();
         this.createdTime = script.getCreateTime();
         this.scriptStatusPriority = scriptStatusPriority;
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
