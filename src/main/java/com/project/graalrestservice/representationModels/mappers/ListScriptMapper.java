@@ -11,7 +11,7 @@ public interface ListScriptMapper {
 
     ListScriptMapper forList = Mappers.getMapper(ListScriptMapper.class);
 
-    @Mapping(target = "status")
-    ScriptInfoForList map(Script script);
+//    @Mapping(target = "status")
+//    ScriptInfoForList map(Script script);
 
 }
