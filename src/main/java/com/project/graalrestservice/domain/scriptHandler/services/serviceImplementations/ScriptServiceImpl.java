@@ -7,9 +7,9 @@ import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
-import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptException;
-import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

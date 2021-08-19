@@ -1,20 +1,14 @@
 package com.project.graalrestservice.controller;
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.*;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptRepository;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
-import com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations.ScriptRepositoryImpl;
-import com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations.ScriptServiceImpl;
-import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
-import com.project.graalrestservice.exceptionHandling.exceptions.*;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;

@@ -5,10 +5,10 @@ import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptRepository;
-import com.project.graalrestservice.exceptionHandling.exceptions.PageDoesNotExistException;
-import com.project.graalrestservice.exceptionHandling.exceptions.ScriptNotFoundException;
-import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
-import com.project.graalrestservice.exceptionHandling.exceptions.WrongArgumentException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.PageDoesNotExistException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.ScriptNotFoundException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongArgumentException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
