@@ -32,7 +32,7 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
         this.createTime = script.getCreateTime();
         this.startTime = script.getStartTime();
         this.endTime = script.getEndTime();
-        this.logsLink = script.getLogsLink();
+        this.logsLink = null;
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
     }

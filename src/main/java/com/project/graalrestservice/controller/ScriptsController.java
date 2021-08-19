@@ -74,7 +74,7 @@ public class ScriptsController {
             HttpServletRequest request) {
         logger.info("A new script is requested to run");
         Script scriptInfo =
-                scriptService.addScript(scriptName, script, request.getRequestURL().append("/logs").toString());
+                scriptService.addScript(scriptName, script);
         if (sync) scriptService.startScriptAsynchronously(scriptInfo);
         else scriptService.startScriptSynchronously(scriptInfo);
         logger.info("Request successfully processed");
@@ -125,7 +125,7 @@ public class ScriptsController {
             @PathVariable String scriptName,
             HttpServletRequest request) {
         logger.info("Script run with logs streaming request received");
-        Script script = scriptService.addScript(scriptName, scriptCode, request.getRequestURL().toString());
+        Script script = scriptService.addScript(scriptName, scriptCode);
         logger.info("Request successfully processed");
         return (OutputStream outputStream) -> {
             QueueOutputStream queueOutputStream = new QueueOutputStream(streamCapacity);

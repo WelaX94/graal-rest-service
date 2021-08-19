@@ -7,13 +7,9 @@ import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
-import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongNameException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.PolyglotException;
-import org.graalvm.polyglot.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,16 +56,11 @@ public class ScriptServiceImpl implements ScriptService {
      * @throws WrongScriptException if script has syntax error
      */
     @Override
-    public Script addScript(String scriptName, String scriptCode, String logsLink) {
+    public Script addScript(String scriptName, String scriptCode) {
         checkName(scriptName);
-        try (Context context = Context.create("js")){
-            context.parse("js", scriptCode);
-            Script script = new Script(scriptName, scriptCode, logsLink, streamCapacity);
-            scriptRepository.put(scriptName, script);
-            return script;
-        } catch (PolyglotException e) {
-            throw new WrongScriptException(e.getMessage());
-        }
+        Script script = Script.create(scriptName, scriptCode, streamCapacity);
+        scriptRepository.put(scriptName, script);
+        return script;
     }
 
     /**

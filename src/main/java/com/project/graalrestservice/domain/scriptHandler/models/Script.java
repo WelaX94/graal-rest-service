@@ -3,6 +3,7 @@ package com.project.graalrestservice.domain.scriptHandler.models;
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.domain.scriptHandler.utils.OutputStreamSplitter;
+import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptException;
 import com.project.graalrestservice.exceptionHandling.exceptions.WrongScriptStatusException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +23,6 @@ public class Script implements Runnable {
     private final String name;
     private final String scriptCode;
     private volatile ScriptStatus status;
-    private final String logsLink;
     private final OutputStream logStorageStream;
     private final OutputStreamSplitter streamSplitter;
     private final OffsetDateTime createTime;
@@ -30,19 +30,27 @@ public class Script implements Runnable {
     private OffsetDateTime endTime;
     private Context context;
 
+    public static Script create(String name, String scriptCode, int streamBufferCapacity) {
+        validate(scriptCode);
+        return new Script(name, scriptCode, streamBufferCapacity);
+    }
+
+    private static void validate(String scriptCode) {
+        try (Context context = Context.create("js")){
+            context.parse("js", scriptCode);
+        } catch (PolyglotException e) {
+            throw new WrongScriptException(e.getMessage());
+        }
+    }
 
     /**
      * Basic constructor
-     *
      * @param name            script name (identifier)
-     * @param scriptCode          JS script
-     * @param logsLink        link for script output logs
+     * @param scriptCode      JS script
      */
-    public Script(
-            String name, String scriptCode, String logsLink, int streamBufferCapacity) {
+    private Script(String name, String scriptCode, int streamBufferCapacity) {
         this.name = name;
         this.scriptCode = scriptCode;
-        this.logsLink = logsLink;
         this.status = ScriptStatus.IN_QUEUE;
         this.createTime = OffsetDateTime.now();
         this.logStorageStream = new CircularOutputStream(streamBufferCapacity);
@@ -53,10 +61,8 @@ public class Script implements Runnable {
     /**
      * Constructor required for tests
      */
-    public Script(
-            String name, String scriptCode, String logsLink,
-            int streamBufferCapacity, ScriptStatus scriptStatus) {
-        this(name, scriptCode, logsLink, streamBufferCapacity);
+    public Script(String name, String scriptCode, int streamBufferCapacity, ScriptStatus scriptStatus) {
+        this(name, scriptCode, streamBufferCapacity);
         this.status = scriptStatus;
     }
 
@@ -159,9 +165,6 @@ public class Script implements Runnable {
     }
     public String getScriptCode() {
         return scriptCode;
-    }
-    public String getLogsLink() {
-        return logsLink;
     }
     public OffsetDateTime getCreateTime() {
         return createTime;
