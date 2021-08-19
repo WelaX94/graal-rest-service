@@ -1,12 +1,15 @@
 package com.project.graalrestservice.controller;
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.PageDoesNotExistException;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongArgumentException;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.domain.scriptHandler.utils.QueueOutputStream;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
+import com.project.graalrestservice.representationModels.mappers.ListScriptMapper;
 import com.project.graalrestservice.representationModels.mappers.SingleScriptMapper;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.LogManager;
@@ -20,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /** Controller class responsible for "/scripts" */
@@ -39,21 +43,24 @@ public class ScriptsController {
 
     /**
      * A method to get a list of scripts
-     * @param filters list of filters to filter and sort the list of scripts
      * @param pageSize maximum number of scripts per page
      * @param page number of page
      * @return page with filtered and sorted scripts
      * */
     @RequestMapping(method = RequestMethod.GET)
     public Page<List<ScriptInfoForList>> getScriptListPage(
-            @RequestParam(defaultValue = "basic") String filters,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "1") int page) {
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String nameContains,
+            @RequestParam(defaultValue = "false") boolean orderByName,
+            @RequestParam(defaultValue = "false") boolean reverseOrder) {
         logger.info(String.format
-                ("Script list request received: filters=%s, pageSize=%d, page=%d", filters, pageSize, page));
-        Page<List<ScriptInfoForList>> scriptListPage = scriptService.getScriptListPage(filters, pageSize, page);
+                ("Script list request received: filters=%s, pageSize=%d, page=%d", status, pageSize, page));
+        List<Script> scriptList = scriptService.getScriptList(ScriptStatus.getStatus(status), nameContains, orderByName, reverseOrder);
+        Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, page, pageSize, status, nameContains, orderByName, reverseOrder);
         logger.info("Request successfully processed");
-        return scriptListPage;
+        return scriptPage;
     }
 
     /**
@@ -77,9 +84,11 @@ public class ScriptsController {
         if (sync) scriptService.startScriptAsynchronously(script);
         else scriptService.startScriptSynchronously(script);
         logger.info("Request successfully processed");
+        ScriptInfoForSingle scriptInfoForSingle =SingleScriptMapper.forSingle.map(script);
+        scriptInfoForSingle.setLinks(request.getRequestURL().toString());
         return (sync) ?
-                (new ResponseEntity<>(SingleScriptMapper.forSingle.map(script), HttpStatus.ACCEPTED)) :
-                (new ResponseEntity<>(SingleScriptMapper.forSingle.map(script), HttpStatus.CREATED));
+                (new ResponseEntity<>(scriptInfoForSingle, HttpStatus.ACCEPTED)) :
+                (new ResponseEntity<>(scriptInfoForSingle, HttpStatus.CREATED));
     }
 
     /**
@@ -88,9 +97,10 @@ public class ScriptsController {
      * @return JSON information about script
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)
-    public ScriptInfoForSingle getSingleScriptInfo(@PathVariable String scriptName) {
+    public ScriptInfoForSingle getSingleScriptInfo(@PathVariable String scriptName, HttpServletRequest request) {
         logger.info("Single script info request received");
-        ScriptInfoForSingle scriptInfoForSingle = scriptService.getScriptInfo(scriptName);
+        ScriptInfoForSingle scriptInfoForSingle = SingleScriptMapper.forSingle.map(scriptService.getScript(scriptName));
+        scriptInfoForSingle.setLinks(request.getRequestURL().toString());
         logger.info("Request successfully processed");
         return scriptInfoForSingle;
     }
@@ -103,7 +113,7 @@ public class ScriptsController {
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.GET)
     public String getScriptLogs(@PathVariable String scriptName) {
         logger.info("Script logs request received");
-        String logs = scriptService.getScriptLogs(scriptName);
+        String logs = scriptService.getScript(scriptName).getOutputLogs();
         logger.info("Request successfully processed");
         return logs;
     }
@@ -165,6 +175,29 @@ public class ScriptsController {
         logger.info("Delete script request received");
         scriptService.deleteScript(scriptName);
         logger.info("Request successfully processed");
+    }
+
+    private Page<List<ScriptInfoForList>> convertListToPage(List<Script> scriptList, int pageNumber, int pageSize, String status, String nameContains, boolean orderByName, boolean reverseOrder) {
+
+        if (pageNumber < 1) throw new WrongArgumentException("The page number cannot be less than 1");
+        if (pageSize < 1) throw new WrongArgumentException("The page size cannot be less than 1");
+
+        int listSize = scriptList.size();
+        int end = pageNumber * pageSize;
+        int start = end - pageSize;
+        if (start >= listSize) throw new PageDoesNotExistException(pageNumber);
+        if (listSize < end) end = listSize;
+
+        List<ScriptInfoForList> pageList = new ArrayList<>();
+        for( ; start < end; start++) {
+            pageList.add(ListScriptMapper.forList.map(scriptList.get(start)));
+        }
+
+        int numPages = (listSize % pageSize == 0) ? (listSize / pageSize) : (listSize / pageSize + 1);
+        Page<List<ScriptInfoForList>> scriptsPage = new Page<>(pageList, pageNumber, numPages, listSize);
+        scriptsPage.setLinks(pageSize, status, nameContains, orderByName, reverseOrder);
+        return scriptsPage;
+
     }
 
 }

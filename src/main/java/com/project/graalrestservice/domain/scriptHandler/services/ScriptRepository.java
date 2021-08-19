@@ -1,19 +1,18 @@
 package com.project.graalrestservice.domain.scriptHandler.services;
 
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
-import com.project.graalrestservice.representationModels.Page;
-import com.project.graalrestservice.representationModels.ScriptInfoForList;
 
 import java.util.List;
 
 public interface ScriptRepository {
 
-    public void put(String scriptName, Script script);
+    public void putScript(String scriptName, Script script);
 
-    public Script get(String scriptName);
+    public Script getScript(String scriptName);
 
-    public void delete(String scriptName);
+    public void deleteScript(String scriptName);
 
-    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page);
+    public List<Script> getScriptList(ScriptStatus status, String nameContains);
 
 }

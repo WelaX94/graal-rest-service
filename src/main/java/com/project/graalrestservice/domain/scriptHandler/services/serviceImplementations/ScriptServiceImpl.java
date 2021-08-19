@@ -4,24 +4,22 @@ import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptRepository;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
-import com.project.graalrestservice.representationModels.Page;
-import com.project.graalrestservice.representationModels.ScriptInfoForList;
-import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptStatusException;
-import com.project.graalrestservice.representationModels.mappers.SingleScriptMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A class for processing commands over scripts
  */
 @Service
-public class ScriptServiceImpl implements ScriptService {
+public class ScriptServiceImpl implements ScriptService{
 
     private final ScriptRepository scriptRepository;
     private final int streamCapacity;
@@ -38,14 +36,17 @@ public class ScriptServiceImpl implements ScriptService {
 
     /**
      * A method to get a script page with specified parameters
-     * @param filters filter list
-     * @param pageSize page size
-     * @param page page
      * @return Page with specified parameters
      */
-    @Override
-    public Page<List<ScriptInfoForList>> getScriptListPage(String filters, int pageSize, int page) {
-        return scriptRepository.getScriptListPage(filters, pageSize, page);
+    public List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains, boolean orderByName, boolean reverseOrder) {
+        Comparator<Script> comparator;
+        if (orderByName) comparator = Comparator.comparing(Script::getName);
+        else comparator = Comparator.comparing(Script::getCreateTime);
+        if (reverseOrder) comparator = comparator.reversed();
+        return scriptRepository.getScriptList(scriptStatus, nameContains)
+                .stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -59,7 +60,7 @@ public class ScriptServiceImpl implements ScriptService {
     public Script addScript(String scriptName, String scriptCode) {
         checkName(scriptName);
         Script script = Script.create(scriptName, scriptCode, streamCapacity);
-        scriptRepository.put(scriptName, script);
+        scriptRepository.putScript(scriptName, script);
         return script;
     }
 
@@ -87,19 +88,8 @@ public class ScriptServiceImpl implements ScriptService {
      * @return ScriptInfoForSingle with information for a single display
      */
     @Override
-    public ScriptInfoForSingle getScriptInfo(String scriptName) {
-        SingleScriptMapper.forSingle.map(scriptRepository.get(scriptName));
-        return SingleScriptMapper.forSingle.map(scriptRepository.get(scriptName));
-    }
-
-    /**
-     * A method for retrieving the script logs
-     * @param scriptName script name (identifier)
-     * @return String with script logs
-     */
-    @Override
-    public String getScriptLogs(String scriptName) {
-        return scriptRepository.get(scriptName).getOutputLogs();
+    public Script getScript(String scriptName) {
+        return scriptRepository.getScript(scriptName);
     }
 
     /**
@@ -108,7 +98,7 @@ public class ScriptServiceImpl implements ScriptService {
      */
     @Override
     public void stopScript(String scriptName) {
-        scriptRepository.get(scriptName).stopScriptExecution();
+        scriptRepository.getScript(scriptName).stopScriptExecution();
     }
 
     /**
@@ -118,12 +108,12 @@ public class ScriptServiceImpl implements ScriptService {
      */
     @Override
     public void deleteScript(String scriptName) {
-        final Script script = scriptRepository.get(scriptName);
+        final Script script = scriptRepository.getScript(scriptName);
         synchronized (script) {
             if (script.getStatus() == ScriptStatus.RUNNING) throw new WrongScriptStatusException
                     ("To delete a running script, you must first stop it", script.getStatus());
             script.closeContext();
-            scriptRepository.delete(scriptName);
+            scriptRepository.deleteScript(scriptName);
         }
     }
 

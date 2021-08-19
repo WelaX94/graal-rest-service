@@ -2,7 +2,6 @@ package com.project.graalrestservice.representationModels;
 
 import com.project.graalrestservice.controller.ScriptsController;
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
-import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.OffsetDateTime;
@@ -21,12 +20,13 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private String logsLink;
+    private String scriptCodeLink;
 
     public ScriptInfoForSingle() {
     }
 
     private void setLinks() {
-        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
+        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name, null)).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
     }
 
@@ -48,6 +48,9 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     public String getLogsLink() {
         return logsLink;
     }
+    public String getScriptCodeLink() {
+        return scriptCodeLink;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -65,7 +68,9 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     public void setEndTime(OffsetDateTime endTime) {
         this.endTime = endTime;
     }
-    public void setLogsLink(String logsLink) {
-        this.logsLink = logsLink;
+    public void setLinks(String scriptLocation) {
+        this.logsLink = scriptLocation + "/logs";
+        this.scriptCodeLink = scriptLocation + "/scriptCode";
     }
+
 }

@@ -2,7 +2,6 @@ package com.project.graalrestservice.representationModels;
 
 import com.project.graalrestservice.controller.ScriptsController;
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
-import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.OffsetDateTime;
@@ -15,33 +14,25 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  */
 public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
 
-    private static final ScriptStatus.Priority defaultPriority = new ScriptStatus.Priority();
-    private final String name;
-    private final ScriptStatus status;
-    private final OffsetDateTime createdTime;
-    private final ScriptStatus.Priority scriptStatusPriority;
+    private String name;
+    private ScriptStatus status;
+    private OffsetDateTime createTime;
 
     /**
      * Class constructor using custom script priority for sorting
-     * @param script the main script containing all the information about the script
-     * @param scriptStatusPriority custom script priority for sorting
-     * @see ScriptStatus.Priority
      */
-    public ScriptInfoForList(Script script, ScriptStatus.Priority scriptStatusPriority) {
-        this.name = script.getName();
-        this.status = script.getStatus();
-        this.createdTime = script.getCreateTime();
-        this.scriptStatusPriority = scriptStatusPriority;
-        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
+    public ScriptInfoForList() {
     }
 
-    /**
-     * Class constructor using default script priority for sorting
-     * @param script the main script containing all the information about the script
-     * @see ScriptStatus.Priority
-     */
-    public ScriptInfoForList(Script script) {
-        this(script, defaultPriority);
+    public void setName(String name) {
+        this.name = name;
+        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name, null)).withSelfRel());
+    }
+    public void setStatus(ScriptStatus status) {
+        this.status = status;
+    }
+    public void setCreateTime(OffsetDateTime createTime) {
+        this.createTime = createTime;
     }
 
     public String getName() {
@@ -50,11 +41,8 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
     public ScriptStatus getStatus() {
         return status;
     }
-    public String getCreatedTime() {
-        return createdTime.toString();
-    }
-    public int returnPriority() {
-        return scriptStatusPriority.getPriority(status);
+    public String getCreateTime() {
+        return createTime.toString();
     }
 
 }

@@ -1,4 +1,4 @@
-# GraalJS REST Service
+# GraalJS REST Service (OLD INFORMATION. WILL BE UPDATED SOON)
 This service allows you to run arbitrary JavaScript code and get the result of its execution.
 
 ## Tech assignment
