@@ -25,9 +25,19 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     public ScriptInfoForSingle() {
     }
 
-    private void setLinks() {
+    private void setHateoasLinks() {
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name, null)).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
+    }
+
+    public void setLinks(String scriptLocation) {
+        this.logsLink = scriptLocation + "/logs";
+        this.scriptCodeLink = scriptLocation + "/scriptCode";
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        setHateoasLinks();
     }
 
     public String getName() {
@@ -52,10 +62,6 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
         return scriptCodeLink;
     }
 
-    public void setName(String name) {
-        this.name = name;
-        setLinks();
-    }
     public void setStatus(ScriptStatus status) {
         this.status = status;
     }
@@ -67,10 +73,6 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     }
     public void setEndTime(OffsetDateTime endTime) {
         this.endTime = endTime;
-    }
-    public void setLinks(String scriptLocation) {
-        this.logsLink = scriptLocation + "/logs";
-        this.scriptCodeLink = scriptLocation + "/scriptCode";
     }
 
 }
