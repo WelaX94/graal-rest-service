@@ -5,10 +5,11 @@ import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStr
 import com.project.graalrestservice.domain.scriptHandler.utils.OutputStreamSplitter;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptStatusException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.*;
 import java.time.Duration;
@@ -19,7 +20,7 @@ import java.time.OffsetDateTime;
  */
 public class Script implements Runnable {
 
-    private static final Logger logger = LogManager.getLogger(Script.class);
+    private static final Logger logger = LoggerFactory.getLogger(Script.class);
     private final String name;
     private final String scriptCode;
     private volatile ScriptStatus status;
@@ -38,7 +39,9 @@ public class Script implements Runnable {
     private static void validate(String scriptCode) {
         try (Context context = Context.create("js")){
             context.parse("js", scriptCode);
+            logger.trace("[{} - Validation of the script was successful]", MDC.get("scriptName"));
         } catch (PolyglotException e) {
+            logger.debug("[{} - Failed to validate the script]", MDC.get("scriptName"));
             throw new WrongScriptException(e.getMessage());
         }
     }
@@ -56,6 +59,7 @@ public class Script implements Runnable {
         this.logStorageStream = new CircularOutputStream(streamBufferCapacity);
         this.streamSplitter = new OutputStreamSplitter();
         this.streamSplitter.addStream(logStorageStream);
+        logger.trace("[{}] - Script object created]", name);
     }
 
     /**
@@ -71,20 +75,21 @@ public class Script implements Runnable {
      */
     @Override
     public void run() {
+        logger.info("[{}] - Attempting to run a script", this.name);
         try (Context context = Context.newBuilder().out(streamSplitter).err(streamSplitter).allowCreateThread(true).build()){
             this.context = context;
-            logger.info(String.format("Attempting to run a script [%s]", name));
             prepareScriptExecution();
             context.eval("js", scriptCode);
             processingSuccessfulExecution();
-            logger.info(String.format("Script [%s] execution completed successfully", name));
+            logger.info("[{}] - Execution completed successfully", name);
         } catch (PolyglotException e) {
             processingFailedOrCanceledExecution(e);
-            logger.info(String.format("Script [%s] execution failed. %s", name, e.getMessage()));
+            logger.info("[{}] - Execution failed. {}", name, e.getMessage());
         }
     }
 
     private synchronized void prepareScriptExecution() {
+        logger.trace("[{}] - Started launch preparations", this.name);
         status = ScriptStatus.RUNNING;
         startTime = OffsetDateTime.now();
     }
@@ -92,6 +97,7 @@ public class Script implements Runnable {
     private synchronized void processingSuccessfulExecution() {
         endTime = OffsetDateTime.now();
         status = ScriptStatus.EXECUTION_SUCCESSFUL;
+        logger.trace("[{}] - Processing of successful completion of the script is finished", this.name);
     }
 
     private synchronized void processingFailedOrCanceledExecution(PolyglotException e) {
@@ -104,8 +110,10 @@ public class Script implements Runnable {
         try {
             streamSplitter.write(sw.toString().getBytes());
         } catch (IOException ex) {
+            logger.error("[{}] - error writing exception stack trace to log stream", this.name);
             ex.printStackTrace();
         }
+        logger.trace("[{}] - Processing of failed completion of the script is finished", this.name);
     }
 
     /**
@@ -115,11 +123,11 @@ public class Script implements Runnable {
         if (status != ScriptStatus.RUNNING) throw new WrongScriptStatusException
                 ("You cannot stop a script that is not running", status);
         else closeContext();
+        logger.trace("[{}] - Script execution stopped", this.name);
     }
 
     /**
      * A method to get the current status of the script
-     *
      * @return current status of the script
      */
     public synchronized ScriptStatus getStatus() {
@@ -128,7 +136,6 @@ public class Script implements Runnable {
 
     /**
      * A method to get the full output logs
-     *
      * @return full output logs
      */
     public String getOutputLogs() {

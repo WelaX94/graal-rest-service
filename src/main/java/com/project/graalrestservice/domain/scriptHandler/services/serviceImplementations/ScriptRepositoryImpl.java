@@ -6,6 +6,8 @@ import com.project.graalrestservice.domain.scriptHandler.services.ScriptReposito
 import com.project.graalrestservice.domain.scriptHandler.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongArgumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class ScriptRepositoryImpl implements ScriptRepository{
 
+    private final static Logger logger = LoggerFactory.getLogger(ScriptRepository.class);
     private final ConcurrentHashMap<String, Script> map = new ConcurrentHashMap<>();
 
     /**
@@ -29,6 +32,7 @@ public class ScriptRepositoryImpl implements ScriptRepository{
     @Override
     public void putScript(String scriptName, Script script) {
         if (map.putIfAbsent(scriptName, script) != null) throw new WrongNameException("Such a name is already in use");
+        logger.trace("[{}] - Script added to the script repository", scriptName);
     }
 
     /**
@@ -41,6 +45,7 @@ public class ScriptRepositoryImpl implements ScriptRepository{
     public Script getScript(String scriptName) {
         Script script = map.get(scriptName);
         if (script == null) throw new ScriptNotFoundException(scriptName);
+        logger.trace("[{}] - Script repository return the script", scriptName);
         return script;
     }
 
@@ -53,7 +58,8 @@ public class ScriptRepositoryImpl implements ScriptRepository{
     public List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains) {
         boolean nullableName = nameContains == null;
         boolean nullableStatus = scriptStatus == null;
-        return map.values()
+        List<Script> scriptList =
+                map.values()
                 .stream()
                 .filter(s -> {
                     boolean name = nullableName || s.getName().contains(nameContains);
@@ -61,6 +67,8 @@ public class ScriptRepositoryImpl implements ScriptRepository{
                     return name && status;
                 })
                 .collect(Collectors.toList());
+        logger.trace("Script repository return filtered script list. Parameters [scriptStatus={}, nameContains={}]", scriptStatus, nameContains);
+        return scriptList;
     }
 
     /**
@@ -71,6 +79,7 @@ public class ScriptRepositoryImpl implements ScriptRepository{
     @Override
     public void deleteScript(String scriptName) {
         if(map.remove(scriptName) == null) throw new ScriptNotFoundException(scriptName);
+        logger.trace("[{}] - Script deleted from script repository", scriptName);
     }
 
 }

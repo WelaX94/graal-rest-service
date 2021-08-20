@@ -7,6 +7,8 @@ import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptStatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class ScriptServiceImpl implements ScriptService{
 
+    private final static Logger logger = LoggerFactory.getLogger(ScriptService.class);
     private final ScriptRepository scriptRepository;
     private final int streamCapacity;
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
@@ -43,10 +46,15 @@ public class ScriptServiceImpl implements ScriptService{
         if (orderByName) comparator = Comparator.comparing(Script::getName);
         else comparator = Comparator.comparing(Script::getCreateTime);
         if (reverseOrder) comparator = comparator.reversed();
-        return scriptRepository.getScriptList(scriptStatus, nameContains)
+        List<Script> scriptList =
+                scriptRepository.getScriptList(scriptStatus, nameContains)
                 .stream()
                 .sorted(comparator)
                 .collect(Collectors.toList());
+        logger.debug(
+                "Script service return filtered and sorted script list. Parameters [scriptStatus={}, nameContains={}, orderByName={}, reverseOrder={}]",
+                scriptStatus, nameContains, orderByName, reverseOrder);
+        return scriptList;
     }
 
     /**
@@ -61,6 +69,7 @@ public class ScriptServiceImpl implements ScriptService{
         checkName(scriptName);
         Script script = Script.create(scriptName, scriptCode, streamCapacity);
         scriptRepository.putScript(scriptName, script);
+        logger.debug("[{}] - New script was added to the service", scriptName);
         return script;
     }
 
@@ -70,6 +79,7 @@ public class ScriptServiceImpl implements ScriptService{
      */
     @Override
     public void startScriptAsynchronously(Script script) {
+        logger.debug("[{}] - Starting script in asynchronously mode", script.getName());
         script.run();
     }
 
@@ -79,6 +89,7 @@ public class ScriptServiceImpl implements ScriptService{
      */
     @Override
     public void startScriptSynchronously(Script script) {
+        logger.debug("[{}] - Starting script in synchronously mode", script.getName());
         script.run();
     }
 
@@ -89,7 +100,9 @@ public class ScriptServiceImpl implements ScriptService{
      */
     @Override
     public Script getScript(String scriptName) {
-        return scriptRepository.getScript(scriptName);
+        Script script = scriptRepository.getScript(scriptName);
+        logger.debug("[{}] - Returning the script", scriptName);
+        return script;
     }
 
     /**
@@ -99,6 +112,7 @@ public class ScriptServiceImpl implements ScriptService{
     @Override
     public void stopScript(String scriptName) {
         scriptRepository.getScript(scriptName).stopScriptExecution();
+        logger.debug("[{}] - Script execution canceled", scriptName);
     }
 
     /**
@@ -115,6 +129,7 @@ public class ScriptServiceImpl implements ScriptService{
             script.closeContext();
             scriptRepository.deleteScript(scriptName);
         }
+        logger.debug("[{}] - Script deleted from the service", script.getName());
     }
 
     /**
@@ -129,6 +144,7 @@ public class ScriptServiceImpl implements ScriptService{
             if (name.equals(scriptName))
                 throw new WrongNameException("This name is reserved and is forbidden for use");
         }
+        logger.trace("[{}] - Name verification completed successfully", scriptName);
     }
 
 }
