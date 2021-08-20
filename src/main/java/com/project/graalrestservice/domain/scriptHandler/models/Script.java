@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.*;
-import java.time.Duration;
 import java.time.OffsetDateTime;
 
 /**
@@ -25,7 +24,7 @@ public class Script implements Runnable {
     private final String scriptCode;
     private volatile ScriptStatus status;
     private final OutputStream logStorageStream;
-    private final OutputStreamSplitter streamSplitter;
+    private final OutputStreamSplitter mainStream;
     private final OffsetDateTime createTime;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
@@ -57,8 +56,8 @@ public class Script implements Runnable {
         this.status = ScriptStatus.IN_QUEUE;
         this.createTime = OffsetDateTime.now();
         this.logStorageStream = new CircularOutputStream(streamBufferCapacity);
-        this.streamSplitter = new OutputStreamSplitter();
-        this.streamSplitter.addStream(logStorageStream);
+        this.mainStream = new OutputStreamSplitter();
+        this.mainStream.addStream(logStorageStream);
         logger.trace("[{}] - Script object created]", name);
     }
 
@@ -76,7 +75,8 @@ public class Script implements Runnable {
     @Override
     public void run() {
         logger.info("[{}] - Attempting to run a script", this.name);
-        try (Context context = Context.newBuilder().out(streamSplitter).err(streamSplitter).allowCreateThread(true).build()){
+        MDC.put("scriptName", this.name);
+        try (Context context = Context.newBuilder().out(mainStream).err(mainStream).allowCreateThread(true).build()){
             this.context = context;
             prepareScriptExecution();
             context.eval("js", scriptCode);
@@ -108,7 +108,7 @@ public class Script implements Runnable {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         try {
-            streamSplitter.write(sw.toString().getBytes());
+            mainStream.write(sw.toString().getBytes());
         } catch (IOException ex) {
             logger.error("[{}] - error writing exception stack trace to log stream", this.name);
             ex.printStackTrace();
@@ -150,10 +150,10 @@ public class Script implements Runnable {
     }
 
     public void addStreamForRecording(OutputStream outputStream) {
-        streamSplitter.addStream(outputStream);
+        mainStream.addStream(outputStream);
     }
     public void deleteStreamForRecording(OutputStream outputStream) {
-        streamSplitter.deleteStream(outputStream);
+        mainStream.deleteStream(outputStream);
     }
 
     public int getLogsSize() {

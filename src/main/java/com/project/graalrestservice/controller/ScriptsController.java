@@ -5,7 +5,6 @@ import com.project.graalrestservice.domain.scriptHandler.exceptions.PageDoesNotE
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongArgumentException;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
-import com.project.graalrestservice.domain.scriptHandler.utils.QueueOutputStream;
 import com.project.graalrestservice.representationModels.Page;
 import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;
@@ -155,21 +154,17 @@ public class ScriptsController {
         logger.info(scriptRequestProcessed, scriptName);
         return (OutputStream outputStream) -> {
             logger.info("[{}] - Streaming logs started", scriptName);
-            QueueOutputStream queueOutputStream = new QueueOutputStream(streamCapacity);
-            script.addStreamForRecording(queueOutputStream);
-            scriptService.startScriptAsynchronously(script);
-            outputStream.flush();
+            script.addStreamForRecording(outputStream);
             try {
-                while (script.getStatus() == ScriptStatus.IN_QUEUE || script.getStatus() == ScriptStatus.RUNNING || queueOutputStream.hasNextByte()) {
-                    outputStream.write(queueOutputStream.readBytes());
-                    outputStream.flush();
+                outputStream.flush();
+                scriptService.startScriptAsynchronously(script);
+                while (script.getStatus() == ScriptStatus.IN_QUEUE || script.getStatus() == ScriptStatus.RUNNING) {
+                    Thread.sleep(100);
                 }
-                logger.trace("[{}] - Try block passed without errors", scriptName);
-            } catch (ClientAbortException e) {
-                logger.debug("[{}] - Client terminated the connection", scriptName);
+            } catch (ClientAbortException | InterruptedException e) {
+                logger.info("[{}] - Client terminated the connection", scriptName);
             } finally {
-                queueOutputStream.clearStream();
-                script.deleteStreamForRecording(queueOutputStream);
+                script.deleteStreamForRecording(outputStream);
             }
             logger.info("[{}] - Streaming logs finished", scriptName);
         };

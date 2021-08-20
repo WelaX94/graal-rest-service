@@ -1,0 +1,117 @@
+        Specific remarks:
+
+------------------------------------------------------------------------------------------------------------------------
+        Bugs:
+
+------------------------------------------------------------------------------------------------------------------------
+        Common objectives:
+
+1)  Install and use linter (for example sonar) and formatter to the maven build and your IDE.
+    There's a lot of warnings my linter reports.
+
+2)  JavaDoc описания должны описывать логику работы метода. Больше конкретики
+
+3)  Where are domain (ScriptInfo) unit tests? A lot of? Positive and negative, concurrent and single threaded?
+
+------------------------------------------------------------------------------------------------------------------------
+        DONE:
+
+1) 	String getPage()
+	изменить на
+	int getPage()
+	int getNumPages()
+	Клиенту проще построить строковое представление, имеющее два последних метода, чем наоборот.
+
+2)	ScriptListPage shall be generalized using generics.
+    Page<ScriptItem> does not have any script specific data or functionality.
+
+3)	Изменить компаратор: https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
+	Comparator.comparing(Person::getFirstName)
+          .thenComparing(Person::getLastName)
+          .thenComparingInt(Person::getAge);
+
+	Prefer using Comparators to Comparables:
+	https://www.baeldung.com/java-comparator-comparable#comparator-vs-comparable
+
+4)	much more efficient to use atomic integer instead of
+    synchronized int getId()
+    and id had to be volatile.
+
+5)  Root controller should return HATEOAS links to top level resource collection(s) - serve as an API TOC
+
+6)	Is incorrect param type and is inefficient - let Spring do type conversion itself and provide default.
+    Param name "api" does not express well its purpose.
+	@RequestParam(defaultValue="false") boolean sync
+	Too much
+	api.equals("f")
+	in one method. Cache repeated expressions to local variables (not needed if correct parameter type is used).
+
+7)	LocalDateTime is not a correct type for timestamps
+
+8)  src/main/java/com/project/graalrestservice/controller/ScriptsController.java
+    Don't understand the idea of using unique id for every log line, it only makes code more complex to read.
+    Millisecond precision timestamp is sufficient as an unique identifier.
+
+9)	yaml format is much more readable and less verbose for the configuration file,
+    so please convert configuration to yaml
+
+10) Thread pool is better to be configured with spring boot.
+
+    https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.task-execution-and-scheduling
+
+    I even not sure it's configured properly and different pools are working correctly
+    to implement the Bulkhead pattern. Please configure different thread pools with different thread name templates
+    and add current thread name pattern to the log output format template to make sure threads are used properly.
+
+11) Read about Zalando problem and install its spring support module to your project.
+    Use it as a basis of your error handling. Currently the problem is that API clients usually expect JSON response
+    irrespective of the result code, but you return plaintext for errors.
+
+12) Сделать подпакет в domain, который добавлял бы конкретики касательно логики пакета
+    Переименовать ScriptInfo -> Script
+    Не писать капсом названия переменных (LOGGER -> logger)
+
+13) Изменить имплементацию SRB на лямбду
+
+14) Вместо расширения CircularOutputStream сделать делегирующий стрим,
+    который будет принимать в себя другие стримы и перенаправлять туда запись
+
+15) Не хранить контекст открытым, а пересоздавать после парсинга.
+
+16) В ScriptInfo.run() повыносить синхронные блоки в отдельные методы
+
+17) Перенести валидацию скрипта в ScriptInfo
+
+18) Перенести exceptions в домен
+
+19) Добавить mapstruct - https://mapstruct.org/
+
+20) Don't like Priority ordering implementation, inefficient and hardly needed. Полностью переработать
+    фильтрацию и сортировку (фильтрация по статусу, паттерну имени / сортировка по дате(прямая/обратная)).
+    Попробовать реализовать через Stream API
+    Облегчить репозиторий. Ему достаточно отдавать "сырой список"
+    Вариант: репозиторий фильтрует, сервис сортирует.
+    Посмотреть композицию компараторов
+
+21) Настроить маппер для ScriptInfoForList
+
+22) Representations and links are http/web layer specific details and shouldn't be a part of the domain.
+
+23) Добавить возможность просмотра скрипта
+
+24) Убрать блокирующий вариант без стриминга логов
+
+25) Рассмотреть возможность отдавать ResponseBody для логов по частям
+    Вариант: что-то вроде пагинации. От такого-то байта до такого-то
+
+26) LOGGER.info is too high logging level, consider debug or even trace level. Read logging best practices.
+
+    Use slf4j api instead of log4j for logging. String.format() is too slow for logging.
+    Learn the way sjf4j lightweight logging templates can be used.
+
+    Change requestId to script name (ThreadLocal API)
+
+    Use logback implementation for logging (using slf4j api it implements natively)
+    and MDC to add a script name to the logging. Read documentation about how logging is configured in the spring boot
+
+27) Настроить стриминг логов без стрима посредника (QueueOutputStream)
