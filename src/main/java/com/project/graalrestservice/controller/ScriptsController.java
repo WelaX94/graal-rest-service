@@ -66,7 +66,6 @@ public class ScriptsController {
      * Method for adding a new script to the run queue
      * @param scriptCode JS script
      * @param scriptName script name (identifier)
-     * @param sync run script type - asynchronous (true) or synchronous (false)
      * @return JSON information about script
      * @see ScriptsController#runScriptWithLogsStreaming(String, String)
      * */
