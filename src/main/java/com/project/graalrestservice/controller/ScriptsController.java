@@ -68,16 +68,14 @@ public class ScriptsController {
      * @param scriptCode JS script
      * @param scriptName script name (identifier)
      * @param sync run script type - asynchronous (true) or synchronous (false)
-     * @param request Http Servlet Request
      * @return JSON information about script
-     * @see ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletRequest)
+     * @see ScriptsController#runScriptWithLogsStreaming(String, String)
      * */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
     public ResponseEntity<ScriptInfoForSingle> runScript(
             @RequestBody String scriptCode,
             @PathVariable String scriptName,
-            @RequestParam(defaultValue = "true") boolean sync,
-            HttpServletRequest request) {
+            @RequestParam(defaultValue = "true") boolean sync) {
         logger.info("A new script is requested to run");
         Script script =
                 scriptService.addScript(scriptName, scriptCode);
@@ -85,7 +83,7 @@ public class ScriptsController {
         else scriptService.startScriptSynchronously(script);
         logger.info("Request successfully processed");
         ScriptInfoForSingle scriptInfoForSingle =SingleScriptMapper.forSingle.map(script);
-        scriptInfoForSingle.setLinks(request.getRequestURL().toString());
+        scriptInfoForSingle.setLinks();
         return (sync) ?
                 (new ResponseEntity<>(scriptInfoForSingle, HttpStatus.ACCEPTED)) :
                 (new ResponseEntity<>(scriptInfoForSingle, HttpStatus.CREATED));
@@ -97,10 +95,10 @@ public class ScriptsController {
      * @return JSON information about script
      */
     @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)
-    public ScriptInfoForSingle getSingleScriptInfo(@PathVariable String scriptName, HttpServletRequest request) {
+    public ScriptInfoForSingle getSingleScriptInfo(@PathVariable String scriptName) {
         logger.info("Single script info request received");
         ScriptInfoForSingle scriptInfoForSingle = SingleScriptMapper.forSingle.map(scriptService.getScript(scriptName));
-        scriptInfoForSingle.setLinks(request.getRequestURL().toString());
+        scriptInfoForSingle.setLinks();
         logger.info("Request successfully processed");
         return scriptInfoForSingle;
     }
@@ -111,28 +109,33 @@ public class ScriptsController {
      * @return script logs
      */
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.GET)
-    public String getScriptLogs(@PathVariable String scriptName) {
+    public ResponseEntity<String> getScriptLogs(@PathVariable String scriptName) {
         logger.info("Script logs request received");
         String logs = scriptService.getScript(scriptName).getOutputLogs();
         logger.info("Request successfully processed");
-        return logs;
+        return new ResponseEntity<>(logs, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{scriptName}/script", method = RequestMethod.GET)
+    public ResponseEntity<String> getScriptCode(@PathVariable String scriptName) {
+        logger.info("Script logs request received");
+        String scriptCode = scriptService.getScript(scriptName).getScriptCode();
+        logger.info("Request successfully processed");
+        return new ResponseEntity<>(scriptCode, HttpStatus.OK);
     }
 
     /**
-     * Another option for adding a new script to the run queue in the blocking variant ({@link ScriptsController#runScript(String, String, boolean, HttpServletRequest) first option})
-     *
+     * Another option for adding a new script to the run queue in the blocking variant ({@link ScriptsController#runScript(String, String, boolean) first option})
      * @param scriptCode JS script
      * @param scriptName script name (identifier)
-     * @param request HttpServletRequest
      * @return the log broadcast in real time
-     * @see ScriptsController#runScript(String, String, boolean, HttpServletRequest)
+     * @see ScriptsController#runScript(String, String, boolean)
      */
     @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.PUT)
     public StreamingResponseBody runScriptWithLogsStreaming(
             @RequestBody String scriptCode,
-            @PathVariable String scriptName,
-            HttpServletRequest request) {
+            @PathVariable String scriptName) {
         logger.info("Script run with logs streaming request received");
         Script script = scriptService.addScript(scriptName, scriptCode);
         logger.info("Request successfully processed");
@@ -190,7 +193,9 @@ public class ScriptsController {
 
         List<ScriptInfoForList> pageList = new ArrayList<>();
         for( ; start < end; start++) {
-            pageList.add(ListScriptMapper.forList.map(scriptList.get(start)));
+            ScriptInfoForList sifl = ListScriptMapper.forList.map(scriptList.get(start));
+            sifl.setLinks();
+            pageList.add(sifl);
         }
 
         int numPages = (listSize % pageSize == 0) ? (listSize / pageSize) : (listSize / pageSize + 1);

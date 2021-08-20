@@ -24,9 +24,12 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
     public ScriptInfoForList() {
     }
 
+    public void setLinks() {
+        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
+    }
+
     public void setName(String name) {
         this.name = name;
-        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name, null)).withSelfRel());
     }
     public void setStatus(ScriptStatus status) {
         this.status = status;
