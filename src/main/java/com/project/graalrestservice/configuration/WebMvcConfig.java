@@ -29,10 +29,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         this.threadNamePrefix = threadNamePrefix;
     }
 
-    /**
-     * A method for creating a custom executor
-     * @param configurer AsyncSupportConfigurer
-     */
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

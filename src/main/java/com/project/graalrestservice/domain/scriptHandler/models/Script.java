@@ -143,16 +143,6 @@ public class Script implements Runnable {
     }
 
     /**
-     * A method to get the execution time of the script
-     *
-     * @return execution time of the script
-     */
-    public String getExecutionTime() {
-        Duration duration = Duration.between(startTime, endTime);
-        return String.format("%d.%03d", duration.getSeconds(), (duration.getNano() / 1_000_000));
-    }
-
-    /**
      * Method for closing the context
      */
     public void closeContext() {
@@ -184,9 +174,6 @@ public class Script implements Runnable {
     }
     public OffsetDateTime getEndTime() {
         return endTime;
-    }
-    public OutputStream getLogStorageStream() {
-        return logStorageStream;
     }
 
 }

@@ -24,7 +24,6 @@ public class CircularOutputStream extends OutputStream {
     public CircularOutputStream(int capacity) {
         buf = new byte[capacity];
         this.capacity = capacity;
-
     }
 
     /**

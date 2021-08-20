@@ -200,7 +200,6 @@ public class ScriptsController {
     }
 
     private Page<List<ScriptInfoForList>> convertListToPage(List<Script> scriptList, int pageNumber, int pageSize, String status, String nameContains, boolean orderByName, boolean reverseOrder) {
-
         logger.trace("Starts converting List<Script> to Page<List<ScriptInfoForList>>. " + parameters, pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
 
         if (pageNumber < 1) throw new WrongArgumentException("The page number cannot be less than 1");
@@ -224,9 +223,7 @@ public class ScriptsController {
         scriptsPage.setLinks(pageSize, status, nameContains, orderByName, reverseOrder);
 
         logger.trace("Converting List<Script> to Page<List<ScriptInfoForList>> completed successfully. " + parameters, pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
-
         return scriptsPage;
-
     }
 
 }
