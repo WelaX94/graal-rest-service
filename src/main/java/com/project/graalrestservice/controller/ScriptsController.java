@@ -102,9 +102,19 @@ public class ScriptsController {
      * @return script logs
      */
     @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.GET)
-    public ResponseEntity<String> getScriptLogs(@PathVariable String scriptName) {
+    public ResponseEntity<String> getScriptLogs(
+            @PathVariable String scriptName,
+            @RequestParam(required = false, defaultValue = "0") Integer from,
+            @RequestParam(required = false) Integer to) {
         logger.info("Script logs request received");
         String logs = scriptService.getScript(scriptName).getOutputLogs();
+        if (to == null) to = logs.length();
+        try {
+            if (from.equals(to)) throw new StringIndexOutOfBoundsException();
+            logs = logs.substring(from, to);
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new WrongArgumentException("The 'from-to' range is entered incorrectly");
+        }
         logger.info("Request successfully processed");
         return new ResponseEntity<>(logs, HttpStatus.OK);
     }

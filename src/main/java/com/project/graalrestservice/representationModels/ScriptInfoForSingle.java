@@ -19,19 +19,16 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     private OffsetDateTime createTime;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
+    private int logsSize;
 
     public ScriptInfoForSingle() {
     }
 
     public void setLinks() {
-        add(linkTo(methodOn(ScriptsController.class).getScriptLogs(name)).withRel("logs"));
+        add(linkTo(methodOn(ScriptsController.class).getScriptLogs(name, null, null)).withRel("logs").expand());
         add(linkTo(methodOn(ScriptsController.class).getScriptCode(name)).withRel("script"));
         add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
         add(linkTo(ScriptsController.class).withRel("scriptList"));
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getName() {
@@ -49,7 +46,13 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     public String getEndTime() {
         return (endTime == null) ? null : endTime.toString();
     }
+    public int getLogsSize() {
+        return logsSize;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
     public void setStatus(ScriptStatus status) {
         this.status = status;
     }
@@ -62,5 +65,7 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     public void setEndTime(OffsetDateTime endTime) {
         this.endTime = endTime;
     }
-
+    public void setLogsSize(int logsSize) {
+        this.logsSize = logsSize;
+    }
 }

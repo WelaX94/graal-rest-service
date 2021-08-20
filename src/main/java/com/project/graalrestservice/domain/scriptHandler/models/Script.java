@@ -159,6 +159,9 @@ public class Script implements Runnable {
         streamSplitter.deleteStream(outputStream);
     }
 
+    public int getLogsSize() {
+        return logStorageStream.toString().length();
+    }
 
     public String getName() {
         return name;
