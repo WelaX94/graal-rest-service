@@ -24,8 +24,8 @@ public class CircularOutputStream extends OutputStream {
   }
 
   /**
-   * Method to write byte to stream
-   *
+   * Method to write byte to stream.
+   * If the capacity runs out, it starts overwriting in a circle.
    * @param b byte to write
    */
   @Override

@@ -7,6 +7,8 @@ import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptStatusException;
+import com.project.graalrestservice.representationModels.Page;
+import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class ScriptServiceImpl implements ScriptService {
   private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
   private final String[] illegalNamespace = new String[] {"swagger-ui"};
 
+  /**
+   * Basic constructor
+   */
   @Autowired
   public ScriptServiceImpl(ScriptRepository scriptRepository,
       @org.springframework.beans.factory.annotation.Value("${scripts.outputStream.capacity}") int streamCapacity) {
@@ -37,9 +42,16 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   /**
-   * A method to get a script page with specified parameters
-   * 
-   * @return Page with specified parameters
+   * The method returns a sorted and filtered list of scripts by specified parameters.
+   * The list is generated and filtered at the
+   * {@link ScriptRepository#getScriptList(ScriptStatus, String) repository level}
+   * and sorted at the service (this) level. By default, no filters are applied and
+   * sorting is done by date of script creation.
+   * @param scriptStatus this parameter is a filter. Allows you to specify the scripts with which statuses you are interested in the output. If null - scripts with all statuses will be displayed.
+   * @param nameContains this parameter is a filter. It allows you to specify an expression that must contain the name of the script. If null - scripts with all names will be displayed
+   * @param orderByName sorting parameter. If true, it will be sorted by script name.
+   * @param reverseOrder parameter to reverse the sorting.
+   * @return sorted and filtered {@link List} of {@link Script}.
    */
   public List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains,
       boolean orderByName, boolean reverseOrder) {
@@ -47,7 +59,7 @@ public class ScriptServiceImpl implements ScriptService {
     if (orderByName)
       comparator = Comparator.comparing(Script::getName);
     else
-      comparator = Comparator.comparing(Script::getCreateTime);
+      comparator = Comparator.comparing(Script::getCreateTime).reversed();
     if (reverseOrder)
       comparator = comparator.reversed();
     List<Script> scriptList = scriptRepository.getScriptList(scriptStatus, nameContains).stream()
@@ -59,14 +71,14 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   /**
-   * A method for checking a script for validity and adding it to the list of scripts
-   * 
+   * A method for adding a new script to the system. Firstly, {@link #checkName(String) the name is checked}
+   * to see if it matches the {@link #correctlyScriptName specified pattern}.
+   * After that, its validity is checked when {@link Script#create(String, String, int) creating a Script object}.
+   * And if everything is good, then it will be {@link ScriptRepository#putScript(String, Script) added to the system}
+   * (if there is no script with the same name).
    * @param scriptName script name (identifier)
-   * @param scriptCode JS script
-   * 
-   * @return Script with information about the script
-   * 
-   * @throws WrongScriptException if script has syntax error
+   * @param scriptCode JS body
+   * @return created Script object
    */
   @Override
   public Script addScript(String scriptName, String scriptCode) {
@@ -79,8 +91,7 @@ public class ScriptServiceImpl implements ScriptService {
 
   /**
    * Method for running the script in asynchronous mode
-   * 
-   * @param script Script of the script to run
+   * @param script launch script
    */
   @Override
   public void startScriptAsynchronously(Script script) {
@@ -89,22 +100,9 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   /**
-   * Method for running the script in synchronous mode
-   * 
-   * @param script Script of the script to run
-   */
-  @Override
-  public void startScriptSynchronously(Script script) {
-    logger.debug("[{}] - Starting script in synchronously mode", script.getName());
-    script.run();
-  }
-
-  /**
    * A method to get information about the script you are looking for
-   * 
    * @param scriptName script name (identifier)
-   * 
-   * @return ScriptInfoForSingle with information for a single display
+   * @return Script information about the script
    */
   @Override
   public Script getScript(String scriptName) {
@@ -114,8 +112,7 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   /**
-   * Method for stopping a running script
-   * 
+   * Method for stopping a running script. You can only stop a script with the status RUNNING.
    * @param scriptName script name (identifier)
    */
   @Override
@@ -125,10 +122,9 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   /**
-   * Method for removing a script from the list
-   * 
+   * Method for removing a script from the {@link ScriptRepository}. You cannot delete a script with RUNNING status.
+   * Otherwise, an {@link WrongScriptStatusException exception} will be thrown.
    * @param scriptName script name (identifier)
-   * 
    * @throws WrongScriptException if script is running
    */
   @Override

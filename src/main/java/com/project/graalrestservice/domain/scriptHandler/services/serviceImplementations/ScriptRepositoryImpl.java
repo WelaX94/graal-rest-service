@@ -5,7 +5,6 @@ import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.domain.scriptHandler.services.ScriptRepository;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
-import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,10 +24,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
   /**
    * Adds a new script to the map
-   * 
    * @param scriptName script name (identifier)
    * @param script script info, contains all the information about the script
-   * 
    * @throws WrongNameException if a script with this name already exists
    */
   @Override
@@ -40,11 +37,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
   /**
    * The method returns information about the script you are looking for
-   * 
    * @param scriptName script name (identifier)
-   * 
    * @return Script with information about the script
-   * 
    * @throws ScriptNotFoundException if script not found
    */
   @Override
@@ -57,12 +51,12 @@ public class ScriptRepositoryImpl implements ScriptRepository {
   }
 
   /**
-   * A method to get the script list page
-   * 
-   * @return Page filtered and sorted by specified parameters
-   * 
-   * @throws WrongArgumentException if page or pageSize less than 1. Also discarded if the list is
-   *         empty for a given page
+   * The method returns a filtered list with the specified parameters.
+   * If there are no filters (null), it returns all the scripts present
+   * in the repository ({@link #map in map})
+   * @param scriptStatus allows you to specify the scripts with which statuses you are interested in the output. If null - scripts with all statuses will be displayed.
+   * @param nameContains it allows you to specify an expression that must contain the name of the script. If null - scripts with all names will be displayed
+   * @return filtered {@link List} of {@link Script}
    */
   @Override
   public List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains) {
@@ -80,10 +74,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
   }
 
   /**
-   * Method for removing a script from the list
-   * 
+   * Method for removing a script from the list.
    * @param scriptName script name (identifier)
-   * 
    * @throws ScriptNotFoundException if script not found
    */
   @Override

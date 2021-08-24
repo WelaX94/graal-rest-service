@@ -9,7 +9,7 @@ import java.util.Objects;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 /**
- * A class for outputting single messages in JSON format
+ * A class for outputting single messages from root controller in JSON format
  */
 public class RootInfo extends RepresentationModel<RootInfo> {
 

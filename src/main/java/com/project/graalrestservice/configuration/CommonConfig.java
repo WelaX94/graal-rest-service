@@ -38,9 +38,7 @@ public class CommonConfig {
    * @param threadNamePrefix prefix for the name of new threads
    * @param corePoolSize initial thread pool size
    * @param maxPoolSize maximum thread pool size
-   * @param queueCapacity the size of the queue, above which the size of the pool will increase to
-   *        the maximum
-   * 
+   * @param queueCapacity the size of the queue, above which the size of the pool will increase to the maximum
    * @return TaskExecutor
    */
   @Bean

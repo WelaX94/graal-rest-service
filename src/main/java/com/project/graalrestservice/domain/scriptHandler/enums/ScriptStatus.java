@@ -3,11 +3,17 @@ package com.project.graalrestservice.domain.scriptHandler.enums;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongArgumentException;
 
 /**
- * Enum script status flag class. Also used for sorting.
+ * Enum script status flag class.
  */
 public enum ScriptStatus {
   IN_QUEUE, RUNNING, EXECUTION_SUCCESSFUL, EXECUTION_FAILED, EXECUTION_CANCELED;
 
+  /**
+   * A method for converting textual status representation to enum.
+   * @param status textual status
+   * @return ScriptStatus. If the input is null, then the output is also null
+   * @throws WrongArgumentException if the status could not be converted
+   */
   public static ScriptStatus getStatus(String status) {
     if (status == null)
       return null;

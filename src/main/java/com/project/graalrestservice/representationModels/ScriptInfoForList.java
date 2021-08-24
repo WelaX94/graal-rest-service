@@ -19,6 +19,9 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
   private ScriptStatus status;
   private OffsetDateTime createTime;
 
+  /**
+   * Method for adding HATEOAS links.
+   */
   public void setLinks() {
     add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
   }
@@ -26,11 +29,9 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
   public void setName(String name) {
     this.name = name;
   }
-
   public void setStatus(ScriptStatus status) {
     this.status = status;
   }
-
   public void setCreateTime(OffsetDateTime createTime) {
     this.createTime = createTime;
   }
@@ -38,11 +39,9 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
   public String getName() {
     return name;
   }
-
   public ScriptStatus getStatus() {
     return status;
   }
-
   public String getCreateTime() {
     return createTime.toString();
   }

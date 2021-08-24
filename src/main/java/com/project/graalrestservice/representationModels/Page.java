@@ -10,7 +10,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
- * Helpful class to display a list of scripts
+ * Helpful class to display a paginated list
  */
 public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
 
@@ -22,8 +22,10 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
 
   /**
    * Basic constructor
-   * 
-   * @param list sheet to display
+   * @param list list to display
+   * @param pageNumber current page number
+   * @param numPages total number of pages
+   * @param totalScripts total scripts in list
    */
   public Page(T list, int pageNumber, int numPages, int totalScripts) {
     this.list = list;
@@ -33,6 +35,9 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
     this.scriptsOnPage = list.size();
   }
 
+  /**
+   * Method for adding HATEOAS links. Parameters are needed to form a correct link
+   */
   public void setLinks(int pageSize, String status, String nameContains, boolean orderByName,
       boolean reverseOrder) {
     if (pageNumber > 1)
@@ -46,19 +51,15 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
   public int getTotalScripts() {
     return totalScripts;
   }
-
   public int getScriptsOnPage() {
     return scriptsOnPage;
   }
-
   public int getPageNumber() {
     return pageNumber;
   }
-
   public int getNumPages() {
     return numPages;
   }
-
   public T getList() {
     return list;
   }

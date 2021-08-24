@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * A class that catches and processes expected exceptions
+ */
 @ControllerAdvice
 public class ManualExceptionHandler {
 

@@ -22,6 +22,9 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
   private OffsetDateTime endTime;
   private int logsSize;
 
+  /**
+   * Method for adding HATEOAS links.
+   */
   public void setLinks() {
     add(linkTo(methodOn(ScriptsController.class).getScriptLogs(name, null, null)).withRel("logs")
         .expand());
@@ -33,23 +36,18 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
   public String getName() {
     return name;
   }
-
   public ScriptStatus getStatus() {
     return status;
   }
-
   public String getCreateTime() {
     return createTime.toString();
   }
-
   public String getStartTime() {
     return (startTime == null) ? null : startTime.toString();
   }
-
   public String getEndTime() {
     return (endTime == null) ? null : endTime.toString();
   }
-
   public int getLogsSize() {
     return logsSize;
   }
@@ -57,23 +55,18 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
   public void setName(String name) {
     this.name = name;
   }
-
   public void setStatus(ScriptStatus status) {
     this.status = status;
   }
-
   public void setCreateTime(OffsetDateTime createTime) {
     this.createTime = createTime;
   }
-
   public void setStartTime(OffsetDateTime startTime) {
     this.startTime = startTime;
   }
-
   public void setEndTime(OffsetDateTime endTime) {
     this.endTime = endTime;
   }
-
   public void setLogsSize(int logsSize) {
     this.logsSize = logsSize;
   }

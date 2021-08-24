@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+/**
+ * Necessary to simplify the conversion of {@link Script} to {@link ScriptInfoForList}
+ */
 @Mapper
 public interface ListScriptMapper {
   ListScriptMapper forList = Mappers.getMapper(ListScriptMapper.class);

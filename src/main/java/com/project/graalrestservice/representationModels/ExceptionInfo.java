@@ -2,6 +2,9 @@ package com.project.graalrestservice.representationModels;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * The class needed to return information to the user about the error in JSON format
+ */
 public class ExceptionInfo {
   private final String title;
   private final int status;

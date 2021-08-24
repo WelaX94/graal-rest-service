@@ -8,6 +8,9 @@ import org.zalando.problem.spring.web.advice.ProblemHandling;
 
 import java.net.URI;
 
+/**
+ * ZalandoExceptionHandler is needed to return JSON instead of a white page error
+ */
 @ControllerAdvice
 public class ZalandoExceptionHandler implements ProblemHandling {
 
