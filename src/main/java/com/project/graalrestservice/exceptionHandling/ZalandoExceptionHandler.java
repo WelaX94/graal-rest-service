@@ -13,11 +13,8 @@ public class ZalandoExceptionHandler implements ProblemHandling {
 
     @Override
     public ProblemBuilder prepare(Throwable throwable, StatusType status, URI type) {
-        return Problem.builder()
-                .withType(type)
-                .withTitle(status.getReasonPhrase())
-                .withStatus(status)
-                .withType(type).with("message: ", throwable.getMessage());
+        return Problem.builder().withType(type).withTitle(status.getReasonPhrase()).withStatus(status).withType(type)
+                .with("message: ", throwable.getMessage());
     }
 
 }

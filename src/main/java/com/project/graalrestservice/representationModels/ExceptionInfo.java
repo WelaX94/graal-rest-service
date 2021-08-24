@@ -16,9 +16,11 @@ public class ExceptionInfo {
     public String getTitle() {
         return title;
     }
+
     public int getStatus() {
         return status;
     }
+
     public String getMessage() {
         return message;
     }

@@ -13,8 +13,9 @@ public class Controller {
 
     /**
      * Method responsible for "/"
+     * 
      * @return JSON with application status, self link and link to script list
-     * */
+     */
     @GetMapping(value = "/")
     public RootInfo appStatus() {
         logger.info("Root request successfully processed");

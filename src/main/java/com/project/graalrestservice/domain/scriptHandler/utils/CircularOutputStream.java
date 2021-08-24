@@ -15,7 +15,9 @@ public class CircularOutputStream extends OutputStream {
 
     /**
      * Basic constructor
-     * @param capacity stream capacity
+     * 
+     * @param capacity
+     *            stream capacity
      */
     public CircularOutputStream(int capacity) {
         buf = new byte[capacity];
@@ -25,7 +27,8 @@ public class CircularOutputStream extends OutputStream {
     /**
      * Method to write byte to stream
      *
-     * @param b byte to write
+     * @param b
+     *            byte to write
      */
     @Override
     public void write(int b) {
@@ -59,7 +62,8 @@ public class CircularOutputStream extends OutputStream {
         else {
             byte[] result = new byte[capacity];
             for (int i = position, k = 0; k < capacity; i++, k++) {
-                if (i == capacity) i = 0;
+                if (i == capacity)
+                    i = 0;
                 result[k] = buf[i];
             }
             return result;

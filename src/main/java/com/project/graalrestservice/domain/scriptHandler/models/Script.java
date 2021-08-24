@@ -37,7 +37,7 @@ public class Script implements Runnable {
     }
 
     private static void validate(String scriptCode) {
-        try (Context context = Context.create("js")){
+        try (Context context = Context.create("js")) {
             context.parse("js", scriptCode);
             logger.trace("[{} - Validation of the script was successful]", MDC.get(mdcNameIdentifier));
         } catch (PolyglotException e) {
@@ -48,8 +48,11 @@ public class Script implements Runnable {
 
     /**
      * Basic constructor
-     * @param name            script name (identifier)
-     * @param scriptCode      JS script
+     * 
+     * @param name
+     *            script name (identifier)
+     * @param scriptCode
+     *            JS script
      */
     private Script(String name, String scriptCode, int streamBufferCapacity) {
         this.name = name;
@@ -71,13 +74,14 @@ public class Script implements Runnable {
     }
 
     /**
-     * The method used to run the script processing. Can be executed asynchronously by passing the current object to the Executor Service
+     * The method used to run the script processing. Can be executed asynchronously by passing the current object to the
+     * Executor Service
      */
     @Override
     public void run() {
         logger.info("[{}] - Attempting to run a script", this.name);
         MDC.put(mdcNameIdentifier, this.name);
-        try (Context context = Context.newBuilder().out(mainStream).err(mainStream).allowCreateThread(true).build()){
+        try (Context context = Context.newBuilder().out(mainStream).err(mainStream).allowCreateThread(true).build()) {
             this.context = context;
             prepareScriptExecution();
             context.eval("js", scriptCode);
@@ -103,8 +107,10 @@ public class Script implements Runnable {
 
     private synchronized void processingFailedOrCanceledExecution(PolyglotException e) {
         endTime = OffsetDateTime.now();
-        if (e.isCancelled()) status = ScriptStatus.EXECUTION_CANCELED;
-        else status = ScriptStatus.EXECUTION_FAILED;
+        if (e.isCancelled())
+            status = ScriptStatus.EXECUTION_CANCELED;
+        else
+            status = ScriptStatus.EXECUTION_FAILED;
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
@@ -121,14 +127,16 @@ public class Script implements Runnable {
      * The method needed to stop the script
      */
     public synchronized void stopScriptExecution() {
-        if (status != ScriptStatus.RUNNING) throw new WrongScriptStatusException
-                ("You cannot stop a script that is not running", status);
-        else closeContext();
+        if (status != ScriptStatus.RUNNING)
+            throw new WrongScriptStatusException("You cannot stop a script that is not running", status);
+        else
+            closeContext();
         logger.trace("[{}] - Script execution stopped", this.name);
     }
 
     /**
      * A method to get the current status of the script
+     * 
      * @return current status of the script
      */
     public synchronized ScriptStatus getStatus() {
@@ -137,6 +145,7 @@ public class Script implements Runnable {
 
     /**
      * A method to get the full output logs
+     * 
      * @return full output logs
      */
     public String getOutputLogs() {
@@ -153,6 +162,7 @@ public class Script implements Runnable {
     public void addStreamForRecording(OutputStream outputStream) {
         mainStream.addStream(outputStream);
     }
+
     public void deleteStreamForRecording(OutputStream outputStream) {
         mainStream.deleteStream(outputStream);
     }
@@ -164,15 +174,19 @@ public class Script implements Runnable {
     public String getName() {
         return name;
     }
+
     public String getScriptCode() {
         return scriptCode;
     }
+
     public OffsetDateTime getCreateTime() {
         return createTime;
     }
+
     public OffsetDateTime getStartTime() {
         return startTime;
     }
+
     public OffsetDateTime getEndTime() {
         return endTime;
     }

@@ -43,7 +43,8 @@ public class ManualExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ExceptionInfo> handleWrongScriptException(WrongScriptException e) {
         logger.info("[{}] - Wrong script. Exception processed successfully.", MDC.get(mdcNameIdentifier));
-        return new ResponseEntity<>(new ExceptionInfo(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY), HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(new ExceptionInfo(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY),
+                HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler

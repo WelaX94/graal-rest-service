@@ -28,25 +28,26 @@ public class CommonConfig {
      */
     @Bean
     public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build();
+        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any()).build();
     }
 
     /**
      * Custom spring thread pool task executor
      *
-     * @param threadNamePrefix prefix for the name of new threads
-     * @param corePoolSize     initial thread pool size
-     * @param maxPoolSize      maximum thread pool size
-     * @param queueCapacity    the size of the queue, above which the size of the pool will increase to the maximum
+     * @param threadNamePrefix
+     *            prefix for the name of new threads
+     * @param corePoolSize
+     *            initial thread pool size
+     * @param maxPoolSize
+     *            maximum thread pool size
+     * @param queueCapacity
+     *            the size of the queue, above which the size of the pool will increase to the maximum
+     * 
      * @return TaskExecutor
      */
     @Bean
-    public TaskExecutor threadPoolTaskExecutor(
-            @Value("${scripts.executor.threadNamePrefix}") String threadNamePrefix,
+    public TaskExecutor threadPoolTaskExecutor(@Value("${scripts.executor.threadNamePrefix}") String threadNamePrefix,
             @Value("${scripts.executor.corePoolSize}") int corePoolSize,
             @Value("${scripts.executor.maxPoolSize}") int maxPoolSize,
             @Value("${scripts.executor.queueCapacity}") int queueCapacity) {
@@ -66,9 +67,7 @@ public class CommonConfig {
      */
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper().registerModules(
-                new ProblemModule(),
-                new ConstraintViolationProblemModule());
+        return new ObjectMapper().registerModules(new ProblemModule(), new ConstraintViolationProblemModule());
     }
 
 }

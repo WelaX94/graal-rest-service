@@ -42,37 +42,46 @@ public class ScriptsController {
 
     /**
      * A method to get a list of scripts
-     * @param pageSize maximum number of scripts per page
-     * @param page number of page
+     * 
+     * @param pageSize
+     *            maximum number of scripts per page
+     * @param page
+     *            number of page
+     * 
      * @return page with filtered and sorted scripts
-     * */
+     */
     @GetMapping
-    public ResponseEntity<Page<List<ScriptInfoForList>>> getScriptListPage(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String status,
+    public ResponseEntity<Page<List<ScriptInfoForList>>> getScriptListPage(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize, @RequestParam(required = false) String status,
             @RequestParam(required = false) String nameContains,
             @RequestParam(defaultValue = "false") boolean orderByName,
             @RequestParam(defaultValue = "false") boolean reverseOrder) {
-        logger.info(
-                "Script list request received. " + parameters, page, pageSize, status, nameContains, orderByName, reverseOrder);
+        logger.info("Script list request received. " + parameters, page, pageSize, status, nameContains, orderByName,
+                reverseOrder);
         MDC.put(mdcNameIdentifier, "GetScriptsMethod");
-        List<Script> scriptList = scriptService.getScriptList(ScriptStatus.getStatus(status), nameContains, orderByName, reverseOrder);
-        Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, page, pageSize, status, nameContains, orderByName, reverseOrder);
-        logger.info("Script list request successfully processed. " + parameters, page, pageSize, status, nameContains, orderByName, reverseOrder);
+        List<Script> scriptList = scriptService.getScriptList(ScriptStatus.getStatus(status), nameContains, orderByName,
+                reverseOrder);
+        Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, page, pageSize, status, nameContains,
+                orderByName, reverseOrder);
+        logger.info("Script list request successfully processed. " + parameters, page, pageSize, status, nameContains,
+                orderByName, reverseOrder);
         return new ResponseEntity<>(scriptPage, HttpStatus.OK);
     }
 
     /**
      * Method for adding a new script to the run queue
-     * @param scriptCode JS script
-     * @param scriptName script name (identifier)
+     * 
+     * @param scriptCode
+     *            JS script
+     * @param scriptName
+     *            script name (identifier)
+     * 
      * @return JSON information about script
+     * 
      * @see ScriptsController#runScriptWithLogsStreaming(String, String)
-     * */
+     */
     @PutMapping(value = "/{scriptName}")
-    public ResponseEntity<ScriptInfoForSingle> runScript(
-            @RequestBody String scriptCode,
+    public ResponseEntity<ScriptInfoForSingle> runScript(@RequestBody String scriptCode,
             @PathVariable String scriptName) {
         logger.info("[{}] - A new script is requested to run", scriptName);
         MDC.put(mdcNameIdentifier, scriptName);
@@ -86,7 +95,10 @@ public class ScriptsController {
 
     /**
      * A method for obtaining information about the script
-     * @param scriptName script name (identifier)
+     * 
+     * @param scriptName
+     *            script name (identifier)
+     * 
      * @return JSON information about script
      */
     @GetMapping(value = "/{scriptName}")
@@ -101,20 +113,24 @@ public class ScriptsController {
 
     /**
      * A method for retrieving the script logs
-     * @param scriptName script name (identifier)
+     * 
+     * @param scriptName
+     *            script name (identifier)
+     * 
      * @return script logs
      */
     @GetMapping(value = "/{scriptName}/logs")
-    public ResponseEntity<String> getScriptLogs(
-            @PathVariable String scriptName,
+    public ResponseEntity<String> getScriptLogs(@PathVariable String scriptName,
             @RequestParam(required = false, defaultValue = "0") Integer from,
             @RequestParam(required = false) Integer to) {
         logger.info("[{}] - Script logs request received (from={}, to={})", scriptName, from, to);
         MDC.put(mdcNameIdentifier, scriptName);
         String logs = scriptService.getScript(scriptName).getOutputLogs();
-        if (to == null) to = logs.length();
+        if (to == null)
+            to = logs.length();
         try {
-            if (from.equals(to)) throw new StringIndexOutOfBoundsException();
+            if (from.equals(to))
+                throw new StringIndexOutOfBoundsException();
             logs = logs.substring(from, to);
             logger.trace("[{}] - Try block passed without errors", scriptName);
         } catch (StringIndexOutOfBoundsException e) {
@@ -135,16 +151,21 @@ public class ScriptsController {
     }
 
     /**
-     * Another option for adding a new script to the run queue in the blocking variant ({@link ScriptsController#runScript(String, String) first option})
-     * @param scriptCode JS script
-     * @param scriptName script name (identifier)
+     * Another option for adding a new script to the run queue in the blocking variant
+     * ({@link ScriptsController#runScript(String, String) first option})
+     * 
+     * @param scriptCode
+     *            JS script
+     * @param scriptName
+     *            script name (identifier)
+     * 
      * @return the log broadcast in real time
+     * 
      * @see ScriptsController#runScript(String, String)
      */
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PutMapping(value = "/{scriptName}/logs")
-    public StreamingResponseBody runScriptWithLogsStreaming(
-            @RequestBody String scriptCode,
+    public StreamingResponseBody runScriptWithLogsStreaming(@RequestBody String scriptCode,
             @PathVariable String scriptName) {
         logger.info("[{}] - Script run with logs streaming request received", scriptName);
         MDC.put(mdcNameIdentifier, scriptName);
@@ -170,7 +191,9 @@ public class ScriptsController {
 
     /**
      * Method for stopping a running script
-     * @param scriptName script name (identifier)
+     * 
+     * @param scriptName
+     *            script name (identifier)
      */
     @PostMapping(value = "/{scriptName}")
     public void stopScript(@PathVariable String scriptName) {
@@ -182,7 +205,9 @@ public class ScriptsController {
 
     /**
      * Method for deleting script from script list
-     * @param scriptName script name (identifier)
+     * 
+     * @param scriptName
+     *            script name (identifier)
      */
     @DeleteMapping(value = "/{scriptName}")
     public void deleteScript(@PathVariable String scriptName) {
@@ -192,20 +217,26 @@ public class ScriptsController {
         logger.info(scriptRequestProcessed, scriptName);
     }
 
-    private Page<List<ScriptInfoForList>> convertListToPage(List<Script> scriptList, int pageNumber, int pageSize, String status, String nameContains, boolean orderByName, boolean reverseOrder) {
-        logger.trace("Starts converting List<Script> to Page<List<ScriptInfoForList>>. " + parameters, pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
+    private Page<List<ScriptInfoForList>> convertListToPage(List<Script> scriptList, int pageNumber, int pageSize,
+            String status, String nameContains, boolean orderByName, boolean reverseOrder) {
+        logger.trace("Starts converting List<Script> to Page<List<ScriptInfoForList>>. " + parameters, pageNumber,
+                pageSize, status, nameContains, orderByName, reverseOrder);
 
-        if (pageNumber < 1) throw new WrongArgumentException("The page number cannot be less than 1");
-        if (pageSize < 1) throw new WrongArgumentException("The page size cannot be less than 1");
+        if (pageNumber < 1)
+            throw new WrongArgumentException("The page number cannot be less than 1");
+        if (pageSize < 1)
+            throw new WrongArgumentException("The page size cannot be less than 1");
 
         int listSize = scriptList.size();
         int end = pageNumber * pageSize;
         int start = end - pageSize;
-        if (start >= listSize) throw new PageDoesNotExistException(pageNumber);
-        if (listSize < end) end = listSize;
+        if (start >= listSize)
+            throw new PageDoesNotExistException(pageNumber);
+        if (listSize < end)
+            end = listSize;
 
         List<ScriptInfoForList> pageList = new ArrayList<>();
-        for( ; start < end; start++) {
+        for (; start < end; start++) {
             ScriptInfoForList sifl = ListScriptMapper.forList.map(scriptList.get(start));
             sifl.setLinks();
             pageList.add(sifl);
@@ -215,7 +246,8 @@ public class ScriptsController {
         Page<List<ScriptInfoForList>> scriptsPage = new Page<>(pageList, pageNumber, numPages, listSize);
         scriptsPage.setLinks(pageSize, status, nameContains, orderByName, reverseOrder);
 
-        logger.trace("Converting List<Script> to Page<List<ScriptInfoForList>> completed successfully. " + parameters, pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
+        logger.trace("Converting List<Script> to Page<List<ScriptInfoForList>> completed successfully. " + parameters,
+                pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
         return scriptsPage;
     }
 

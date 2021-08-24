@@ -17,14 +17,17 @@ public class OutputStreamSplitter extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        for(OutputStream outputStream: streamSet) {
+        for (OutputStream outputStream : streamSet) {
             try {
                 outputStream.write(b);
-                if (autoFlushable) outputStream.flush();
+                if (autoFlushable)
+                    outputStream.flush();
             } catch (IOException e) {
                 deleteStream(outputStream);
-                logger.warn("[{}] - Stream recording error. It will be removed from the stream list", MDC.get("scriptName"));
-                if (streamSet.isEmpty()) throw new IOException("OutputStreamSplitter: no streams for recording");
+                logger.warn("[{}] - Stream recording error. It will be removed from the stream list",
+                        MDC.get("scriptName"));
+                if (streamSet.isEmpty())
+                    throw new IOException("OutputStreamSplitter: no streams for recording");
             }
         }
     }
