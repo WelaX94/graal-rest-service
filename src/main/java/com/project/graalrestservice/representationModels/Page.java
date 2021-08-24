@@ -22,6 +22,7 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
 
   /**
    * Basic constructor
+   * 
    * @param list list to display
    * @param pageNumber current page number
    * @param numPages total number of pages
@@ -51,26 +52,35 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
   public int getTotalScripts() {
     return totalScripts;
   }
+
   public int getScriptsOnPage() {
     return scriptsOnPage;
   }
+
   public int getPageNumber() {
     return pageNumber;
   }
+
   public int getNumPages() {
     return numPages;
   }
+
   public T getList() {
     return list;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
     Page<?> page = (Page<?>) o;
-    return pageNumber == page.pageNumber && numPages == page.numPages && totalScripts == page.totalScripts && scriptsOnPage == page.scriptsOnPage && Objects.equals(list, page.list);
+    return pageNumber == page.pageNumber && numPages == page.numPages
+        && totalScripts == page.totalScripts && scriptsOnPage == page.scriptsOnPage
+        && Objects.equals(list, page.list);
   }
 
   @Override

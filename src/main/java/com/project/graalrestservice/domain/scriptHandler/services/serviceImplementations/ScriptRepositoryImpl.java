@@ -24,6 +24,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
   /**
    * Adds a new script to the map
+   * 
    * @param scriptName script name (identifier)
    * @param script script info, contains all the information about the script
    * @throws WrongNameException if a script with this name already exists
@@ -37,6 +38,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
   /**
    * The method returns information about the script you are looking for
+   * 
    * @param scriptName script name (identifier)
    * @return Script with information about the script
    * @throws ScriptNotFoundException if script not found
@@ -51,11 +53,13 @@ public class ScriptRepositoryImpl implements ScriptRepository {
   }
 
   /**
-   * The method returns a filtered list with the specified parameters.
-   * If there are no filters (null), it returns all the scripts present
-   * in the repository ({@link #map in map})
-   * @param scriptStatus allows you to specify the scripts with which statuses you are interested in the output. If null - scripts with all statuses will be displayed.
-   * @param nameContains it allows you to specify an expression that must contain the name of the script. If null - scripts with all names will be displayed
+   * The method returns a filtered list with the specified parameters. If there are no filters
+   * (null), it returns all the scripts present in the repository ({@link #map in map})
+   * 
+   * @param scriptStatus allows you to specify the scripts with which statuses you are interested in
+   *        the output. If null - scripts with all statuses will be displayed.
+   * @param nameContains it allows you to specify an expression that must contain the name of the
+   *        script. If null - scripts with all names will be displayed
    * @return filtered {@link List} of {@link Script}
    */
   @Override
@@ -75,6 +79,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
   /**
    * Method for removing a script from the list.
+   * 
    * @param scriptName script name (identifier)
    * @throws ScriptNotFoundException if script not found
    */

@@ -46,48 +46,61 @@ public class ScriptsController {
   }
 
   /**
-   * The method returns a sorted, filtered and paginated JSON {@link Page} with {@link ScriptInfoForList}.
-   * The primary List with {@link Script} is {@link ScriptRepository#getScriptList(ScriptStatus, String) filtered}
-   * at the {@link ScriptRepository} level.
-   * It is then {@link ScriptService#getScriptList(ScriptStatus, String, boolean, boolean) sorted}
-   * by {@link ScriptService}.
+   * The method returns a sorted, filtered and paginated JSON {@link Page} with
+   * {@link ScriptInfoForList}. The primary List with {@link Script} is
+   * {@link ScriptRepository#getScriptList(ScriptStatus, String) filtered} at the
+   * {@link ScriptRepository} level. It is then
+   * {@link ScriptService#getScriptList(ScriptStatus, String, boolean, boolean) sorted} by
+   * {@link ScriptService}.
    * {@link ScriptsController#convertListToPage(List, int, int, String, String, boolean, boolean)
-   * Pagination and conversion} to {@link Page} with {@link ScriptInfoForList} occurs at the controller (this) level.
-   * By default, no filters are applied and sorting is done by date of script creation.
-   * @param pageNumber the number of the page you are requesting. If not specified, the default value is '1'.
-   * @param pageSize maximum number of scripts per page. If not specified, the default value is '10'.
-   * @param status this parameter is a filter. Allows you to specify the scripts with which statuses you are interested in the output. If not specified, scripts with all statuses will be displayed.
-   * @param nameContains this parameter is a filter. It allows you to specify an expression that must contain the name of the script. If not specified, scripts with all names will be displayed
-   * @param orderByName sorting parameter. If true, it will be sorted by script name. By default, (false), sorting is set to the date the script was created.
+   * Pagination and conversion} to {@link Page} with {@link ScriptInfoForList} occurs at the
+   * controller (this) level. By default, no filters are applied and sorting is done by date of
+   * script creation.
+   * 
+   * @param pageNumber the number of the page you are requesting. If not specified, the default
+   *        value is '1'.
+   * @param pageSize maximum number of scripts per page. If not specified, the default value is
+   *        '10'.
+   * @param status this parameter is a filter. Allows you to specify the scripts with which statuses
+   *        you are interested in the output. If not specified, scripts with all statuses will be
+   *        displayed.
+   * @param nameContains this parameter is a filter. It allows you to specify an expression that
+   *        must contain the name of the script. If not specified, scripts with all names will be
+   *        displayed
+   * @param orderByName sorting parameter. If true, it will be sorted by script name. By default,
+   *        (false), sorting is set to the date the script was created.
    * @param reverseOrder parameter to reverse the sorting. The default is false.
    * @return a sorted, filtered and paginated {@link Page} with List of {@link ScriptInfoForList}.
    */
   @GetMapping
   public ResponseEntity<Page<List<ScriptInfoForList>>> getScriptListPage(
-      @RequestParam(defaultValue = "1") int pageNumber, @RequestParam(defaultValue = "10") int pageSize,
+      @RequestParam(defaultValue = "1") int pageNumber,
+      @RequestParam(defaultValue = "10") int pageSize,
       @RequestParam(required = false) String status,
       @RequestParam(required = false) String nameContains,
       @RequestParam(defaultValue = "false") boolean orderByName,
       @RequestParam(defaultValue = "false") boolean reverseOrder) {
-    logger.info("Script list request received. " + parameters, pageNumber, pageSize, status, nameContains,
-        orderByName, reverseOrder);
+    logger.info("Script list request received. " + parameters, pageNumber, pageSize, status,
+        nameContains, orderByName, reverseOrder);
     MDC.put(mdcNameIdentifier, "GetScriptsMethod");
     List<Script> scriptList = scriptService.getScriptList(ScriptStatus.getStatus(status),
         nameContains, orderByName, reverseOrder);
-    Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, pageNumber, pageSize, status,
-        nameContains, orderByName, reverseOrder);
-    logger.info("Script list request successfully processed. " + parameters, pageNumber, pageSize, status,
-        nameContains, orderByName, reverseOrder);
+    Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, pageNumber, pageSize,
+        status, nameContains, orderByName, reverseOrder);
+    logger.info("Script list request successfully processed. " + parameters, pageNumber, pageSize,
+        status, nameContains, orderByName, reverseOrder);
     return new ResponseEntity<>(scriptPage, HttpStatus.OK);
   }
 
   /**
    * Method for adding a new script to the run queue. Firstly, the new {@link Script} is added to
    * {@link ScriptRepository#putScript(String, Script) ScriptRepository} via
-   * {@link ScriptService#addScript(String, String) ScriptRepository}
-   * with the passage of some additional checks.
-   * If successful, the script is {@link ScriptService#startScriptAsynchronously(Script) added to the execution queue}
-   * (asynchronously) and the user is returned JSON with information about the script at the time it was created.
+   * {@link ScriptService#addScript(String, String) ScriptRepository} with the passage of some
+   * additional checks. If successful, the script is
+   * {@link ScriptService#startScriptAsynchronously(Script) added to the execution queue}
+   * (asynchronously) and the user is returned JSON with information about the script at the time it
+   * was created.
+   * 
    * @param scriptCode JS body
    * @param scriptName a unique identifier of the script, by which it can be accessed in the future
    * @return ScriptInfoForSingle with information about the script at the time it was created
@@ -107,6 +120,7 @@ public class ScriptsController {
 
   /**
    * A method for obtaining information about the script
+   * 
    * @param scriptName script name (identifier)
    * @return ScriptInfoForSingle JSON information about script
    */
@@ -122,14 +136,16 @@ public class ScriptsController {
   }
 
   /**
-   * A method for getting the output logs of a script. By default, it returns full logs,
-   * but you can limit the boundaries from-to if necessary (either together or separately).
-   * Important: The numbering of the logs starts from 0.
+   * A method for getting the output logs of a script. By default, it returns full logs, but you can
+   * limit the boundaries from-to if necessary (either together or separately). Important: The
+   * numbering of the logs starts from 0.
+   * 
    * @param scriptName script name (identifier)
    * @param from the beginning index, inclusive.
    * @param to the ending index, exclusive.
    * @return full logs or logs from from-to range
-   * @throws WrongArgumentException if  range is entered incorrectly (from/to is less than 0 or greater than the log length; from >= to)
+   * @throws WrongArgumentException if range is entered incorrectly (from/to is less than 0 or
+   *         greater than the log length; from >= to)
    */
   @GetMapping(value = "/{scriptName}/logs")
   public ResponseEntity<String> getScriptLogs(@PathVariable String scriptName,
@@ -156,6 +172,7 @@ public class ScriptsController {
 
   /**
    * A method for viewing a script that has been sent to run
+   * 
    * @param scriptName script name (identifier)
    * @return String with JS body
    */
@@ -169,11 +186,12 @@ public class ScriptsController {
   }
 
   /**
-   * Adds a new script to the execution queue with that ability to stream logs in real time.
-   * As with {@link ScriptsController#runScript(String, String) first variant}, the script is first added to the
-   * repository with some checks, then the StreamingResponseBody is returns.
-   * In StreamingResponseBody the script is added to the execution queue
-   * (asynchronously) and log streaming begins.
+   * Adds a new script to the execution queue with that ability to stream logs in real time. As with
+   * {@link ScriptsController#runScript(String, String) first variant}, the script is first added to
+   * the repository with some checks, then the StreamingResponseBody is returns. In
+   * StreamingResponseBody the script is added to the execution queue (asynchronously) and log
+   * streaming begins.
+   * 
    * @param scriptCode JS body
    * @param scriptName script name (identifier)
    * @return StreamingResponseBody which broadcasts logs in real time
@@ -206,10 +224,11 @@ public class ScriptsController {
   }
 
   /**
-   * This method is needed to stop a running script.
-   * The {@link ScriptService#stopScript(String) ScriptService method} is used to stop the script,
-   * which performs additional checks (you can only stop the script with the {@link ScriptStatus status} RUNNING)
-   * and if everything is successful, the script stops executing.
+   * This method is needed to stop a running script. The {@link ScriptService#stopScript(String)
+   * ScriptService method} is used to stop the script, which performs additional checks (you can
+   * only stop the script with the {@link ScriptStatus status} RUNNING) and if everything is
+   * successful, the script stops executing.
+   * 
    * @param scriptName script name (identifier)
    */
   @PostMapping(value = "/{scriptName}")
@@ -221,10 +240,12 @@ public class ScriptsController {
   }
 
   /**
-   * This method is needed to delete a {@link Script script} from {@link ScriptRepository}.
-   * The {@link ScriptService#deleteScript(String) ScriptService method} is used to delete the {@link Script script},
-   * which performs additional checks (you can't delete the script with the {@link ScriptStatus status} RUNNING)
-   * and if everything is successful, the script deleting from repository.
+   * This method is needed to delete a {@link Script script} from {@link ScriptRepository}. The
+   * {@link ScriptService#deleteScript(String) ScriptService method} is used to delete the
+   * {@link Script script}, which performs additional checks (you can't delete the script with the
+   * {@link ScriptStatus status} RUNNING) and if everything is successful, the script deleting from
+   * repository.
+   * 
    * @param scriptName script name (identifier)
    */
   @DeleteMapping(value = "/{scriptName}")
@@ -237,9 +258,10 @@ public class ScriptsController {
 
   /**
    * A sub-method, which is necessary for
-   * {@link ScriptsController#getScriptListPage(int, int, String, String, boolean, boolean) getScriptListPage}.
-   * It paginates and converts List to {@link Page}. The following parameters (except scriptList) are needed to
-   * create links and fill in information about the page.
+   * {@link ScriptsController#getScriptListPage(int, int, String, String, boolean, boolean)
+   * getScriptListPage}. It paginates and converts List to {@link Page}. The following parameters
+   * (except scriptList) are needed to create links and fill in information about the page.
+   * 
    * @param scriptList script list to be converted
    * @param pageNumber the number of the page you are requesting.
    * @param pageSize maximum number of scripts per page.

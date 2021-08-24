@@ -16,8 +16,8 @@ public interface ScriptService {
 
   void deleteScript(String scriptName);
 
-  List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains,
-      boolean orderByName, boolean reverseOrder);
+  List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains, boolean orderByName,
+      boolean reverseOrder);
 
   @Async
   void startScriptAsynchronously(Script script);

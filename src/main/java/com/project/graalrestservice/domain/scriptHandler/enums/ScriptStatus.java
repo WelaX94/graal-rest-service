@@ -10,6 +10,7 @@ public enum ScriptStatus {
 
   /**
    * A method for converting textual status representation to enum.
+   * 
    * @param status textual status
    * @return ScriptStatus. If the input is null, then the output is also null
    * @throws WrongArgumentException if the status could not be converted
