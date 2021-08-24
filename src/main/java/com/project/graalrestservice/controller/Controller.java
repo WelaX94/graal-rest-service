@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class Controller {
 
-    private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+  private static final Logger logger = LoggerFactory.getLogger(Controller.class);
 
-    /**
-     * Method responsible for "/"
-     * 
-     * @return JSON with application status, self link and link to script list
-     */
-    @GetMapping(value = "/")
-    public RootInfo appStatus() {
-        logger.info("Root request successfully processed");
-        return new RootInfo("The application is running");
-    }
+  /**
+   * Method responsible for "/"
+   * 
+   * @return JSON with application status, self link and link to script list
+   */
+  @GetMapping(value = "/")
+  public RootInfo appStatus() {
+    logger.info("Root request successfully processed");
+    return new RootInfo("The application is running");
+  }
 
 }

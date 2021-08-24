@@ -8,9 +8,9 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface SingleScriptMapper {
-    SingleScriptMapper forSingle = Mappers.getMapper(SingleScriptMapper.class);
+  SingleScriptMapper forSingle = Mappers.getMapper(SingleScriptMapper.class);
 
-    @Mapping(target = "status")
-    ScriptInfoForSingle map(Script script);
+  @Mapping(target = "status")
+  ScriptInfoForSingle map(Script script);
 
 }

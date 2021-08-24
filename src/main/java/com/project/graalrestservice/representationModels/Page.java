@@ -4,6 +4,7 @@ import com.project.graalrestservice.controller.ScriptsController;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -13,7 +14,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  */
 public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
 
-  private final int page;
+  private final int pageNumber;
   private final int numPages;
   private final int totalScripts;
   private final int scriptsOnPage;
@@ -24,9 +25,9 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
    * 
    * @param list sheet to display
    */
-  public Page(T list, int page, int numPages, int totalScripts) {
+  public Page(T list, int pageNumber, int numPages, int totalScripts) {
     this.list = list;
-    this.page = page;
+    this.pageNumber = pageNumber;
     this.numPages = numPages;
     this.totalScripts = totalScripts;
     this.scriptsOnPage = list.size();
@@ -34,12 +35,12 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
 
   public void setLinks(int pageSize, String status, String nameContains, boolean orderByName,
       boolean reverseOrder) {
-    if (page > 1)
-      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(page - 1, pageSize, status,
-          nameContains, orderByName, reverseOrder)).withRel("previousPage").expand());
-    if (page < numPages)
-      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(page + 1, pageSize, status,
-          nameContains, orderByName, reverseOrder)).withRel("nextPage").expand());
+    if (pageNumber > 1)
+      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(pageNumber - 1, pageSize,
+          status, nameContains, orderByName, reverseOrder)).withRel("previousPage").expand());
+    if (pageNumber < numPages)
+      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(pageNumber + 1, pageSize,
+          status, nameContains, orderByName, reverseOrder)).withRel("nextPage").expand());
   }
 
   public int getTotalScripts() {
@@ -50,8 +51,8 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
     return scriptsOnPage;
   }
 
-  public int getPage() {
-    return page;
+  public int getPageNumber() {
+    return pageNumber;
   }
 
   public int getNumPages() {
@@ -62,4 +63,17 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
     return list;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    Page<?> page = (Page<?>) o;
+    return pageNumber == page.pageNumber && numPages == page.numPages && totalScripts == page.totalScripts && scriptsOnPage == page.scriptsOnPage && Objects.equals(list, page.list);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), pageNumber, numPages, totalScripts, scriptsOnPage, list);
+  }
 }

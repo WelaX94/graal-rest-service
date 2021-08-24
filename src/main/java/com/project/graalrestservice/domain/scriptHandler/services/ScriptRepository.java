@@ -7,12 +7,12 @@ import java.util.List;
 
 public interface ScriptRepository {
 
-    public void putScript(String scriptName, Script script);
+  void putScript(String scriptName, Script script);
 
-    public Script getScript(String scriptName);
+  Script getScript(String scriptName);
 
-    public void deleteScript(String scriptName);
+  void deleteScript(String scriptName);
 
-    public List<Script> getScriptList(ScriptStatus status, String nameContains);
+  List<Script> getScriptList(ScriptStatus status, String nameContains);
 
 }

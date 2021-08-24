@@ -5,6 +5,7 @@ import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -14,42 +15,52 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  */
 public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
 
-    private String name;
-    private ScriptStatus status;
-    private OffsetDateTime createTime;
+  private String name;
+  private ScriptStatus status;
+  private OffsetDateTime createTime;
 
-    /**
-     * Class constructor using custom script priority for sorting
-     */
-    public ScriptInfoForList() {
-    }
+  public void setLinks() {
+    add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
+  }
 
-    public void setLinks() {
-        add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setStatus(ScriptStatus status) {
+    this.status = status;
+  }
 
-    public void setStatus(ScriptStatus status) {
-        this.status = status;
-    }
+  public void setCreateTime(OffsetDateTime createTime) {
+    this.createTime = createTime;
+  }
 
-    public void setCreateTime(OffsetDateTime createTime) {
-        this.createTime = createTime;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public ScriptStatus getStatus() {
+    return status;
+  }
 
-    public ScriptStatus getStatus() {
-        return status;
-    }
+  public String getCreateTime() {
+    return createTime.toString();
+  }
 
-    public String getCreateTime() {
-        return createTime.toString();
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    ScriptInfoForList that = (ScriptInfoForList) o;
+    return Objects.equals(name, that.name);
+  }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), name);
+  }
 }

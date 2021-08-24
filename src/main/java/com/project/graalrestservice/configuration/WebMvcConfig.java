@@ -12,30 +12,30 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final int corePoolSize;
-    private final int maxPoolSize;
-    private final int queueCapacity;
-    private final String threadNamePrefix;
+  private final int corePoolSize;
+  private final int maxPoolSize;
+  private final int queueCapacity;
+  private final String threadNamePrefix;
 
-    public WebMvcConfig(@Value("${webmvc.executor.corePoolSize}") int corePoolSize,
-            @Value("${webmvc.executor.maxPoolSize}") int maxPoolSize,
-            @Value("${webmvc.executor.queueCapacity}") int queueCapacity,
-            @Value("${webmvc.executor.threadNamePrefix}") String threadNamePrefix) {
-        this.corePoolSize = corePoolSize;
-        this.maxPoolSize = maxPoolSize;
-        this.queueCapacity = queueCapacity;
-        this.threadNamePrefix = threadNamePrefix;
-    }
+  public WebMvcConfig(@Value("${webmvc.executor.corePoolSize}") int corePoolSize,
+      @Value("${webmvc.executor.maxPoolSize}") int maxPoolSize,
+      @Value("${webmvc.executor.queueCapacity}") int queueCapacity,
+      @Value("${webmvc.executor.threadNamePrefix}") String threadNamePrefix) {
+    this.corePoolSize = corePoolSize;
+    this.maxPoolSize = maxPoolSize;
+    this.queueCapacity = queueCapacity;
+    this.threadNamePrefix = threadNamePrefix;
+  }
 
-    @Override
-    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePoolSize);
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setThreadNamePrefix(threadNamePrefix);
-        executor.initialize();
-        configurer.setTaskExecutor(executor);
-    }
+  @Override
+  public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+    final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(corePoolSize);
+    executor.setMaxPoolSize(maxPoolSize);
+    executor.setQueueCapacity(queueCapacity);
+    executor.setThreadNamePrefix(threadNamePrefix);
+    executor.initialize();
+    configurer.setTaskExecutor(executor);
+  }
 
 }

@@ -8,20 +8,20 @@ import java.util.List;
 
 public interface ScriptService {
 
-    public Script addScript(String name, String script);
+  Script addScript(String name, String script);
 
-    public Script getScript(String scriptName);
+  Script getScript(String scriptName);
 
-    public void stopScript(String scriptName);
+  void stopScript(String scriptName);
 
-    public void deleteScript(String scriptName);
+  void deleteScript(String scriptName);
 
-    public List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains, boolean orderByName,
-            boolean reverseOrder);
+  List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains,
+      boolean orderByName, boolean reverseOrder);
 
-    @Async
-    public void startScriptAsynchronously(Script script);
+  @Async
+  void startScriptAsynchronously(Script script);
 
-    public void startScriptSynchronously(Script script);
+  void startScriptSynchronously(Script script);
 
 }
