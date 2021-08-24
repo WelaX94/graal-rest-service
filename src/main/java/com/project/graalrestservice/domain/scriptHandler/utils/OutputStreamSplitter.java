@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public class OutputStreamSplitter extends OutputStream {
 
-    public static Logger logger = LoggerFactory.getLogger(OutputStreamSplitter.class);
+    public static final Logger logger = LoggerFactory.getLogger(OutputStreamSplitter.class);
     private final Set<OutputStream> streamSet = new CopyOnWriteArraySet<>();
     private boolean autoFlushable = true;
 

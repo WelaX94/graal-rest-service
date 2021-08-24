@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class ScriptServiceImpl implements ScriptService{
 
-    private final static Logger logger = LoggerFactory.getLogger(ScriptService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ScriptService.class);
     private final ScriptRepository scriptRepository;
     private final int streamCapacity;
     private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");

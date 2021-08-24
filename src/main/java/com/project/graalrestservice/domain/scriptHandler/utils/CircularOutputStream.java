@@ -1,8 +1,5 @@
 package com.project.graalrestservice.domain.scriptHandler.utils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.OutputStream;
 import java.util.Arrays;
 
@@ -11,7 +8,6 @@ import java.util.Arrays;
  */
 public class CircularOutputStream extends OutputStream {
 
-    private static final Logger logger = LogManager.getLogger(CircularOutputStream.class);
     private final byte[] buf;
     private final int capacity;
     private int position = 0;

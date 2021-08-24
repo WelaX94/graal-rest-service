@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class ScriptRepositoryImpl implements ScriptRepository{
 
-    private final static Logger logger = LoggerFactory.getLogger(ScriptRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(ScriptRepository.class);
     private final ConcurrentHashMap<String, Script> map = new ConcurrentHashMap<>();
 
     /**

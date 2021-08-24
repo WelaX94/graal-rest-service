@@ -20,9 +20,10 @@ import java.time.OffsetDateTime;
 public class Script implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(Script.class);
+    private static final String mdcNameIdentifier = "scriptName";
     private final String name;
     private final String scriptCode;
-    private volatile ScriptStatus status;
+    private ScriptStatus status;
     private final OutputStream logStorageStream;
     private final OutputStreamSplitter mainStream;
     private final OffsetDateTime createTime;
@@ -38,9 +39,9 @@ public class Script implements Runnable {
     private static void validate(String scriptCode) {
         try (Context context = Context.create("js")){
             context.parse("js", scriptCode);
-            logger.trace("[{} - Validation of the script was successful]", MDC.get("scriptName"));
+            logger.trace("[{} - Validation of the script was successful]", MDC.get(mdcNameIdentifier));
         } catch (PolyglotException e) {
-            logger.debug("[{} - Failed to validate the script]", MDC.get("scriptName"));
+            logger.debug("[{} - Failed to validate the script]", MDC.get(mdcNameIdentifier));
             throw new WrongScriptException(e.getMessage());
         }
     }
@@ -75,7 +76,7 @@ public class Script implements Runnable {
     @Override
     public void run() {
         logger.info("[{}] - Attempting to run a script", this.name);
-        MDC.put("scriptName", this.name);
+        MDC.put(mdcNameIdentifier, this.name);
         try (Context context = Context.newBuilder().out(mainStream).err(mainStream).allowCreateThread(true).build()){
             this.context = context;
             prepareScriptExecution();

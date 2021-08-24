@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,15 +30,14 @@ import java.util.List;
 public class ScriptsController {
 
     private static final Logger logger = LoggerFactory.getLogger(ScriptsController.class);
+    private static final String scriptRequestProcessed = "[{}] - Request successfully processed";
+    private static final String parameters = "Parameters: [page={}, pageSize={}, status={}, nameContains={}, orderByName={}, reverseOrder={}]";
+    private static final String mdcNameIdentifier = "scriptName";
     private final ScriptService scriptService;
-    private final int streamCapacity;
-    private final String scriptRequestProcessed = "[{}] - Request successfully processed";
-    private final String parameters = "Parameters: [page={}, pageSize={}, status={}, nameContains={}, orderByName={}, reverseOrder={}]";
 
     @Autowired
-    public ScriptsController(ScriptService scriptService, @Value("${scripts.outputStream.capacity}") int streamCapacity) {
+    public ScriptsController(ScriptService scriptService) {
         this.scriptService = scriptService;
-        this.streamCapacity = streamCapacity;
     }
 
     /**
@@ -48,7 +46,7 @@ public class ScriptsController {
      * @param page number of page
      * @return page with filtered and sorted scripts
      * */
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<Page<List<ScriptInfoForList>>> getScriptListPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
@@ -58,7 +56,7 @@ public class ScriptsController {
             @RequestParam(defaultValue = "false") boolean reverseOrder) {
         logger.info(
                 "Script list request received. " + parameters, page, pageSize, status, nameContains, orderByName, reverseOrder);
-        MDC.put("scriptName", "GetScriptsMethod");
+        MDC.put(mdcNameIdentifier, "GetScriptsMethod");
         List<Script> scriptList = scriptService.getScriptList(ScriptStatus.getStatus(status), nameContains, orderByName, reverseOrder);
         Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, page, pageSize, status, nameContains, orderByName, reverseOrder);
         logger.info("Script list request successfully processed. " + parameters, page, pageSize, status, nameContains, orderByName, reverseOrder);
@@ -72,12 +70,12 @@ public class ScriptsController {
      * @return JSON information about script
      * @see ScriptsController#runScriptWithLogsStreaming(String, String)
      * */
-    @RequestMapping(value = "/{scriptName}", method = RequestMethod.PUT)
+    @PutMapping(value = "/{scriptName}")
     public ResponseEntity<ScriptInfoForSingle> runScript(
             @RequestBody String scriptCode,
             @PathVariable String scriptName) {
         logger.info("[{}] - A new script is requested to run", scriptName);
-        MDC.put("scriptName", scriptName);
+        MDC.put(mdcNameIdentifier, scriptName);
         Script script = scriptService.addScript(scriptName, scriptCode);
         scriptService.startScriptAsynchronously(script);
         ScriptInfoForSingle scriptInfoForSingle = SingleScriptMapper.forSingle.map(script);
@@ -91,10 +89,10 @@ public class ScriptsController {
      * @param scriptName script name (identifier)
      * @return JSON information about script
      */
-    @RequestMapping(value = "/{scriptName}", method = RequestMethod.GET)
+    @GetMapping(value = "/{scriptName}")
     public ResponseEntity<ScriptInfoForSingle> getSingleScriptInfo(@PathVariable String scriptName) {
         logger.info("[{}] - Single script info request received", scriptName);
-        MDC.put("scriptName", scriptName);
+        MDC.put(mdcNameIdentifier, scriptName);
         ScriptInfoForSingle scriptInfoForSingle = SingleScriptMapper.forSingle.map(scriptService.getScript(scriptName));
         scriptInfoForSingle.setLinks();
         logger.info(scriptRequestProcessed, scriptName);
@@ -106,13 +104,13 @@ public class ScriptsController {
      * @param scriptName script name (identifier)
      * @return script logs
      */
-    @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.GET)
+    @GetMapping(value = "/{scriptName}/logs")
     public ResponseEntity<String> getScriptLogs(
             @PathVariable String scriptName,
             @RequestParam(required = false, defaultValue = "0") Integer from,
             @RequestParam(required = false) Integer to) {
         logger.info("[{}] - Script logs request received (from={}, to={})", scriptName, from, to);
-        MDC.put("scriptName", scriptName);
+        MDC.put(mdcNameIdentifier, scriptName);
         String logs = scriptService.getScript(scriptName).getOutputLogs();
         if (to == null) to = logs.length();
         try {
@@ -127,10 +125,10 @@ public class ScriptsController {
         return new ResponseEntity<>(logs, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{scriptName}/script", method = RequestMethod.GET)
+    @GetMapping(value = "/{scriptName}/script")
     public ResponseEntity<String> getScriptCode(@PathVariable String scriptName) {
         logger.info("[{}] - Script code request received", scriptName);
-        MDC.put("scriptName", scriptName);
+        MDC.put(mdcNameIdentifier, scriptName);
         String scriptCode = scriptService.getScript(scriptName).getScriptCode();
         logger.info(scriptRequestProcessed, scriptName);
         return new ResponseEntity<>(scriptCode, HttpStatus.OK);
@@ -144,12 +142,12 @@ public class ScriptsController {
      * @see ScriptsController#runScript(String, String)
      */
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @RequestMapping(value = "/{scriptName}/logs", method = RequestMethod.PUT)
+    @PutMapping(value = "/{scriptName}/logs")
     public StreamingResponseBody runScriptWithLogsStreaming(
             @RequestBody String scriptCode,
             @PathVariable String scriptName) {
         logger.info("[{}] - Script run with logs streaming request received", scriptName);
-        MDC.put("scriptName", scriptName);
+        MDC.put(mdcNameIdentifier, scriptName);
         Script script = scriptService.addScript(scriptName, scriptCode);
         logger.info(scriptRequestProcessed, scriptName);
         return (OutputStream outputStream) -> {
@@ -174,10 +172,10 @@ public class ScriptsController {
      * Method for stopping a running script
      * @param scriptName script name (identifier)
      */
-    @RequestMapping(value = "/{scriptName}", method = RequestMethod.POST)
+    @PostMapping(value = "/{scriptName}")
     public void stopScript(@PathVariable String scriptName) {
         logger.info("[{}] - Stop script request received", scriptName);
-        MDC.put("scriptName", scriptName);
+        MDC.put(mdcNameIdentifier, scriptName);
         scriptService.stopScript(scriptName);
         logger.info(scriptRequestProcessed, scriptName);
     }
@@ -186,10 +184,10 @@ public class ScriptsController {
      * Method for deleting script from script list
      * @param scriptName script name (identifier)
      */
-    @RequestMapping(value = "/{scriptName}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{scriptName}")
     public void deleteScript(@PathVariable String scriptName) {
         logger.info("[{}] - Delete script request received", scriptName);
-        MDC.put("scriptName", scriptName);
+        MDC.put(mdcNameIdentifier, scriptName);
         scriptService.deleteScript(scriptName);
         logger.info(scriptRequestProcessed, scriptName);
     }
