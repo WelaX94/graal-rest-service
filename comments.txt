@@ -11,9 +11,7 @@
 ------------------------------------------------------------------------------------------------------------------------
         Common objectives:
 
-2)  JavaDoc описания должны описывать логику работы метода. Больше конкретики
-
-3)  Where are domain (ScriptInfo) unit tests? A lot of? Positive and negative, concurrent and single threaded?
+1)  Where are domain (ScriptInfo) unit tests? A lot of? Positive and negative, concurrent and single threaded?
 
 ------------------------------------------------------------------------------------------------------------------------
         DONE:
@@ -118,5 +116,9 @@
 
 27) Настроить стриминг логов без стрима посредника (QueueOutputStream)
 
-28)  Install and use linter (for example sonar) and formatter to the maven build and your IDE.
+28) Install and use linter (for example sonar) and formatter to the maven build and your IDE.
     There's a lot of warnings my linter reports.
+
+29) JavaDoc описания должны описывать логику работы метода. Больше конкретики
+
+30) Update Readme.md after all changes.
