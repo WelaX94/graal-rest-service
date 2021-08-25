@@ -7,8 +7,6 @@ import com.project.graalrestservice.domain.scriptHandler.services.ScriptService;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongNameException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptStatusException;
-import com.project.graalrestservice.representationModels.Page;
-import com.project.graalrestservice.representationModels.ScriptInfoForList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
