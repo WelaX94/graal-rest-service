@@ -1,6 +1,7 @@
 package com.project.graalrestservice.domain.scriptHandler.models;
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
+import com.project.graalrestservice.domain.scriptHandler.exceptions.ScriptNotFoundException;
 import com.project.graalrestservice.domain.scriptHandler.utils.CircularOutputStream;
 import com.project.graalrestservice.domain.scriptHandler.utils.OutputStreamSplitter;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongScriptException;
@@ -40,6 +41,7 @@ public class Script implements Runnable {
   private OffsetDateTime startTime;
   private OffsetDateTime endTime;
   private Context context;
+  private volatile boolean scriptDeleted;
 
   /**
    * The Script constructor is {@link #Script(String, String, int) private} and this method is used
@@ -109,8 +111,6 @@ public class Script implements Runnable {
    */
   @Override
   public void run() {
-    logger.info("[{}] - Attempting to run a script", this.name);
-    MDC.put(mdcNameIdentifier, this.name);
     try (Context context =
         Context.newBuilder().out(mainStream).err(mainStream).allowCreateThread(true).build()) {
       this.context = context;
@@ -121,6 +121,8 @@ public class Script implements Runnable {
     } catch (PolyglotException e) {
       processingFailedOrCanceledExecution(e);
       logger.info("[{}] - Execution failed. {}", name, e.getMessage());
+    } catch (ScriptNotFoundException e) {
+      logger.info("[{}] - The script has been removed from the repository. The run has been cancelled", name);
     }
   }
 
@@ -128,7 +130,8 @@ public class Script implements Runnable {
    * The method performs preparatory actions before {@link #run() running} the script
    */
   private synchronized void prepareScriptExecution() {
-    logger.trace("[{}] - Started launch preparations", this.name);
+    logger.info("[{}] - Attempting to run a script", this.name);
+    if (scriptDeleted) throw new ScriptNotFoundException("Script was deleted from repository");
     status = ScriptStatus.RUNNING;
     startTime = OffsetDateTime.now();
   }
@@ -176,7 +179,7 @@ public class Script implements Runnable {
     if (status != ScriptStatus.RUNNING)
       throw new WrongScriptStatusException("You cannot stop a script that is not running", status);
     else
-      closeContext();
+      context.close(true);
     logger.trace("[{}] - Script execution stopped", this.name);
   }
 
@@ -196,13 +199,6 @@ public class Script implements Runnable {
    */
   public String getOutputLogs() {
     return logStorageStream.toString();
-  }
-
-  /**
-   * Method for closing the context
-   */
-  public void closeContext() {
-    context.close(true);
   }
 
   /**
@@ -245,6 +241,10 @@ public class Script implements Runnable {
 
   public OffsetDateTime getEndTime() {
     return endTime;
+  }
+
+  public void setScriptDeleted(boolean scriptDeleted) {
+    this.scriptDeleted = scriptDeleted;
   }
 
 }

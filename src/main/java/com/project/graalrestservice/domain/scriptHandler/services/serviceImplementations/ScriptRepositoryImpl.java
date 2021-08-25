@@ -85,8 +85,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
    */
   @Override
   public void deleteScript(String scriptName) {
-    if (map.remove(scriptName) == null)
-      throw new ScriptNotFoundException(scriptName);
+    Script script = map.remove(scriptName);
+    if (script == null) throw new ScriptNotFoundException(scriptName);
+    script.setScriptDeleted(true);
     logger.trace("[{}] - Script deleted from script repository", scriptName);
   }
 

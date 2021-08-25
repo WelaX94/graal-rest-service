@@ -143,7 +143,6 @@ public class ScriptServiceImpl implements ScriptService {
       if (script.getStatus() == ScriptStatus.RUNNING)
         throw new WrongScriptStatusException("To delete a running script, you must first stop it",
             script.getStatus());
-      script.closeContext();
       scriptRepository.deleteScript(scriptName);
     }
     logger.debug("[{}] - Script deleted from the service", script.getName());
