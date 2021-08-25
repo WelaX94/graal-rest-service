@@ -54,9 +54,10 @@ public class OutputStreamSplitter extends OutputStream {
   /**
    * Writes len bytes from the specified byte array starting at offset off to this output stream.
    * The rest of the logic is the same as {@link #write(int) this method}
-   * @param      b     the data.
-   * @param      off   the start offset in the data.
-   * @param      len   the number of bytes to write.
+   * 
+   * @param b the data.
+   * @param off the start offset in the data.
+   * @param len the number of bytes to write.
    * @throws IOException if streamSet is empty
    */
   @Override
@@ -69,7 +70,7 @@ public class OutputStreamSplitter extends OutputStream {
       } catch (IOException e) {
         deleteStream(outputStream);
         logger.warn("[{}] - Stream recording error. It will be removed from the stream list",
-                MDC.get("scriptName"));
+            MDC.get("scriptName"));
         if (streamSet.isEmpty())
           throw new IOException("OutputStreamSplitter: no streams for recording");
       }
