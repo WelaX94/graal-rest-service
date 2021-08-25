@@ -1,4 +1,4 @@
-package com.project.graalrestservice.representationModels;
+package com.project.graalrestservice.representationModels; // NOSONAR
 
 import org.springframework.http.HttpStatus;
 

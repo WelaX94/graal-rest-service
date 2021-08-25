@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.utils;
+package com.project.graalrestservice.domain.scriptHandler.utils; // NOSONAR
 
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -6,7 +6,7 @@ import java.util.Arrays;
 /**
  * Class extends the output stream and works on the principle of Circular buffer
  */
-public class CircularOutputStream extends OutputStream {
+public class CircularOutputStream extends OutputStream { // NOSONAR
 
   private final byte[] buf;
   private final int capacity;

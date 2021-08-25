@@ -63,33 +63,30 @@ class ScriptsControllerTest {
     assertThrows(WrongArgumentException.class,
         () -> scriptsController.getScriptListPage(-10, 10, null, null, false, false));
     assertThrows(WrongArgumentException.class,
-            () -> scriptsController.getScriptListPage(1, -10, null, null, false, false));
+        () -> scriptsController.getScriptListPage(1, -10, null, null, false, false));
     assertThrows(WrongArgumentException.class,
-            () -> scriptsController.getScriptListPage(1, 10, "wrongStatus", null, false, false));
+        () -> scriptsController.getScriptListPage(1, 10, "wrongStatus", null, false, false));
 
     assertThrows(PageDoesNotExistException.class,
-            () -> scriptsController.getScriptListPage(6, 1, null, null, false, false));
+        () -> scriptsController.getScriptListPage(6, 1, null, null, false, false));
     assertThrows(PageDoesNotExistException.class,
-            () -> scriptsController.getScriptListPage(2, 10, null, null, false, false));
+        () -> scriptsController.getScriptListPage(2, 10, null, null, false, false));
     assertThrows(PageDoesNotExistException.class,
-            () -> scriptsController.getScriptListPage(2, 10, "queue", null, false, false));
+        () -> scriptsController.getScriptListPage(2, 10, "queue", null, false, false));
     assertThrows(PageDoesNotExistException.class,
-            () -> scriptsController.getScriptListPage(1, 10, null, "somePattern", false, false));
+        () -> scriptsController.getScriptListPage(1, 10, null, "somePattern", false, false));
 
+    assertDoesNotThrow(() -> scriptsController.getScriptListPage(2, 4, null, null, false, false));
+    assertDoesNotThrow(() -> scriptsController.getScriptListPage(5, 1, null, null, false, false));
     assertDoesNotThrow(
-            () -> scriptsController.getScriptListPage(2, 4, null, null, false, false));
-    assertDoesNotThrow(
-            () -> scriptsController.getScriptListPage(5, 1, null, null, false, false));
-    assertDoesNotThrow(
-            () -> scriptsController.getScriptListPage(1, 10, "successful", null, false, false));
-    assertDoesNotThrow(
-            () -> scriptsController.getScriptListPage(1, 10, null, "r_s", false, false));
+        () -> scriptsController.getScriptListPage(1, 10, "successful", null, false, false));
+    assertDoesNotThrow(() -> scriptsController.getScriptListPage(1, 10, null, "r_s", false, false));
   }
 
   @Test
   void testGetScriptListPagePagination() {
     Page<List<ScriptInfoForList>> page =
-            scriptsController.getScriptListPage(1, 5, null, null, false, false).getBody();
+        scriptsController.getScriptListPage(1, 5, null, null, false, false).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(5, page.getTotalScripts());
@@ -123,8 +120,9 @@ class ScriptsControllerTest {
   }
 
   @Test
-  void testGetScriptListPageFiltration() {  //NOSONAR
-    Page<List<ScriptInfoForList>> page = scriptsController.getScriptListPage(1, 10, "queue", null, false, false).getBody();
+  void testGetScriptListPageFiltration() { // NOSONAR
+    Page<List<ScriptInfoForList>> page =
+        scriptsController.getScriptListPage(1, 10, "queue", null, false, false).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -142,7 +140,8 @@ class ScriptsControllerTest {
     assertEquals(1, list.size());
     assertEquals("s_script", list.get(0).getName());
 
-    page = scriptsController.getScriptListPage(1, 10, "successful", "s_scr", false, false).getBody();
+    page =
+        scriptsController.getScriptListPage(1, 10, "successful", "s_scr", false, false).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -175,8 +174,9 @@ class ScriptsControllerTest {
   }
 
   @Test
-  void testGetScriptListPageSorting() { //NOSONAR
-    Page<List<ScriptInfoForList>> page = scriptsController.getScriptListPage(1, 10, null, null, false, false).getBody();
+  void testGetScriptListPageSorting() { // NOSONAR
+    Page<List<ScriptInfoForList>> page =
+        scriptsController.getScriptListPage(1, 10, null, null, false, false).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(5, page.getTotalScripts());
@@ -230,8 +230,9 @@ class ScriptsControllerTest {
   }
 
   @Test
-  void testGetScriptListPageCommon() {  //NOSONAR
-    Page<List<ScriptInfoForList>> page = scriptsController.getScriptListPage(1, 3, "successful", null, false, true).getBody();
+  void testGetScriptListPageCommon() { // NOSONAR
+    Page<List<ScriptInfoForList>> page =
+        scriptsController.getScriptListPage(1, 3, "successful", null, false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -279,7 +280,7 @@ class ScriptsControllerTest {
     assertEquals("c_script", list.get(2).getName());
     assertEquals("r_script", list.get(3).getName());
 
-    page = scriptsController.getScriptListPage(1, 7,"failed" , "_", false, true).getBody();
+    page = scriptsController.getScriptListPage(1, 7, "failed", "_", false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -288,7 +289,7 @@ class ScriptsControllerTest {
     assertEquals(1, list.size());
     assertEquals("f_script", list.get(0).getName());
 
-    page = scriptsController.getScriptListPage(1, 6,"running" , "r_script", false, true).getBody();
+    page = scriptsController.getScriptListPage(1, 6, "running", "r_script", false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -338,18 +339,23 @@ class ScriptsControllerTest {
     assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "!@#"));
     assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "$%^"));
     assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "&*("));
-    assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "asd(as)"));
-    assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;",
-            "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaa" +
-                    "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaaT"));
-    assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "q_script"));
-    assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "f_script"));
-    assertThrows(WrongScriptException.class, () -> scriptsController.runScript("leta a = 0;", "new1"));
+    assertThrows(WrongNameException.class,
+        () -> scriptsController.runScript("let a = 0;", "asd(as)"));
+    assertThrows(WrongNameException.class,
+        () -> scriptsController.runScript("let a = 0;",
+            "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaa"
+                + "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaaT"));
+    assertThrows(WrongNameException.class,
+        () -> scriptsController.runScript("let a = 0;", "q_script"));
+    assertThrows(WrongNameException.class,
+        () -> scriptsController.runScript("let a = 0;", "f_script"));
+    assertThrows(WrongScriptException.class,
+        () -> scriptsController.runScript("leta a = 0;", "new1"));
 
     assertDoesNotThrow(() -> scriptsController.runScript("let a = 0;", "new2"));
     assertDoesNotThrow(() -> scriptsController.runScript("let a = 0;",
-            "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaa" +
-            "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaa"));
+        "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaa"
+            + "aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaa"));
 
     assertThrows(WrongNameException.class, () -> scriptsController.runScript("let a = 0;", "new2"));
   }
@@ -363,8 +369,10 @@ class ScriptsControllerTest {
     }
     scriptsController.runScript("let a = 0;", "q_scr");
 
-    await().until(fieldIn(scriptMap.get("s_scr")).ofType(ScriptStatus.class).andWithName("status"), equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
-    await().until(fieldIn(scriptMap.get("f_scr")).ofType(ScriptStatus.class).andWithName("status"), equalTo(ScriptStatus.EXECUTION_FAILED));
+    await().until(fieldIn(scriptMap.get("s_scr")).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+    await().until(fieldIn(scriptMap.get("f_scr")).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(ScriptStatus.EXECUTION_FAILED));
 
     assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
     assertEquals(ScriptStatus.EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
@@ -374,11 +382,14 @@ class ScriptsControllerTest {
       final String scrName = "r_scr_" + i;
       assertEquals(ScriptStatus.RUNNING, scriptMap.get(scrName).getStatus());
       scriptsController.stopScript(scrName);
-      await().until(fieldIn(scriptMap.get(scrName)).ofType(ScriptStatus.class).andWithName("status"), equalTo(ScriptStatus.EXECUTION_CANCELED));
+      await().until(
+          fieldIn(scriptMap.get(scrName)).ofType(ScriptStatus.class).andWithName("status"),
+          equalTo(ScriptStatus.EXECUTION_CANCELED));
       assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript(scrName));
     }
 
-    await().until(fieldIn(scriptMap.get("q_scr")).ofType(ScriptStatus.class).andWithName("status"), equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+    await().until(fieldIn(scriptMap.get("q_scr")).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
 
     assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript("s_scr"));
     assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript("f_scr"));
@@ -390,7 +401,8 @@ class ScriptsControllerTest {
   void testDeleteScriptExceptionsThrowing() {
     assertThrows(ScriptNotFoundException.class, () -> scriptsController.deleteScript("ABC"));
 
-    assertThrows(WrongScriptStatusException.class, () -> scriptsController.deleteScript("r_script"));
+    assertThrows(WrongScriptStatusException.class,
+        () -> scriptsController.deleteScript("r_script"));
 
     assertDoesNotThrow(() -> scriptsController.deleteScript("q_script"));
     assertNull(scriptMap.get("q_script"));
@@ -404,18 +416,26 @@ class ScriptsControllerTest {
 
   @Test
   void testRunScriptAndGetScriptLogs() throws InterruptedException {
-    assertThrows(ScriptNotFoundException.class, () -> scriptsController.getScriptLogs("test", null, null));
+    assertThrows(ScriptNotFoundException.class,
+        () -> scriptsController.getScriptLogs("test", null, null));
 
     scriptsController.runScript("console.log('0123456789')", "numbers");
 
-    await().until(fieldIn(scriptMap.get("numbers")).ofType(ScriptStatus.class).andWithName("status"), equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+    await().until(
+        fieldIn(scriptMap.get("numbers")).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
 
     assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptMap.get("numbers").getStatus());
-    assertThrows(WrongArgumentException.class, () -> scriptsController.getScriptLogs("numbers", -10, null));
-    assertThrows(WrongArgumentException.class, () -> scriptsController.getScriptLogs("numbers", 0, 999999));
-    assertThrows(WrongArgumentException.class, () -> scriptsController.getScriptLogs("numbers", 0, -100));
-    assertThrows(WrongArgumentException.class, () -> scriptsController.getScriptLogs("numbers", 8, 5));
-    assertThrows(WrongArgumentException.class, () -> scriptsController.getScriptLogs("numbers", 3, 3));
+    assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("numbers", -10, null));
+    assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("numbers", 0, 999999));
+    assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("numbers", 0, -100));
+    assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("numbers", 8, 5));
+    assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("numbers", 3, 3));
 
     assertEquals("0123456789\n", scriptsController.getScriptLogs("numbers", 0, null).getBody());
     assertEquals("0123456789\n", scriptsController.getScriptLogs("numbers", 0, 11).getBody());
@@ -439,7 +459,8 @@ class ScriptsControllerTest {
 
   @Test
   void testRunAndGetSingleScriptInfo() throws InterruptedException {
-    assertThrows(ScriptNotFoundException.class, () -> scriptsController.getSingleScriptInfo("notFound"));
+    assertThrows(ScriptNotFoundException.class,
+        () -> scriptsController.getSingleScriptInfo("notFound"));
 
     ScriptInfoForSingle script = scriptsController.getSingleScriptInfo("q_script").getBody();
     assertEquals("q_script", script.getName());
@@ -468,7 +489,8 @@ class ScriptsControllerTest {
 
     scriptsController.runScript("console.log('Hello, World!')", "hello");
 
-    await().until(fieldIn(scriptMap.get("hello")).ofType(ScriptStatus.class).andWithName("status"), equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+    await().until(fieldIn(scriptMap.get("hello")).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
 
     script = scriptsController.getSingleScriptInfo("hello").getBody();
     assertEquals("hello", script.getName());

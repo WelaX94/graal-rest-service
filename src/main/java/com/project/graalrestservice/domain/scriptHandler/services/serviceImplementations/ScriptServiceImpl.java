@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations;
+package com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations; // NOSONAR
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class ScriptServiceImpl implements ScriptService {
 
-  private static final Logger logger = LoggerFactory.getLogger(ScriptService.class);
+  private static final Logger logger = LoggerFactory.getLogger(ScriptService.class); // NOSONAR
   private final ScriptRepository scriptRepository;
   private final int streamCapacity;
   private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");

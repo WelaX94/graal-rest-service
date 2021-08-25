@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.models;
+package com.project.graalrestservice.domain.scriptHandler.models; // NOSONAR
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.exceptions.ScriptNotFoundException;
@@ -21,10 +21,10 @@ import java.time.OffsetDateTime;
 public class Script implements Runnable {
 
   private static final Logger logger = LoggerFactory.getLogger(Script.class);
-  private static final String mdcNameIdentifier = "scriptName";
+  private static final String MDC_NAME_IDENTIFIER = "scriptName";
   private final String name;
   private final String scriptCode;
-  private ScriptStatus status;
+  private volatile ScriptStatus status;
   /**
    * The {@link CircularOutputStream} is used to store logs. If its size is exceeded, the data will
    * be overwritten according to the Circular buffer principle
@@ -69,9 +69,9 @@ public class Script implements Runnable {
   private static void validate(String scriptCode) {
     try (Context context = Context.create("js")) {
       context.parse("js", scriptCode);
-      logger.trace("[{} - Validation of the script was successful]", MDC.get(mdcNameIdentifier));
+      logger.trace("[{} - Validation of the script was successful]", MDC.get(MDC_NAME_IDENTIFIER));
     } catch (PolyglotException e) {
-      logger.debug("[{} - Failed to validate the script]", MDC.get(mdcNameIdentifier));
+      logger.debug("[{} - Failed to validate the script]", MDC.get(MDC_NAME_IDENTIFIER));
       throw new WrongScriptException(e.getMessage());
     }
   }
@@ -111,18 +111,20 @@ public class Script implements Runnable {
    */
   @Override
   public void run() {
-    try (Context context =
+    try (Context jsContext =
         Context.newBuilder().out(mainStream).err(mainStream).allowCreateThread(true).build()) {
-      this.context = context;
+      this.context = jsContext;
       prepareScriptExecution();
-      context.eval("js", scriptCode);
+      jsContext.eval("js", scriptCode);
       processingSuccessfulExecution();
       logger.info("[{}] - Execution completed successfully", name);
     } catch (PolyglotException e) {
       processingFailedOrCanceledExecution(e);
       logger.info("[{}] - Execution failed. {}", name, e.getMessage());
     } catch (ScriptNotFoundException e) {
-      logger.info("[{}] - The script has been removed from the repository. The run has been cancelled", name);
+      logger.info(
+          "[{}] - The script has been removed from the repository. The run has been cancelled",
+          name);
     }
   }
 
@@ -131,7 +133,9 @@ public class Script implements Runnable {
    */
   private synchronized void prepareScriptExecution() {
     logger.info("[{}] - Attempting to run a script", this.name);
-    if (scriptDeleted) throw new ScriptNotFoundException("Script was deleted from repository");
+    MDC.put(MDC_NAME_IDENTIFIER, name);
+    if (scriptDeleted)
+      throw new ScriptNotFoundException("Script was deleted from repository");
     status = ScriptStatus.RUNNING;
     startTime = OffsetDateTime.now();
   }

@@ -1,4 +1,4 @@
-package com.project.graalrestservice.representationModels;
+package com.project.graalrestservice.representationModels; // NOSONAR
 
 import com.project.graalrestservice.controller.ScriptsController;
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;

@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.utils;
+package com.project.graalrestservice.domain.scriptHandler.utils; // NOSONAR
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * Class extends the output stream and needed to divide one OutputStream into several independent of
  * each other.
  */
-public class OutputStreamSplitter extends OutputStream {
+public class OutputStreamSplitter extends OutputStream { // NOSONAR
 
   public static final Logger logger = LoggerFactory.getLogger(OutputStreamSplitter.class);
   private final Set<OutputStream> streamSet = new CopyOnWriteArraySet<>();

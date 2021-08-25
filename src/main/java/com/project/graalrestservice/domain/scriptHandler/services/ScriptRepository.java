@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.services;
+package com.project.graalrestservice.domain.scriptHandler.services; // NOSONAR
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;

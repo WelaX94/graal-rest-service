@@ -1,4 +1,4 @@
-package com.project.graalrestservice.representationModels;
+package com.project.graalrestservice.representationModels; // NOSONAR
 
 import com.project.graalrestservice.controller.Controller;
 import com.project.graalrestservice.controller.ScriptsController;

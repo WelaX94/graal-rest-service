@@ -31,10 +31,10 @@ import java.util.List;
 public class ScriptsController {
 
   private static final Logger logger = LoggerFactory.getLogger(ScriptsController.class);
-  private static final String scriptRequestProcessed = "[{}] - Request successfully processed";
-  private static final String parameters =
+  private static final String SCRIPT_REQUEST_PROCESSED = "[{}] - Request successfully processed";
+  private static final String REQUEST_PARAMETERS =
       "Parameters: [page={}, pageSize={}, status={}, nameContains={}, orderByName={}, reverseOrder={}]";
-  private static final String mdcNameIdentifier = "scriptName";
+  private static final String MDC_NAME_IDENTIFIER = "scriptName";
   private final ScriptService scriptService;
 
   /**
@@ -80,15 +80,15 @@ public class ScriptsController {
       @RequestParam(required = false) String nameContains,
       @RequestParam(defaultValue = "false") boolean orderByName,
       @RequestParam(defaultValue = "false") boolean reverseOrder) {
-    logger.info("Script list request received. " + parameters, pageNumber, pageSize, status,
+    logger.info("Script list request received. " + REQUEST_PARAMETERS, pageNumber, pageSize, status,
         nameContains, orderByName, reverseOrder);
-    MDC.put(mdcNameIdentifier, "GetScriptsMethod");
+    MDC.put(MDC_NAME_IDENTIFIER, "GetScriptsMethod");
     List<Script> scriptList = scriptService.getScriptList(ScriptStatus.getStatus(status),
         nameContains, orderByName, reverseOrder);
     Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, pageNumber, pageSize,
         status, nameContains, orderByName, reverseOrder);
-    logger.info("Script list request successfully processed. " + parameters, pageNumber, pageSize,
-        status, nameContains, orderByName, reverseOrder);
+    logger.info("Script list request successfully processed. " + REQUEST_PARAMETERS, pageNumber,
+        pageSize, status, nameContains, orderByName, reverseOrder);
     return new ResponseEntity<>(scriptPage, HttpStatus.OK);
   }
 
@@ -109,12 +109,12 @@ public class ScriptsController {
   public ResponseEntity<ScriptInfoForSingle> runScript(@RequestBody String scriptCode,
       @PathVariable String scriptName) {
     logger.info("[{}] - A new script is requested to run", scriptName);
-    MDC.put(mdcNameIdentifier, scriptName);
+    MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     Script script = scriptService.addScript(scriptName, scriptCode);
     scriptService.startScriptAsynchronously(script);
     ScriptInfoForSingle scriptInfoForSingle = SingleScriptMapper.forSingle.map(script);
     scriptInfoForSingle.setLinks();
-    logger.info(scriptRequestProcessed, scriptName);
+    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(scriptInfoForSingle, HttpStatus.CREATED);
   }
 
@@ -127,11 +127,11 @@ public class ScriptsController {
   @GetMapping(value = "/{scriptName}")
   public ResponseEntity<ScriptInfoForSingle> getSingleScriptInfo(@PathVariable String scriptName) {
     logger.info("[{}] - Single script info request received", scriptName);
-    MDC.put(mdcNameIdentifier, scriptName);
+    MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     ScriptInfoForSingle scriptInfoForSingle =
         SingleScriptMapper.forSingle.map(scriptService.getScript(scriptName));
     scriptInfoForSingle.setLinks();
-    logger.info(scriptRequestProcessed, scriptName);
+    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(scriptInfoForSingle, HttpStatus.OK);
   }
 
@@ -152,7 +152,7 @@ public class ScriptsController {
       @RequestParam(required = false, defaultValue = "0") Integer from,
       @RequestParam(required = false) Integer to) {
     logger.info("[{}] - Script logs request received (from={}, to={})", scriptName, from, to);
-    MDC.put(mdcNameIdentifier, scriptName);
+    MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     String logs = scriptService.getScript(scriptName).getOutputLogs();
     if (to == null)
       to = logs.length();
@@ -166,7 +166,7 @@ public class ScriptsController {
           scriptName);
       throw new WrongArgumentException("The 'from-to' range is entered incorrectly");
     }
-    logger.info(scriptRequestProcessed, scriptName);
+    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(logs, HttpStatus.OK);
   }
 
@@ -179,9 +179,9 @@ public class ScriptsController {
   @GetMapping(value = "/{scriptName}/script")
   public ResponseEntity<String> getScriptCode(@PathVariable String scriptName) {
     logger.info("[{}] - Script code request received", scriptName);
-    MDC.put(mdcNameIdentifier, scriptName);
+    MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     String scriptCode = scriptService.getScript(scriptName).getScriptCode();
-    logger.info(scriptRequestProcessed, scriptName);
+    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(scriptCode, HttpStatus.OK);
   }
 
@@ -201,9 +201,9 @@ public class ScriptsController {
   public StreamingResponseBody runScriptWithLogsStreaming(@RequestBody String scriptCode,
       @PathVariable String scriptName) {
     logger.info("[{}] - Script run with logs streaming request received", scriptName);
-    MDC.put(mdcNameIdentifier, scriptName);
+    MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     Script script = scriptService.addScript(scriptName, scriptCode);
-    logger.info(scriptRequestProcessed, scriptName);
+    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
     return (OutputStream outputStream) -> {
       logger.info("[{}] - Streaming logs started", scriptName);
       script.addStreamForRecording(outputStream);
@@ -214,8 +214,8 @@ public class ScriptsController {
             || script.getStatus() == ScriptStatus.RUNNING) {
           Thread.sleep(100);
         }
-      } catch (ClientAbortException | InterruptedException e) {
-        logger.info("[{}] - Client terminated the connection", scriptName);
+      } catch (ClientAbortException | InterruptedException e) { // NOSONAR
+        logger.info("[{}] - Client terminated the connection. {}", scriptName, e.getMessage());
       } finally {
         script.deleteStreamForRecording(outputStream);
       }
@@ -234,9 +234,9 @@ public class ScriptsController {
   @PostMapping(value = "/{scriptName}")
   public void stopScript(@PathVariable String scriptName) {
     logger.info("[{}] - Stop script request received", scriptName);
-    MDC.put(mdcNameIdentifier, scriptName);
+    MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     scriptService.stopScript(scriptName);
-    logger.info(scriptRequestProcessed, scriptName);
+    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
   }
 
   /**
@@ -251,9 +251,9 @@ public class ScriptsController {
   @DeleteMapping(value = "/{scriptName}")
   public void deleteScript(@PathVariable String scriptName) {
     logger.info("[{}] - Delete script request received", scriptName);
-    MDC.put(mdcNameIdentifier, scriptName);
+    MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     scriptService.deleteScript(scriptName);
-    logger.info(scriptRequestProcessed, scriptName);
+    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
   }
 
   /**
@@ -273,7 +273,8 @@ public class ScriptsController {
    */
   private Page<List<ScriptInfoForList>> convertListToPage(List<Script> scriptList, int pageNumber,
       int pageSize, String status, String nameContains, boolean orderByName, boolean reverseOrder) {
-    logger.trace("Starts converting List<Script> to Page<List<ScriptInfoForList>>. " + parameters,
+    logger.trace(
+        "Starts converting List<Script> to Page<List<ScriptInfoForList>>. " + REQUEST_PARAMETERS,
         pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
 
     if (pageNumber < 1)
@@ -301,8 +302,10 @@ public class ScriptsController {
         new Page<>(pageList, pageNumber, numPages, listSize);
     scriptsPage.setLinks(pageSize, status, nameContains, orderByName, reverseOrder);
 
-    logger.trace("Converting List<Script> to Page<List<ScriptInfoForList>> completed successfully. "
-        + parameters, pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
+    logger.trace(
+        "Converting List<Script> to Page<List<ScriptInfoForList>> completed successfully. "
+            + REQUEST_PARAMETERS,
+        pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
     return scriptsPage;
   }
 

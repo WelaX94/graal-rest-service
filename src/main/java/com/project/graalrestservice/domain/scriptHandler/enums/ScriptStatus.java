@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.enums;
+package com.project.graalrestservice.domain.scriptHandler.enums; // NOSONAR
 
 import com.project.graalrestservice.domain.scriptHandler.exceptions.WrongArgumentException;
 

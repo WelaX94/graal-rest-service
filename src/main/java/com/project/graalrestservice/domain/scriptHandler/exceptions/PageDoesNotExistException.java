@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.exceptions;
+package com.project.graalrestservice.domain.scriptHandler.exceptions; // NOSONAR
 
 public class PageDoesNotExistException extends RuntimeException {
 

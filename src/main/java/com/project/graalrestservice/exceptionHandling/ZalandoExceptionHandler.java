@@ -1,4 +1,4 @@
-package com.project.graalrestservice.exceptionHandling;
+package com.project.graalrestservice.exceptionHandling; // NOSONAR
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.zalando.problem.Problem;

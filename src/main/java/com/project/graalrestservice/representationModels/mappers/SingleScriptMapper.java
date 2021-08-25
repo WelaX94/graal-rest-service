@@ -1,4 +1,4 @@
-package com.project.graalrestservice.representationModels.mappers;
+package com.project.graalrestservice.representationModels.mappers; // NOSONAR
 
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
 import com.project.graalrestservice.representationModels.ScriptInfoForSingle;

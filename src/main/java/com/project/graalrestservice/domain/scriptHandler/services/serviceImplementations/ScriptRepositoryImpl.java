@@ -1,4 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations;
+package com.project.graalrestservice.domain.scriptHandler.services.serviceImplementations; // NOSONAR
 
 import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import com.project.graalrestservice.domain.scriptHandler.models.Script;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class ScriptRepositoryImpl implements ScriptRepository {
 
-  private static final Logger logger = LoggerFactory.getLogger(ScriptRepository.class);
+  private static final Logger logger = LoggerFactory.getLogger(ScriptRepository.class); // NOSONAR
   private final ConcurrentHashMap<String, Script> map = new ConcurrentHashMap<>();
 
   /**
@@ -86,7 +86,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
   @Override
   public void deleteScript(String scriptName) {
     Script script = map.remove(scriptName);
-    if (script == null) throw new ScriptNotFoundException(scriptName);
+    if (script == null)
+      throw new ScriptNotFoundException(scriptName);
     script.setScriptDeleted(true);
     logger.trace("[{}] - Script deleted from script repository", scriptName);
   }
