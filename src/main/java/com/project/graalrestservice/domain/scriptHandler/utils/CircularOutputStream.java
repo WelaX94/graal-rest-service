@@ -29,14 +29,12 @@ public class CircularOutputStream extends OutputStream { // NOSONAR
    * @param b byte to write
    */
   @Override
-  public void write(int b) {
-    synchronized (this) {
+  public synchronized void write(int b) {
       if (capacity == position) {
         completed = true;
         position = 0;
       }
       buf[position++] = (byte) b;
-    }
   }
 
   /**
