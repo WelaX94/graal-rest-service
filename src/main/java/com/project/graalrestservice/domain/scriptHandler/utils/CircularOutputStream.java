@@ -49,12 +49,8 @@ public class CircularOutputStream extends OutputStream {
    */
   @Override
   public synchronized void write(@NonNull byte[] b, int off, int len) {
-    for (int i = off; i <= len; i++) {
-      if (capacity == position) {
-        completed = true;
-        position = 0;
-      }
-      buf[position++] = b[i];
+    for (int i = off; i < len; i++) {
+      write(b[i]);
     }
   }
 
