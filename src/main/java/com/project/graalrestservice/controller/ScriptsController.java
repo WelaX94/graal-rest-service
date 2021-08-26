@@ -215,7 +215,7 @@ public class ScriptsController {
           Thread.sleep(100);
         }
       } catch (ClientAbortException | InterruptedException e) { // NOSONAR
-        logger.info("[{}] - Client terminated the connection. {}", scriptName, e.getMessage());
+        logger.info("[{}] - Client terminated the connection ({}).", scriptName, e.getMessage());
       } finally {
         script.deleteStreamForRecording(outputStream);
       }
