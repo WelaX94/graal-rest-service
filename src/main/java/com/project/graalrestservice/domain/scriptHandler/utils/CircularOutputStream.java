@@ -1,6 +1,4 @@
-package com.project.graalrestservice.domain.scriptHandler.utils;  //NOSONAR
-
-import org.springframework.lang.NonNull;
+package com.project.graalrestservice.domain.scriptHandler.utils; // NOSONAR
 
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -48,7 +46,7 @@ public class CircularOutputStream extends OutputStream {
    * @param len the number of bytes to write.
    */
   @Override
-  public synchronized void write(@NonNull byte[] b, int off, int len) {
+  public synchronized void write(byte[] b, int off, int len) {
     for (int i = 0; i < len; i++) {
       write(b[off++]);
     }

@@ -3,7 +3,6 @@ package com.project.graalrestservice.domain.scriptHandler.utils; // NOSONAR
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -61,7 +60,7 @@ public class OutputStreamSplitter extends OutputStream {
    * @throws IOException if streamSet is empty
    */
   @Override
-  public void write(@NonNull byte[] b, int off, int len) throws IOException {
+  public void write(byte[] b, int off, int len) throws IOException {
     for (OutputStream outputStream : streamSet) {
       try {
         outputStream.write(b, off, len);
