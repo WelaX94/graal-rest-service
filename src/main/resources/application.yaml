@@ -1,30 +1,30 @@
 server:
-  port: 3030
+  port: '3030'
 
 webmvc:
   executor:
-    corePoolSize: 20
-    maxPoolSize: 50
-    queueCapacity: 300
-    threadNamePrefix: mvc-exec-
+    corePoolSize: '20'
+    maxPoolSize: '50'
+    queueCapacity: '300'
+    threadNamePrefix: 'mvc-exec-'
 
 spring:
   mvc:
-    throw-exception-if-no-handler-found: true
+    throw-exception-if-no-handler-found: 'true'
     async:
-      request-timeout: 0
+      request-timeout: '0'
   resources:
-    add-mappings: false
+    add-mappings: 'false'
   http:
     encoding:
-      force: true
+      force: 'true'
 
 scripts:
   outputStream:
-    capacity: 65536
+    capacity: '65536'
   executor:
-    threadNamePrefix: script-exec-
-    corePoolSize: 10
-    maxPoolSize: 50
-    queueCapacity: 300
+    threadNamePrefix: 'script-exec-'
+    corePoolSize: '10'
+    maxPoolSize: '50'
+    queueCapacity: '300'
 

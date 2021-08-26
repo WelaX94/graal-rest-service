@@ -361,7 +361,7 @@ class ScriptsControllerTest {
   }
 
   @Test
-  void testRunAndStopScript() throws InterruptedException {
+  void testRunAndStopScript() {
     scriptsController.runScript("let a = 0;", "s_scr");
     scriptsController.runScript("console.lottt(1)", "f_scr");
     for (int i = 0; i < 10; i++) {
@@ -394,7 +394,6 @@ class ScriptsControllerTest {
     assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript("s_scr"));
     assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript("f_scr"));
     assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript("q_scr"));
-
   }
 
   @Test
@@ -415,7 +414,7 @@ class ScriptsControllerTest {
   }
 
   @Test
-  void testRunScriptAndGetScriptLogs() throws InterruptedException {
+  void testRunScriptAndGetScriptLogs() {
     assertThrows(ScriptNotFoundException.class,
         () -> scriptsController.getScriptLogs("test", null, null));
 
@@ -458,7 +457,7 @@ class ScriptsControllerTest {
   }
 
   @Test
-  void testRunAndGetSingleScriptInfo() throws InterruptedException {
+  void testRunAndGetSingleScriptInfo() {
     assertThrows(ScriptNotFoundException.class,
         () -> scriptsController.getSingleScriptInfo("notFound"));
 
