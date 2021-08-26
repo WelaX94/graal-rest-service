@@ -12,7 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -498,6 +501,21 @@ class ScriptsControllerTest {
     assertNotNull(script.getStartTime());
     assertNotNull(script.getEndTime());
     assertEquals(14, script.getLogsSize());
+  }
+
+  @Test
+  void testRunScriptWithLogsStreaming() throws IOException {
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    StreamingResponseBody srb = scriptsController.runScriptWithLogsStreaming("console.log('Hello')", "s_scr");
+    srb.writeTo(os);
+    assertEquals("Hello\n", os.toString());
+    assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
+
+    os.reset();
+    srb = scriptsController.runScriptWithLogsStreaming("console.logaaa('Hello')", "f_scr");
+    srb.writeTo(os);
+    assertTrue(os.toString().contains("TypeError: (intermediate value).logaaa is not a function"));
+    assertEquals(ScriptStatus.EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
   }
 
 }
