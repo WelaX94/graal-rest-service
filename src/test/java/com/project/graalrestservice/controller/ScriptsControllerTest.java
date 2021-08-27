@@ -506,7 +506,8 @@ class ScriptsControllerTest {
   @Test
   void testRunScriptWithLogsStreaming() throws IOException {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    StreamingResponseBody srb = scriptsController.runScriptWithLogsStreaming("console.log('Hello')", "s_scr");
+    StreamingResponseBody srb =
+        scriptsController.runScriptWithLogsStreaming("console.log('Hello')", "s_scr");
     srb.writeTo(os);
     assertEquals("Hello\n", os.toString());
     assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());

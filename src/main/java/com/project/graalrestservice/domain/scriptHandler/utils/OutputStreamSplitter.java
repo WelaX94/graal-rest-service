@@ -41,7 +41,7 @@ public class OutputStreamSplitter extends OutputStream {
         if (autoFlushable)
           outputStream.flush();
       } catch (IOException e) {
-        handleIOException(e,outputStream);
+        handleIOException(e, outputStream);
       }
     }
   }
@@ -63,13 +63,14 @@ public class OutputStreamSplitter extends OutputStream {
         if (autoFlushable)
           outputStream.flush();
       } catch (IOException e) {
-        handleIOException(e,outputStream);
+        handleIOException(e, outputStream);
       }
     }
   }
 
   /**
-   * Handles {@link IOException} thrown from {@link #write(int) this} or {@link #write(byte[], int, int) that} methods.
+   * Handles {@link IOException} thrown from {@link #write(int) this} or
+   * {@link #write(byte[], int, int) that} methods.
    * 
    * @param e processing {@link IOException}
    * @param outputStream {@link OutputStream} from which the exception was thrown
@@ -78,7 +79,7 @@ public class OutputStreamSplitter extends OutputStream {
   private void handleIOException(IOException e, OutputStream outputStream) throws IOException {
     deleteStream(outputStream);
     logger.warn("[{}] - Stream recording error ({}). It will be removed from the stream list",
-            MDC.get("scriptName"), e.getMessage());
+        MDC.get("scriptName"), e.getMessage());
     if (streamSet.isEmpty())
       throw new IOException("OutputStreamSplitter: no streams for recording");
   }
