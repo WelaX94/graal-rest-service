@@ -14,11 +14,11 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
 
 
 ## Requirements for launching
-* Java JDK 11
+* [Java JDK 11](https://openjdk.java.net/)
 
    or
 
-* GraalVM 21.2.0 (Java 11 based)
+* [GraalVM 21.2.0 (Java 11 based)](https://www.graalvm.org/)
 
 
 ## Service Launch
