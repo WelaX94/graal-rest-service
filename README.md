@@ -12,6 +12,15 @@ Write a REST API shell around GraalJs, which would allow through the api
 
 Requests can come in parallel. A script can run for a long time or freeze in an endless loop - we have no control over the scripts content.
 
+
+## Requirements for launching
+* Java JDK 11
+
+   or
+
+* GraalVM 21.2.0 (Java 11 based)
+
+
 ## Service Launch
 1. Build service in Jar file
    > mvn cln package
