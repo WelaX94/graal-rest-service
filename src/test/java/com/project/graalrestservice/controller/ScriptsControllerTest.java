@@ -67,22 +67,20 @@ class ScriptsControllerTest {
         () -> scriptsController.getScriptListPage(-10, 10, null, null, false, false));
     assertThrows(WrongArgumentException.class,
         () -> scriptsController.getScriptListPage(1, -10, null, null, false, false));
-    assertThrows(WrongArgumentException.class,
-        () -> scriptsController.getScriptListPage(1, 10, "wrongStatus", null, false, false));
 
     assertThrows(PageDoesNotExistException.class,
         () -> scriptsController.getScriptListPage(6, 1, null, null, false, false));
     assertThrows(PageDoesNotExistException.class,
         () -> scriptsController.getScriptListPage(2, 10, null, null, false, false));
-    assertThrows(PageDoesNotExistException.class,
-        () -> scriptsController.getScriptListPage(2, 10, "queue", null, false, false));
+    assertThrows(PageDoesNotExistException.class, () -> scriptsController.getScriptListPage(2, 10,
+        ScriptStatus.IN_QUEUE, null, false, false));
     assertThrows(PageDoesNotExistException.class,
         () -> scriptsController.getScriptListPage(1, 10, null, "somePattern", false, false));
 
     assertDoesNotThrow(() -> scriptsController.getScriptListPage(2, 4, null, null, false, false));
     assertDoesNotThrow(() -> scriptsController.getScriptListPage(5, 1, null, null, false, false));
-    assertDoesNotThrow(
-        () -> scriptsController.getScriptListPage(1, 10, "successful", null, false, false));
+    assertDoesNotThrow(() -> scriptsController.getScriptListPage(1, 10,
+        ScriptStatus.EXECUTION_SUCCESSFUL, null, false, false));
     assertDoesNotThrow(() -> scriptsController.getScriptListPage(1, 10, null, "r_s", false, false));
   }
 
@@ -124,8 +122,8 @@ class ScriptsControllerTest {
 
   @Test
   void testGetScriptListPageFiltration() { // NOSONAR
-    Page<List<ScriptInfoForList>> page =
-        scriptsController.getScriptListPage(1, 10, "queue", null, false, false).getBody();
+    Page<List<ScriptInfoForList>> page = scriptsController
+        .getScriptListPage(1, 10, ScriptStatus.IN_QUEUE, null, false, false).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -134,7 +132,8 @@ class ScriptsControllerTest {
     assertEquals(1, list.size());
     assertEquals("q_script", list.get(0).getName());
 
-    page = scriptsController.getScriptListPage(1, 10, "successful", null, false, false).getBody();
+    page = scriptsController
+        .getScriptListPage(1, 10, ScriptStatus.EXECUTION_SUCCESSFUL, null, false, false).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -143,8 +142,9 @@ class ScriptsControllerTest {
     assertEquals(1, list.size());
     assertEquals("s_script", list.get(0).getName());
 
-    page =
-        scriptsController.getScriptListPage(1, 10, "successful", "s_scr", false, false).getBody();
+    page = scriptsController
+        .getScriptListPage(1, 10, ScriptStatus.EXECUTION_SUCCESSFUL, "s_scr", false, false)
+        .getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -234,8 +234,8 @@ class ScriptsControllerTest {
 
   @Test
   void testGetScriptListPageCommon() { // NOSONAR
-    Page<List<ScriptInfoForList>> page =
-        scriptsController.getScriptListPage(1, 3, "successful", null, false, true).getBody();
+    Page<List<ScriptInfoForList>> page = scriptsController
+        .getScriptListPage(1, 3, ScriptStatus.EXECUTION_SUCCESSFUL, null, false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -253,7 +253,8 @@ class ScriptsControllerTest {
     assertEquals(1, list.size());
     assertEquals("f_script", list.get(0).getName());
 
-    page = scriptsController.getScriptListPage(1, 3, "canceled", "c_sc", true, true).getBody();
+    page = scriptsController
+        .getScriptListPage(1, 3, ScriptStatus.EXECUTION_CANCELED, "c_sc", true, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -283,7 +284,8 @@ class ScriptsControllerTest {
     assertEquals("c_script", list.get(2).getName());
     assertEquals("r_script", list.get(3).getName());
 
-    page = scriptsController.getScriptListPage(1, 7, "failed", "_", false, true).getBody();
+    page = scriptsController
+        .getScriptListPage(1, 7, ScriptStatus.EXECUTION_FAILED, "_", false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -292,7 +294,8 @@ class ScriptsControllerTest {
     assertEquals(1, list.size());
     assertEquals("f_script", list.get(0).getName());
 
-    page = scriptsController.getScriptListPage(1, 6, "running", "r_script", false, true).getBody();
+    page = scriptsController.getScriptListPage(1, 6, ScriptStatus.RUNNING, "r_script", false, true)
+        .getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());

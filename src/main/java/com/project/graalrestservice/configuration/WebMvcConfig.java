@@ -1,7 +1,9 @@
 package com.project.graalrestservice.configuration;
 
+import com.project.graalrestservice.convert.StringToScriptStatusConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -48,6 +50,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     executor.setThreadNamePrefix(threadNamePrefix);
     executor.initialize();
     configurer.setTaskExecutor(executor);
+  }
+
+  /**
+   * Registration {@link StringToScriptStatusConverter custom converter}
+   */
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(new StringToScriptStatusConverter());
   }
 
 }

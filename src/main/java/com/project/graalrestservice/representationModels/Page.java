@@ -1,6 +1,7 @@
 package com.project.graalrestservice.representationModels; // NOSONAR
 
 import com.project.graalrestservice.controller.ScriptsController;
+import com.project.graalrestservice.domain.scriptHandler.enums.ScriptStatus;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
   /**
    * Method for adding HATEOAS links. Parameters are needed to form a correct link
    */
-  public void setLinks(int pageSize, String status, String nameContains, boolean orderByName,
+  public void setLinks(int pageSize, ScriptStatus status, String nameContains, boolean orderByName,
       boolean reverseOrder) {
     if (pageNumber > 1)
       add(linkTo(methodOn(ScriptsController.class).getScriptListPage(pageNumber - 1, pageSize,

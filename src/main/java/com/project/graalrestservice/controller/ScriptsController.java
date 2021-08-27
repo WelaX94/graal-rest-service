@@ -52,7 +52,7 @@ public class ScriptsController {
    * {@link ScriptRepository} level. It is then
    * {@link ScriptService#getScriptList(ScriptStatus, String, boolean, boolean) sorted} by
    * {@link ScriptService}.
-   * {@link ScriptsController#convertListToPage(List, int, int, String, String, boolean, boolean)
+   * {@link ScriptsController#convertListToPage(List, int, int, ScriptStatus, String, boolean, boolean)
    * Pagination and conversion} to {@link Page} with {@link ScriptInfoForList} occurs at the
    * controller (this) level. By default, no filters are applied and sorting is done by date of
    * script creation.
@@ -76,15 +76,15 @@ public class ScriptsController {
   public ResponseEntity<Page<List<ScriptInfoForList>>> getScriptListPage(
       @RequestParam(defaultValue = "1") int pageNumber,
       @RequestParam(defaultValue = "10") int pageSize,
-      @RequestParam(required = false) String status,
+      @RequestParam(required = false) ScriptStatus status,
       @RequestParam(required = false) String nameContains,
       @RequestParam(defaultValue = "false") boolean orderByName,
       @RequestParam(defaultValue = "false") boolean reverseOrder) {
     logger.info("Script list request received. " + REQUEST_PARAMETERS, pageNumber, pageSize, status,
         nameContains, orderByName, reverseOrder);
     MDC.put(MDC_NAME_IDENTIFIER, "GetScriptsMethod");
-    List<Script> scriptList = scriptService.getScriptList(ScriptStatus.getStatus(status),
-        nameContains, orderByName, reverseOrder);
+    List<Script> scriptList =
+        scriptService.getScriptList(status, nameContains, orderByName, reverseOrder);
     Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, pageNumber, pageSize,
         status, nameContains, orderByName, reverseOrder);
     logger.info("Script list request successfully processed. " + REQUEST_PARAMETERS, pageNumber,
@@ -258,7 +258,7 @@ public class ScriptsController {
 
   /**
    * A sub-method, which is necessary for
-   * {@link ScriptsController#getScriptListPage(int, int, String, String, boolean, boolean)
+   * {@link ScriptsController#getScriptListPage(int, int, ScriptStatus, String, boolean, boolean)
    * getScriptListPage}. It paginates and converts List to {@link Page}. The following parameters
    * (except scriptList) are needed to create links and fill in information about the page.
    * 
@@ -272,7 +272,8 @@ public class ScriptsController {
    * @return paginated {@link Page} with List of {@link ScriptInfoForList}.
    */
   private Page<List<ScriptInfoForList>> convertListToPage(List<Script> scriptList, int pageNumber,
-      int pageSize, String status, String nameContains, boolean orderByName, boolean reverseOrder) {
+      int pageSize, ScriptStatus status, String nameContains, boolean orderByName,
+      boolean reverseOrder) {
     logger.trace(
         "Starts converting List<Script> to Page<List<ScriptInfoForList>>. " + REQUEST_PARAMETERS,
         pageNumber, pageSize, status, nameContains, orderByName, reverseOrder);
