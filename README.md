@@ -41,11 +41,11 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
 * List of parameters (optional)
     1. Filtration
         * status - allows you to filter the list of received scripts by a specified status. Options:
-            * queue
+            * in_queue
             * running
-            * canceled
-            * successful
-            * failed
+            * execution_canceled
+            * execution_successful
+            * execution_failed
           
             If the parameter is not specified, scripts will be output regardless of their status.
         * nameContains - allows you to filter the list of scripts by a pattern, which must contain the script name
@@ -57,7 +57,7 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
        Query examples:
           > http://localhost:3030/scripts?status=running
        >
-          > http://localhost:3030/scripts?nameContains=aer&status=canceled
+          > http://localhost:3030/scripts?nameContains=aer&status=execution_canceled
 
     2. Sorting
         * orderByName - allows you to filter the list of received scripts by a specified status. Options:
@@ -92,7 +92,7 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
        
   You can combine parameters, use them individually or don't specify them.
   Query examples:
->   http://localhost:3030/scripts?reverseOrder=true&status=successful&pageNumber=5
+>   http://localhost:3030/scripts?reverseOrder=true&status=execution_successful&pageNumber=5
 > 
 >   http://localhost:3030/scripts?pageSize=13&orderByName=true
 
