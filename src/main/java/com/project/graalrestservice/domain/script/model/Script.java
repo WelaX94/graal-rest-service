@@ -43,7 +43,6 @@ public class Script implements Runnable {
   private Instant startTime;
   private Instant endTime;
   private Context context;
-  private volatile boolean scriptDeleted;
 
   /**
    * The Script constructor is {@link #Script(String, String, int) private} and this method is used
@@ -126,7 +125,7 @@ public class Script implements Runnable {
   private synchronized void prepareScriptExecution() {
     logger.info("[{}] - Attempting to run a script", this.name);
     MDC.put(MDC_NAME_IDENTIFIER, this.name);
-    if (scriptDeleted)
+    if (this.status == EXECUTION_CANCELED)
       throw new ScriptNotFoundException("Script was deleted from repository");
     this.status = RUNNING;
     this.startTime = Instant.now();
@@ -216,6 +215,14 @@ public class Script implements Runnable {
     this.mainStream.deleteStream(outputStream);
   }
 
+  /**
+   * This method works if the script was deleted while it was in the execution queue
+   */
+  public synchronized void cancelExecution() {
+    this.status = EXECUTION_CANCELED;
+    if (this.context != null) context.close(true);
+  }
+
   public int getLogsSize() {
     return this.logStorageStream.toString().length();
   }
@@ -238,10 +245,6 @@ public class Script implements Runnable {
 
   public Instant getEndTime() {
     return this.endTime;
-  }
-
-  public void setScriptDeleted(boolean scriptDeleted) {
-    this.scriptDeleted = scriptDeleted;
   }
 
 }
