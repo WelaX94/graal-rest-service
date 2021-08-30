@@ -16,6 +16,8 @@ import org.slf4j.MDC;
 import java.io.*;
 import java.time.Instant;
 
+import static com.project.graalrestservice.domain.script.enumeration.ScriptStatus.*;
+
 /**
  * A class that contains all the information about the script, as well as the code to run it
  */
@@ -67,8 +69,8 @@ public class Script implements Runnable {
    * @throws WrongScriptException if the script failed to parse
    */
   private static void validate(String scriptCode) {
-    try (Context context = Context.create("js")) {
-      context.parse("js", scriptCode);
+    try (Context jsContext = Context.create("js")) {
+      jsContext.parse("js", scriptCode);
       logger.trace("[{} - Validation of the script was successful]", MDC.get(MDC_NAME_IDENTIFIER));
     } catch (PolyglotException e) {
       logger.debug("[{} - Failed to validate the script]", MDC.get(MDC_NAME_IDENTIFIER));
@@ -83,21 +85,12 @@ public class Script implements Runnable {
   private Script(String name, String scriptCode, int streamBufferCapacity) {
     this.name = name;
     this.scriptCode = scriptCode;
-    this.status = ScriptStatus.IN_QUEUE;
+    this.status = IN_QUEUE;
     this.createTime = Instant.now();
     this.logStorageStream = new CircularOutputStream(streamBufferCapacity);
     this.mainStream = new OutputStreamSplitter();
     this.mainStream.addStream(logStorageStream);
     logger.trace("[{}] - Script object created]", name);
-  }
-
-  /**
-   * Constructor required for tests
-   */
-  public Script(String name, String scriptCode, int streamBufferCapacity,
-      ScriptStatus scriptStatus) {
-    this(name, scriptCode, streamBufferCapacity);
-    this.status = scriptStatus;
   }
 
   /**
@@ -110,20 +103,20 @@ public class Script implements Runnable {
    */
   @Override
   public void run() {
-    try (Context jsContext = Context.newBuilder().out(mainStream).err(mainStream)
-        .allowCreateThread(true).build()) {
+    try (Context jsContext =
+        Context.newBuilder().out(mainStream).err(mainStream).allowCreateThread(true).build()) {
       this.context = jsContext;
       prepareScriptExecution();
-      jsContext.eval("js", scriptCode);
+      jsContext.eval("js", this.scriptCode);
       processingSuccessfulExecution();
-      logger.info("[{}] - Execution completed successfully", name);
+      logger.info("[{}] - Execution completed successfully", this.name);
     } catch (PolyglotException e) {
       processingFailedOrCanceledExecution(e);
-      logger.info("[{}] - Execution failed. {}", name, e.getMessage());
+      logger.info("[{}] - Execution failed. {}", this.name, e.getMessage());
     } catch (ScriptNotFoundException e) {
       logger.info(
           "[{}] - The script has been removed from the repository. The run has been cancelled",
-          name);
+          this.name);
     }
   }
 
@@ -132,19 +125,19 @@ public class Script implements Runnable {
    */
   private synchronized void prepareScriptExecution() {
     logger.info("[{}] - Attempting to run a script", this.name);
-    MDC.put(MDC_NAME_IDENTIFIER, name);
+    MDC.put(MDC_NAME_IDENTIFIER, this.name);
     if (scriptDeleted)
       throw new ScriptNotFoundException("Script was deleted from repository");
-    status = ScriptStatus.RUNNING;
-    startTime = Instant.now();
+    this.status = RUNNING;
+    this.startTime = Instant.now();
   }
 
   /**
    * The method handles the successful completion of the script {@link #run() execution}
    */
   private synchronized void processingSuccessfulExecution() {
-    endTime = Instant.now();
-    status = ScriptStatus.EXECUTION_SUCCESSFUL;
+    this.endTime = Instant.now();
+    this.status = EXECUTION_SUCCESSFUL;
     logger.trace("[{}] - Processing of successful completion of the script is finished", this.name);
   }
 
@@ -155,16 +148,16 @@ public class Script implements Runnable {
    * @param e PolyglotException, which stores the cause of the failed execution
    */
   private synchronized void processingFailedOrCanceledExecution(PolyglotException e) {
-    endTime = Instant.now();
+    this.endTime = Instant.now();
     if (e.isCancelled())
-      status = ScriptStatus.EXECUTION_CANCELED;
+      status = EXECUTION_CANCELED;
     else
-      status = ScriptStatus.EXECUTION_FAILED;
+      status = EXECUTION_FAILED;
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
     e.printStackTrace(pw);
     try {
-      mainStream.write(sw.toString().getBytes());
+      this.mainStream.write(sw.toString().getBytes());
     } catch (IOException ex) {
       logger.error("[{}] - error writing exception stack trace to log stream", this.name);
       ex.printStackTrace();
@@ -179,10 +172,11 @@ public class Script implements Runnable {
    * @throws WrongScriptException if the script status is not RUNNING
    */
   public synchronized void stopScriptExecution() {
-    if (status != ScriptStatus.RUNNING)
-      throw new WrongScriptStatusException("You cannot stop a script that is not running", status);
+    if (this.status != RUNNING)
+      throw new WrongScriptStatusException("You cannot stop a script that is not running",
+          this.status);
     else
-      context.close(true);
+      this.context.close(true);
     logger.trace("[{}] - Script execution stopped", this.name);
   }
 
@@ -192,7 +186,7 @@ public class Script implements Runnable {
    * @return current status of the script
    */
   public synchronized ScriptStatus getStatus() {
-    return status;
+    return this.status;
   }
 
   /**
@@ -201,7 +195,7 @@ public class Script implements Runnable {
    * @return output logs
    */
   public String getOutputLogs() {
-    return logStorageStream.toString();
+    return this.logStorageStream.toString();
   }
 
   /**
@@ -210,7 +204,7 @@ public class Script implements Runnable {
    * @param outputStream OutputStream
    */
   public void addStreamForRecording(OutputStream outputStream) {
-    mainStream.addStream(outputStream);
+    this.mainStream.addStream(outputStream);
   }
 
   /**
@@ -219,31 +213,31 @@ public class Script implements Runnable {
    * @param outputStream OutputStream for removal
    */
   public void deleteStreamForRecording(OutputStream outputStream) {
-    mainStream.deleteStream(outputStream);
+    this.mainStream.deleteStream(outputStream);
   }
 
   public int getLogsSize() {
-    return logStorageStream.toString().length();
+    return this.logStorageStream.toString().length();
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public String getScriptCode() {
-    return scriptCode;
+    return this.scriptCode;
   }
 
   public Instant getCreateTime() {
-    return createTime;
+    return this.createTime;
   }
 
   public Instant getStartTime() {
-    return startTime;
+    return this.startTime;
   }
 
   public Instant getEndTime() {
-    return endTime;
+    return this.endTime;
   }
 
   public void setScriptDeleted(boolean scriptDeleted) {

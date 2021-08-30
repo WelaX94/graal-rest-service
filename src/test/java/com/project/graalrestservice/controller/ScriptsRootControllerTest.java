@@ -17,10 +17,13 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import static com.project.graalrestservice.domain.script.enumeration.ScriptStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.awaitility.Awaitility.*;
@@ -35,20 +38,36 @@ class ScriptsRootControllerTest {
   private Map<String, Script> scriptMap;
 
   @BeforeEach
-  void setUp() throws NoSuchFieldException, IllegalAccessException {
+  void setUp() throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException,
+      InvocationTargetException, InstantiationException {
     if (scriptMap == null) {
       Field mapField = ScriptRepositoryImpl.class.getDeclaredField("map");
       mapField.setAccessible(true);
       scriptMap = (Map<String, Script>) mapField.get(scriptRepositoryImpl);
     }
+    Constructor<Script> scriptConstructor =
+        Script.class.getDeclaredConstructor(String.class, String.class, int.class);
+    scriptConstructor.setAccessible(true);
+    Field statusField = Script.class.getDeclaredField("status");
+    statusField.setAccessible(true);
 
     int bufCapacity = 65536;
-    Script s0 = new Script("q_script", "let a = 0;", bufCapacity, ScriptStatus.IN_QUEUE);
-    Script s1 = new Script("r_script", "let a = 0;", bufCapacity, ScriptStatus.RUNNING);
-    Script s2 = new Script("c_script", "let a = 0;", bufCapacity, ScriptStatus.EXECUTION_CANCELED);
-    Script s3 = new Script("f_script", "let a = 0;", bufCapacity, ScriptStatus.EXECUTION_FAILED);
-    Script s4 =
-        new Script("s_script", "let a = 0;", bufCapacity, ScriptStatus.EXECUTION_SUCCESSFUL);
+
+    Script s0 = scriptConstructor.newInstance("q_script", "let a = 0;", bufCapacity);
+    statusField.set(s0, IN_QUEUE);
+
+    Script s1 = scriptConstructor.newInstance("r_script", "let a = 0;", bufCapacity);
+    statusField.set(s1, RUNNING);
+
+    Script s2 = scriptConstructor.newInstance("c_script", "let a = 0;", bufCapacity);
+    statusField.set(s2, EXECUTION_CANCELED);
+
+    Script s3 = scriptConstructor.newInstance("f_script", "let a = 0;", bufCapacity);
+    statusField.set(s3, EXECUTION_FAILED);
+
+    Script s4 = scriptConstructor.newInstance("s_script", "let a = 0;", bufCapacity);
+    statusField.set(s4, EXECUTION_SUCCESSFUL);
+
     scriptMap.put("q_script", s0);
     scriptMap.put("r_script", s1);
     scriptMap.put("c_script", s2);
@@ -73,15 +92,15 @@ class ScriptsRootControllerTest {
         () -> scriptsController.getScriptListPage(6, 1, null, null, false, false));
     assertThrows(PageDoesNotExistException.class,
         () -> scriptsController.getScriptListPage(2, 10, null, null, false, false));
-    assertThrows(PageDoesNotExistException.class, () -> scriptsController.getScriptListPage(2, 10,
-        ScriptStatus.IN_QUEUE, null, false, false));
+    assertThrows(PageDoesNotExistException.class,
+        () -> scriptsController.getScriptListPage(2, 10, IN_QUEUE, null, false, false));
     assertThrows(PageDoesNotExistException.class,
         () -> scriptsController.getScriptListPage(1, 10, null, "somePattern", false, false));
 
     assertDoesNotThrow(() -> scriptsController.getScriptListPage(2, 4, null, null, false, false));
     assertDoesNotThrow(() -> scriptsController.getScriptListPage(5, 1, null, null, false, false));
-    assertDoesNotThrow(() -> scriptsController.getScriptListPage(1, 10,
-        ScriptStatus.EXECUTION_SUCCESSFUL, null, false, false));
+    assertDoesNotThrow(
+        () -> scriptsController.getScriptListPage(1, 10, EXECUTION_SUCCESSFUL, null, false, false));
     assertDoesNotThrow(() -> scriptsController.getScriptListPage(1, 10, null, "r_s", false, false));
   }
 
@@ -123,8 +142,8 @@ class ScriptsRootControllerTest {
 
   @Test
   void testGetScriptListPageFiltration() { // NOSONAR
-    Page<List<ScriptInfoForList>> page = scriptsController
-        .getScriptListPage(1, 10, ScriptStatus.IN_QUEUE, null, false, false).getBody();
+    Page<List<ScriptInfoForList>> page =
+        scriptsController.getScriptListPage(1, 10, IN_QUEUE, null, false, false).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -133,8 +152,8 @@ class ScriptsRootControllerTest {
     assertEquals(1, list.size());
     assertEquals("q_script", list.get(0).getName());
 
-    page = scriptsController
-        .getScriptListPage(1, 10, ScriptStatus.EXECUTION_SUCCESSFUL, null, false, false).getBody();
+    page = scriptsController.getScriptListPage(1, 10, EXECUTION_SUCCESSFUL, null, false, false)
+        .getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -143,8 +162,7 @@ class ScriptsRootControllerTest {
     assertEquals(1, list.size());
     assertEquals("s_script", list.get(0).getName());
 
-    page = scriptsController
-        .getScriptListPage(1, 10, ScriptStatus.EXECUTION_SUCCESSFUL, "s_scr", false, false)
+    page = scriptsController.getScriptListPage(1, 10, EXECUTION_SUCCESSFUL, "s_scr", false, false)
         .getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
@@ -236,7 +254,7 @@ class ScriptsRootControllerTest {
   @Test
   void testGetScriptListPageCommon() { // NOSONAR
     Page<List<ScriptInfoForList>> page = scriptsController
-        .getScriptListPage(1, 3, ScriptStatus.EXECUTION_SUCCESSFUL, null, false, true).getBody();
+        .getScriptListPage(1, 3, EXECUTION_SUCCESSFUL, null, false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -254,8 +272,8 @@ class ScriptsRootControllerTest {
     assertEquals(1, list.size());
     assertEquals("f_script", list.get(0).getName());
 
-    page = scriptsController
-        .getScriptListPage(1, 3, ScriptStatus.EXECUTION_CANCELED, "c_sc", true, true).getBody();
+    page =
+        scriptsController.getScriptListPage(1, 3, EXECUTION_CANCELED, "c_sc", true, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -285,8 +303,7 @@ class ScriptsRootControllerTest {
     assertEquals("c_script", list.get(2).getName());
     assertEquals("r_script", list.get(3).getName());
 
-    page = scriptsController
-        .getScriptListPage(1, 7, ScriptStatus.EXECUTION_FAILED, "_", false, true).getBody();
+    page = scriptsController.getScriptListPage(1, 7, EXECUTION_FAILED, "_", false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -295,8 +312,7 @@ class ScriptsRootControllerTest {
     assertEquals(1, list.size());
     assertEquals("f_script", list.get(0).getName());
 
-    page = scriptsController.getScriptListPage(1, 6, ScriptStatus.RUNNING, "r_script", false, true)
-        .getBody();
+    page = scriptsController.getScriptListPage(1, 6, RUNNING, "r_script", false, true).getBody();
     assertEquals(1, page.getPageNumber());
     assertEquals(1, page.getNumPages());
     assertEquals(1, page.getTotalScripts());
@@ -377,26 +393,26 @@ class ScriptsRootControllerTest {
     scriptsController.runScript("let a = 0;", "q_scr");
 
     await().until(fieldIn(scriptMap.get("s_scr")).ofType(ScriptStatus.class).andWithName("status"),
-        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+        equalTo(EXECUTION_SUCCESSFUL));
     await().until(fieldIn(scriptMap.get("f_scr")).ofType(ScriptStatus.class).andWithName("status"),
-        equalTo(ScriptStatus.EXECUTION_FAILED));
+        equalTo(EXECUTION_FAILED));
 
-    assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
-    assertEquals(ScriptStatus.EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
-    assertEquals(ScriptStatus.IN_QUEUE, scriptMap.get("q_scr").getStatus());
+    assertEquals(EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
+    assertEquals(EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
+    assertEquals(IN_QUEUE, scriptMap.get("q_scr").getStatus());
 
     for (int i = 0; i < 10; i++) {
       final String scrName = "r_scr_" + i;
-      assertEquals(ScriptStatus.RUNNING, scriptMap.get(scrName).getStatus());
+      assertEquals(RUNNING, scriptMap.get(scrName).getStatus());
       scriptsController.stopScript(scrName);
       await().until(
           fieldIn(scriptMap.get(scrName)).ofType(ScriptStatus.class).andWithName("status"),
-          equalTo(ScriptStatus.EXECUTION_CANCELED));
+          equalTo(EXECUTION_CANCELED));
       assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript(scrName));
     }
 
     await().until(fieldIn(scriptMap.get("q_scr")).ofType(ScriptStatus.class).andWithName("status"),
-        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+        equalTo(EXECUTION_SUCCESSFUL));
 
     assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript("s_scr"));
     assertThrows(WrongScriptStatusException.class, () -> scriptsController.stopScript("f_scr"));
@@ -429,9 +445,9 @@ class ScriptsRootControllerTest {
 
     await().until(
         fieldIn(scriptMap.get("numbers")).ofType(ScriptStatus.class).andWithName("status"),
-        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+        equalTo(EXECUTION_SUCCESSFUL));
 
-    assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptMap.get("numbers").getStatus());
+    assertEquals(EXECUTION_SUCCESSFUL, scriptMap.get("numbers").getStatus());
     assertThrows(WrongArgumentException.class,
         () -> scriptsController.getScriptLogs("numbers", -10, null));
     assertThrows(WrongArgumentException.class,
@@ -470,37 +486,37 @@ class ScriptsRootControllerTest {
 
     ScriptInfoForSingle script = scriptsController.getSingleScriptInfo("q_script").getBody();
     assertEquals("q_script", script.getName());
-    assertEquals(ScriptStatus.IN_QUEUE, script.getStatus());
+    assertEquals(IN_QUEUE, script.getStatus());
     assertNotNull(script.getCreateTime());
 
     script = scriptsController.getSingleScriptInfo("r_script").getBody();
     assertEquals("r_script", script.getName());
-    assertEquals(ScriptStatus.RUNNING, script.getStatus());
+    assertEquals(RUNNING, script.getStatus());
     assertNotNull(script.getCreateTime());
 
     script = scriptsController.getSingleScriptInfo("c_script").getBody();
     assertEquals("c_script", script.getName());
-    assertEquals(ScriptStatus.EXECUTION_CANCELED, script.getStatus());
+    assertEquals(EXECUTION_CANCELED, script.getStatus());
     assertNotNull(script.getCreateTime());
 
     script = scriptsController.getSingleScriptInfo("f_script").getBody();
     assertEquals("f_script", script.getName());
-    assertEquals(ScriptStatus.EXECUTION_FAILED, script.getStatus());
+    assertEquals(EXECUTION_FAILED, script.getStatus());
     assertNotNull(script.getCreateTime());
 
     script = scriptsController.getSingleScriptInfo("s_script").getBody();
     assertEquals("s_script", script.getName());
-    assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getStatus());
+    assertEquals(EXECUTION_SUCCESSFUL, script.getStatus());
     assertNotNull(script.getCreateTime());
 
     scriptsController.runScript("console.log('Hello, World!')", "hello");
 
     await().until(fieldIn(scriptMap.get("hello")).ofType(ScriptStatus.class).andWithName("status"),
-        equalTo(ScriptStatus.EXECUTION_SUCCESSFUL));
+        equalTo(EXECUTION_SUCCESSFUL));
 
     script = scriptsController.getSingleScriptInfo("hello").getBody();
     assertEquals("hello", script.getName());
-    assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, script.getStatus());
+    assertEquals(EXECUTION_SUCCESSFUL, script.getStatus());
     assertNotNull(script.getCreateTime());
     assertNotNull(script.getStartTime());
     assertNotNull(script.getEndTime());
@@ -514,13 +530,13 @@ class ScriptsRootControllerTest {
         scriptsController.runScriptWithLogsStreaming("console.log('Hello')", "s_scr");
     srb.writeTo(os);
     assertEquals("Hello\n", os.toString());
-    assertEquals(ScriptStatus.EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
+    assertEquals(EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
 
     os.reset();
     srb = scriptsController.runScriptWithLogsStreaming("console.logaaa('Hello')", "f_scr");
     srb.writeTo(os);
     assertTrue(os.toString().contains("TypeError: (intermediate value).logaaa is not a function"));
-    assertEquals(ScriptStatus.EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
+    assertEquals(EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
   }
 
 }

@@ -42,32 +42,32 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
    */
   public void setLinks(int pageSize, ScriptStatus status, String nameContains, boolean orderByName,
       boolean reverseOrder) {
-    if (pageNumber > 1)
-      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(pageNumber - 1, pageSize,
+    if (this.pageNumber > 1)
+      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(this.pageNumber - 1, pageSize,
           status, nameContains, orderByName, reverseOrder)).withRel("previousPage").expand());
-    if (pageNumber < numPages)
-      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(pageNumber + 1, pageSize,
+    if (this.pageNumber < this.numPages)
+      add(linkTo(methodOn(ScriptsController.class).getScriptListPage(this.pageNumber + 1, pageSize,
           status, nameContains, orderByName, reverseOrder)).withRel("nextPage").expand());
   }
 
   public int getTotalScripts() {
-    return totalScripts;
+    return this.totalScripts;
   }
 
   public int getScriptsOnPage() {
-    return scriptsOnPage;
+    return this.scriptsOnPage;
   }
 
   public int getPageNumber() {
-    return pageNumber;
+    return this.pageNumber;
   }
 
   public int getNumPages() {
-    return numPages;
+    return this.numPages;
   }
 
   public T getList() {
-    return list;
+    return this.list;
   }
 
   @Override
@@ -79,13 +79,15 @@ public class Page<T extends List<?>> extends RepresentationModel<Page<T>> {
     if (!super.equals(o))
       return false;
     Page<?> page = (Page<?>) o;
-    return pageNumber == page.pageNumber && numPages == page.numPages
-        && totalScripts == page.totalScripts && scriptsOnPage == page.scriptsOnPage
-        && Objects.equals(list, page.list);
+    return this.pageNumber == page.pageNumber && this.numPages == page.numPages
+        && this.totalScripts == page.totalScripts && this.scriptsOnPage == page.scriptsOnPage
+        && Objects.equals(this.list, page.list);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), pageNumber, numPages, totalScripts, scriptsOnPage, list);
+    return Objects.hash(super.hashCode(), this.pageNumber, this.numPages, this.totalScripts,
+        this.scriptsOnPage, this.list);
   }
+
 }

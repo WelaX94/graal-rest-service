@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.project.graalrestservice.domain.script.enumeration.ScriptStatus.*;
+
 /** RootController class responsible for "/scripts" */
 @RestController
 @RequestMapping("/scripts")
@@ -210,8 +212,7 @@ public class ScriptsController {
       try {
         outputStream.flush();
         scriptService.startScriptAsynchronously(script);
-        while (script.getStatus() == ScriptStatus.IN_QUEUE
-            || script.getStatus() == ScriptStatus.RUNNING) {
+        while (script.getStatus() == IN_QUEUE || script.getStatus() == RUNNING) {
           Thread.sleep(100);
         }
       } catch (ClientAbortException | InterruptedException e) { // NOSONAR

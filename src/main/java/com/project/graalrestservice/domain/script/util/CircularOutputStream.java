@@ -19,7 +19,7 @@ public class CircularOutputStream extends OutputStream {
    * @param capacity stream capacity
    */
   public CircularOutputStream(int capacity) {
-    buf = new byte[capacity];
+    this.buf = new byte[capacity];
     this.capacity = capacity;
   }
 
@@ -30,11 +30,11 @@ public class CircularOutputStream extends OutputStream {
    */
   @Override
   public synchronized void write(int b) {
-    if (capacity == position) {
-      completed = true;
-      position = 0;
+    if (this.capacity == this.position) {
+      this.completed = true;
+      this.position = 0;
     }
-    buf[position++] = (byte) b;
+    this.buf[position++] = (byte) b;
   }
 
   /**
@@ -59,8 +59,8 @@ public class CircularOutputStream extends OutputStream {
    */
   @Override
   public String toString() {
-    return completed ? new String(toByteArray(), 0, capacity)
-        : new String(toByteArray(), 0, position);
+    return this.completed ? new String(toByteArray(), 0, this.capacity)
+        : new String(toByteArray(), 0, this.position);
   }
 
   /**
@@ -69,15 +69,15 @@ public class CircularOutputStream extends OutputStream {
    * @return array of stream content in the correct order
    */
   private synchronized byte[] toByteArray() {
-    if (!completed)
-      return Arrays.copyOf(buf, position);
+    if (!this.completed)
+      return Arrays.copyOf(this.buf, this.position);
     else {
-      byte[] result = new byte[capacity];
-      int i = position;
-      for (int k = 0; k < capacity; i++, k++) {
-        if (i == capacity)
+      byte[] result = new byte[this.capacity];
+      int i = this.position;
+      for (int k = 0; k < this.capacity; i++, k++) {
+        if (i == this.capacity)
           i = 0;
-        result[k] = buf[i];
+        result[k] = this.buf[i];
       }
       return result;
     }

@@ -35,10 +35,10 @@ public class OutputStreamSplitter extends OutputStream {
    */
   @Override
   public void write(int b) throws IOException {
-    for (OutputStream outputStream : streamSet) {
+    for (OutputStream outputStream : this.streamSet) {
       try {
         outputStream.write(b);
-        if (autoFlushable)
+        if (this.autoFlushable)
           outputStream.flush();
       } catch (IOException e) {
         handleIOException(e, outputStream);
@@ -57,10 +57,10 @@ public class OutputStreamSplitter extends OutputStream {
    */
   @Override
   public void write(byte[] b, int off, int len) throws IOException {
-    for (OutputStream outputStream : streamSet) {
+    for (OutputStream outputStream : this.streamSet) {
       try {
         outputStream.write(b, off, len);
-        if (autoFlushable)
+        if (this.autoFlushable)
           outputStream.flush();
       } catch (IOException e) {
         handleIOException(e, outputStream);
@@ -80,7 +80,7 @@ public class OutputStreamSplitter extends OutputStream {
     deleteStream(outputStream);
     logger.warn("[{}] - Stream recording error ({}). It will be removed from the stream list",
         MDC.get("scriptName"), e.getMessage());
-    if (streamSet.isEmpty())
+    if (this.streamSet.isEmpty())
       throw new IOException("OutputStreamSplitter: no streams for recording");
   }
 
@@ -89,23 +89,23 @@ public class OutputStreamSplitter extends OutputStream {
   }
 
   public boolean isAutoFlushable() {
-    return autoFlushable;
+    return this.autoFlushable;
   }
 
   public boolean addStream(OutputStream outputStream) {
-    return streamSet.add(outputStream);
+    return this.streamSet.add(outputStream);
   }
 
   public boolean deleteStream(OutputStream outputStream) {
-    return streamSet.remove(outputStream);
+    return this.streamSet.remove(outputStream);
   }
 
   public int currentNumberOfStreams() {
-    return streamSet.size();
+    return this.streamSet.size();
   }
 
   public void deleteAllStreams() {
-    streamSet.clear();
+    this.streamSet.clear();
   }
 
 }

@@ -17,15 +17,15 @@ public class ExceptionInfo {
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   public int getStatus() {
-    return status;
+    return this.status;
   }
 
   public String getMessage() {
-    return message;
+    return this.message;
   }
 
 }

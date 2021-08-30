@@ -26,35 +26,35 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
    * Method for adding HATEOAS links.
    */
   public void setLinks() {
-    add(linkTo(methodOn(ScriptsController.class).getScriptLogs(name, null, null)).withRel("logs")
-        .expand());
-    add(linkTo(methodOn(ScriptsController.class).getScriptCode(name)).withRel("script"));
-    add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
+    add(linkTo(methodOn(ScriptsController.class).getScriptLogs(this.name, null, null))
+        .withRel("logs").expand());
+    add(linkTo(methodOn(ScriptsController.class).getScriptCode(this.name)).withRel("script"));
+    add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(this.name)).withSelfRel());
     add(linkTo(ScriptsController.class).withRel("scriptList"));
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public ScriptStatus getStatus() {
-    return status;
+    return this.status;
   }
 
   public String getCreateTime() {
-    return createTime.toString();
+    return this.createTime.toString();
   }
 
   public String getStartTime() {
-    return (startTime == null) ? null : startTime.toString();
+    return (this.startTime == null) ? null : this.startTime.toString();
   }
 
   public String getEndTime() {
-    return (endTime == null) ? null : endTime.toString();
+    return (this.endTime == null) ? null : this.endTime.toString();
   }
 
   public int getLogsSize() {
-    return logsSize;
+    return this.logsSize;
   }
 
   public void setName(String name) {
@@ -90,12 +90,12 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     if (!super.equals(o))
       return false;
     ScriptInfoForSingle that = (ScriptInfoForSingle) o;
-    return Objects.equals(name, that.name);
+    return Objects.equals(this.name, that.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), name);
+    return Objects.hash(super.hashCode(), this.name);
   }
 
 }

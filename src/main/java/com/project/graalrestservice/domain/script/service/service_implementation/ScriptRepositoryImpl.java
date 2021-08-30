@@ -31,7 +31,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
    */
   @Override
   public void putScript(String scriptName, Script script) {
-    if (map.putIfAbsent(scriptName, script) != null)
+    if (this.map.putIfAbsent(scriptName, script) != null)
       throw new WrongNameException("Such a name is already in use");
     logger.trace("[{}] - Script added to the script repository", scriptName);
   }
@@ -45,7 +45,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
    */
   @Override
   public Script getScript(String scriptName) {
-    Script script = map.get(scriptName);
+    Script script = this.map.get(scriptName);
     if (script == null)
       throw new ScriptNotFoundException(scriptName);
     logger.trace("[{}] - Script repository return the script", scriptName);
@@ -66,7 +66,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
   public List<Script> getScriptList(ScriptStatus scriptStatus, String nameContains) {
     boolean nullableName = nameContains == null;
     boolean nullableStatus = scriptStatus == null;
-    List<Script> scriptList = map.values().stream().filter(s -> {
+    List<Script> scriptList = this.map.values().stream().filter(s -> {
       boolean name = nullableName || s.getName().contains(nameContains);
       boolean status = nullableStatus || s.getStatus() == scriptStatus;
       return name && status;
@@ -85,7 +85,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
    */
   @Override
   public void deleteScript(String scriptName) {
-    Script script = map.remove(scriptName);
+    Script script = this.map.remove(scriptName);
     if (script == null)
       throw new ScriptNotFoundException(scriptName);
     script.setScriptDeleted(true);

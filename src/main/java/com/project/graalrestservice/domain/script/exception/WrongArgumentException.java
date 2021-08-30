@@ -6,8 +6,4 @@ public class WrongArgumentException extends RuntimeException {
     super("Wrong argument. " + message);
   }
 
-  public WrongArgumentException(char filter) {
-    super("Unknown filter - " + filter);
-  }
-
 }

@@ -23,7 +23,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
    * Method for adding HATEOAS links.
    */
   public void setLinks() {
-    add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(name)).withSelfRel());
+    add(linkTo(methodOn(ScriptsController.class).getSingleScriptInfo(this.name)).withSelfRel());
   }
 
   public void setName(String name) {
@@ -39,15 +39,15 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public ScriptStatus getStatus() {
-    return status;
+    return this.status;
   }
 
   public String getCreateTime() {
-    return createTime.toString();
+    return this.createTime.toString();
   }
 
   @Override
@@ -59,11 +59,12 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
     if (!super.equals(o))
       return false;
     ScriptInfoForList that = (ScriptInfoForList) o;
-    return Objects.equals(name, that.name);
+    return Objects.equals(this.name, that.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), name);
+    return Objects.hash(super.hashCode(), this.name);
   }
+
 }

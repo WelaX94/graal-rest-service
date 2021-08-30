@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.project.graalrestservice.domain.script.enumeration.ScriptStatus.*;
+
 /**
  * A class for processing commands over scripts
  */
@@ -27,7 +29,6 @@ public class ScriptServiceImpl implements ScriptService {
   private final ScriptRepository scriptRepository;
   private final int streamCapacity;
   private final Pattern correctlyScriptName = Pattern.compile("^[A-Za-z0-9-_]{0,100}$");
-  private final String[] illegalNamespace = new String[] {"swagger-ui"};
 
   /**
    * Basic constructor
@@ -86,7 +87,7 @@ public class ScriptServiceImpl implements ScriptService {
   @Override
   public Script addScript(String scriptName, String scriptCode) {
     checkName(scriptName);
-    Script script = Script.create(scriptName, scriptCode, streamCapacity);
+    Script script = Script.create(scriptName, scriptCode, this.streamCapacity);
     scriptRepository.putScript(scriptName, script);
     logger.debug("[{}] - New script was added to the service", scriptName);
     return script;
@@ -138,7 +139,7 @@ public class ScriptServiceImpl implements ScriptService {
   public void deleteScript(String scriptName) {
     final Script script = scriptRepository.getScript(scriptName);
     synchronized (script) {
-      if (script.getStatus() == ScriptStatus.RUNNING)
+      if (script.getStatus() == RUNNING)
         throw new WrongScriptStatusException("To delete a running script, you must first stop it",
             script.getStatus());
       scriptRepository.deleteScript(scriptName);
@@ -154,13 +155,9 @@ public class ScriptServiceImpl implements ScriptService {
    * @throws WrongNameException if script name contains forbidden words and symbols
    */
   private void checkName(String scriptName) {
-    if (!correctlyScriptName.matcher(scriptName).matches())
+    if (!this.correctlyScriptName.matcher(scriptName).matches())
       throw new WrongNameException(
           "The name uses illegal characters or exceeds the allowed length");
-    for (String name : illegalNamespace) {
-      if (name.equals(scriptName))
-        throw new WrongNameException("This name is reserved and is forbidden for use");
-    }
     logger.trace("[{}] - Name verification completed successfully", scriptName);
   }
 

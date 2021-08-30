@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.zalando.problem.Problem;
 import org.zalando.problem.ProblemBuilder;
-import org.zalando.problem.Status;
 import org.zalando.problem.StatusType;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
 
 import java.net.URI;
+
+import static org.zalando.problem.Status.*;
 
 /**
  * ZalandoExceptionHandler is needed to return JSON instead of a white page error
@@ -36,7 +37,7 @@ public class ZalandoExceptionHandler implements ProblemHandling {
       NativeWebRequest request) {
     logger.info("[{}] - Page doesn't exist. Exception processed successfully.",
         MDC.get(MDC_NAME_IDENTIFIER));
-    return create(Status.NOT_FOUND, e, request);
+    return create(NOT_FOUND, e, request);
   }
 
   @ExceptionHandler
@@ -44,7 +45,7 @@ public class ZalandoExceptionHandler implements ProblemHandling {
       NativeWebRequest request) {
     logger.info("[{}] - Script not found. Exception processed successfully.",
         MDC.get(MDC_NAME_IDENTIFIER));
-    return create(Status.NOT_FOUND, e, request);
+    return create(NOT_FOUND, e, request);
   }
 
   @ExceptionHandler
@@ -52,7 +53,7 @@ public class ZalandoExceptionHandler implements ProblemHandling {
       NativeWebRequest request) {
     logger.info("[{}] - Wrong argument. Exception processed successfully.",
         MDC.get(MDC_NAME_IDENTIFIER));
-    return create(Status.BAD_REQUEST, e, request);
+    return create(BAD_REQUEST, e, request);
   }
 
   @ExceptionHandler
@@ -60,7 +61,7 @@ public class ZalandoExceptionHandler implements ProblemHandling {
       NativeWebRequest request) {
     logger.info("[{}] - Wrong name. Exception processed successfully.",
         MDC.get(MDC_NAME_IDENTIFIER));
-    return create(Status.CONFLICT, e, request);
+    return create(CONFLICT, e, request);
   }
 
   @ExceptionHandler
@@ -68,7 +69,7 @@ public class ZalandoExceptionHandler implements ProblemHandling {
       NativeWebRequest request) {
     logger.info("[{}] - Wrong script. Exception processed successfully.",
         MDC.get(MDC_NAME_IDENTIFIER));
-    return create(Status.UNPROCESSABLE_ENTITY, e, request);
+    return create(UNPROCESSABLE_ENTITY, e, request);
   }
 
   @ExceptionHandler
@@ -76,7 +77,7 @@ public class ZalandoExceptionHandler implements ProblemHandling {
       NativeWebRequest request) {
     logger.info("[{}] - Wrong script status. Exception processed successfully.",
         MDC.get(MDC_NAME_IDENTIFIER));
-    return create(Status.FORBIDDEN, e, request);
+    return create(FORBIDDEN, e, request);
   }
 
 }

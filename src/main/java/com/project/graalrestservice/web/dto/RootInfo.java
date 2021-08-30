@@ -22,7 +22,7 @@ public class RootInfo extends RepresentationModel<RootInfo> {
   }
 
   public String getInfo() {
-    return info;
+    return this.info;
   }
 
   @Override
@@ -34,11 +34,11 @@ public class RootInfo extends RepresentationModel<RootInfo> {
     if (!super.equals(o))
       return false;
     RootInfo rootInfo = (RootInfo) o;
-    return Objects.equals(info, rootInfo.info);
+    return Objects.equals(this.info, rootInfo.info);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), info);
+    return Objects.hash(super.hashCode(), this.info);
   }
 }
