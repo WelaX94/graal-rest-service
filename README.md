@@ -115,14 +115,15 @@ Requests can come in parallel. A script can run for a long time or freeze in an 
     1. Script name
     2. Execution status
     3. Creation time
-    4. Start time (if available)
-    5. End time (if available)
+    4. Start time
+    5. End time
     6. Logs size
     7. Link to logs page
     8. Link to script body page
     9. Self link
     10. Script list link
 
+* Additional information: time is stored as timestamp in the format `yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'`
 
 ### Get script logs
 > GET http://localhost:3030/scripts/script_name/logs
