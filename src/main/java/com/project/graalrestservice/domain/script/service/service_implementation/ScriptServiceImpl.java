@@ -64,8 +64,8 @@ public class ScriptServiceImpl implements ScriptService {
       comparator = Comparator.comparing(Script::getCreateTime).reversed();
     if (reverseOrder)
       comparator = comparator.reversed();
-    List<Script> scriptList = scriptRepository.getScriptList(scriptStatus, nameContains).stream()
-        .sorted(comparator).collect(Collectors.toList());
+    List<Script> scriptList = scriptRepository.getScriptList(scriptStatus, nameContains)
+        .parallelStream().sorted(comparator).collect(Collectors.toList());
     logger.debug(
         "Script service return filtered and sorted script list. Parameters [scriptStatus={}, nameContains={}, orderByName={}, reverseOrder={}]",
         scriptStatus, nameContains, orderByName, reverseOrder);
