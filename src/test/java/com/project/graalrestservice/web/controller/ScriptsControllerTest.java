@@ -1,4 +1,4 @@
-package com.project.graalrestservice.controller;
+package com.project.graalrestservice.web.controller;
 
 import com.project.graalrestservice.domain.script.enumeration.ScriptStatus;
 import com.project.graalrestservice.domain.script.exception.*;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.awaitility.Awaitility.*;
 
 @SpringBootTest
-class ScriptsRootControllerTest {
+class ScriptsControllerTest {
 
   @Autowired
   private ScriptsController scriptsController;

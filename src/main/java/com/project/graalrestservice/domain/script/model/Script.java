@@ -220,7 +220,8 @@ public class Script implements Runnable {
    */
   public synchronized void cancelExecution() {
     this.status = EXECUTION_CANCELED;
-    if (this.context != null) context.close(true);
+    if (this.context != null)
+      context.close(true);
   }
 
   public int getLogsSize() {
