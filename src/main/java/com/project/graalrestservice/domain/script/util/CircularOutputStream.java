@@ -9,13 +9,14 @@ import java.util.Arrays;
 public class CircularOutputStream extends OutputStream {
 
   private final byte[] buf;
+  private final byte[] temp = new byte[1];
   private final int capacity;
   private int position = 0;
   private boolean completed = false;
 
   /**
    * Basic constructor
-   * 
+   *
    * @param capacity stream capacity
    */
   public CircularOutputStream(int capacity) {
@@ -24,32 +25,46 @@ public class CircularOutputStream extends OutputStream {
   }
 
   /**
-   * Method to write byte to stream. If the capacity runs out, it starts overwriting in a circle.
-   * 
+   * Method to write byte to stream.
+   *
    * @param b byte to write
    */
   @Override
   public synchronized void write(int b) {
-    if (this.capacity == this.position) {
-      this.completed = true;
-      this.position = 0;
-    }
-    this.buf[position++] = (byte) b;
+    this.temp[0] = (byte) b;
+    write(temp, 0, 1);
   }
 
   /**
    * Writes len bytes from the specified byte array starting at offset off to this output stream. If
    * the capacity runs out, it starts overwriting in a circle.
-   * 
+   *
    * @param b the data.
    * @param off the start offset in the data.
    * @param len the number of bytes to write.
    */
   @Override
   public synchronized void write(byte[] b, int off, int len) {
-    for (int i = 0; i < len; i++) {
-      write(b[off++]);
+    if (len >= this.capacity) {
+      System.arraycopy(b, len - this.capacity, this.buf, 0, this.capacity);
+      this.completed = true;
+      this.position = 0;
+    } else if (this.capacity >= this.position + len) {
+      System.arraycopy(b, off, this.buf, this.position, len);
+      this.position += len;
+      if (this.capacity == this.position) {
+        this.completed = true;
+        this.position = 0;
+      }
+    } else {
+      int lenFirstPart = (this.capacity - this.position);
+      System.arraycopy(b, off, this.buf, this.position, lenFirstPart);
+      int lenSecondPart = len - lenFirstPart;
+      System.arraycopy(b, off + lenFirstPart, this.buf, 0, lenSecondPart);
+      this.position = lenSecondPart == this.capacity ? 0 : lenSecondPart;
+      this.completed = true;
     }
+
   }
 
   /**

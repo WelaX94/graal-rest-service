@@ -21,7 +21,7 @@ public class OutputStreamSplitter extends OutputStream {
    * If true, then the {@link #flush()} method will be automatically called after writing a new byte
    * to the stream
    */
-  private boolean autoFlushable = true;
+  private volatile boolean autoFlushable = true;
 
   /**
    * Method to write byte to set of streams. There must always be at least one stream in a
@@ -34,7 +34,7 @@ public class OutputStreamSplitter extends OutputStream {
    * @throws IOException if {@link #streamSet} is empty
    */
   @Override
-  public void write(int b) throws IOException {
+  public synchronized void write(int b) throws IOException {
     for (OutputStream outputStream : this.streamSet) {
       try {
         outputStream.write(b);
@@ -56,7 +56,7 @@ public class OutputStreamSplitter extends OutputStream {
    * @throws IOException if streamSet is empty
    */
   @Override
-  public void write(byte[] b, int off, int len) throws IOException {
+  public synchronized void write(byte[] b, int off, int len) throws IOException {
     for (OutputStream outputStream : this.streamSet) {
       try {
         outputStream.write(b, off, len);
