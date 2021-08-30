@@ -111,7 +111,7 @@ public class Script implements Runnable {
   @Override
   public void run() {
     try (Context jsContext = Context.newBuilder().out(mainStream).err(mainStream)
-        .allowCreateThread(true).option("engine.WarnInterpreterOnly", "false").build()) {
+        .allowCreateThread(true).build()) {
       this.context = jsContext;
       prepareScriptExecution();
       jsContext.eval("js", scriptCode);
