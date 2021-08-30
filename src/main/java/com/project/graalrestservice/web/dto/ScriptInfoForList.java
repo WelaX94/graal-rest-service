@@ -4,7 +4,7 @@ import com.project.graalrestservice.web.controller.ScriptsController;
 import com.project.graalrestservice.domain.script.enumeration.ScriptStatus;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -17,7 +17,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
 
   private String name;
   private ScriptStatus status;
-  private OffsetDateTime createTime;
+  private Instant createTime;
 
   /**
    * Method for adding HATEOAS links.
@@ -34,7 +34,7 @@ public class ScriptInfoForList extends RepresentationModel<ScriptInfoForList> {
     this.status = status;
   }
 
-  public void setCreateTime(OffsetDateTime createTime) {
+  public void setCreateTime(Instant createTime) {
     this.createTime = createTime;
   }
 

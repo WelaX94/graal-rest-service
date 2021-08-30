@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.*;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 /**
  * A class that contains all the information about the script, as well as the code to run it
@@ -37,9 +37,9 @@ public class Script implements Runnable {
    * {@link ScriptsController#runScriptWithLogsStreaming(String, String) stream them}.
    */
   private final OutputStreamSplitter mainStream;
-  private final OffsetDateTime createTime;
-  private OffsetDateTime startTime;
-  private OffsetDateTime endTime;
+  private final Instant createTime;
+  private Instant startTime;
+  private Instant endTime;
   private Context context;
   private volatile boolean scriptDeleted;
 
@@ -84,7 +84,7 @@ public class Script implements Runnable {
     this.name = name;
     this.scriptCode = scriptCode;
     this.status = ScriptStatus.IN_QUEUE;
-    this.createTime = OffsetDateTime.now();
+    this.createTime = Instant.now();
     this.logStorageStream = new CircularOutputStream(streamBufferCapacity);
     this.mainStream = new OutputStreamSplitter();
     this.mainStream.addStream(logStorageStream);
@@ -136,14 +136,14 @@ public class Script implements Runnable {
     if (scriptDeleted)
       throw new ScriptNotFoundException("Script was deleted from repository");
     status = ScriptStatus.RUNNING;
-    startTime = OffsetDateTime.now();
+    startTime = Instant.now();
   }
 
   /**
    * The method handles the successful completion of the script {@link #run() execution}
    */
   private synchronized void processingSuccessfulExecution() {
-    endTime = OffsetDateTime.now();
+    endTime = Instant.now();
     status = ScriptStatus.EXECUTION_SUCCESSFUL;
     logger.trace("[{}] - Processing of successful completion of the script is finished", this.name);
   }
@@ -155,7 +155,7 @@ public class Script implements Runnable {
    * @param e PolyglotException, which stores the cause of the failed execution
    */
   private synchronized void processingFailedOrCanceledExecution(PolyglotException e) {
-    endTime = OffsetDateTime.now();
+    endTime = Instant.now();
     if (e.isCancelled())
       status = ScriptStatus.EXECUTION_CANCELED;
     else
@@ -234,15 +234,15 @@ public class Script implements Runnable {
     return scriptCode;
   }
 
-  public OffsetDateTime getCreateTime() {
+  public Instant getCreateTime() {
     return createTime;
   }
 
-  public OffsetDateTime getStartTime() {
+  public Instant getStartTime() {
     return startTime;
   }
 
-  public OffsetDateTime getEndTime() {
+  public Instant getEndTime() {
     return endTime;
   }
 

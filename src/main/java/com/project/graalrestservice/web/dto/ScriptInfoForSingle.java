@@ -4,7 +4,7 @@ import com.project.graalrestservice.web.controller.ScriptsController;
 import com.project.graalrestservice.domain.script.enumeration.ScriptStatus;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -17,9 +17,9 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
 
   private String name;
   private ScriptStatus status;
-  private OffsetDateTime createTime;
-  private OffsetDateTime startTime;
-  private OffsetDateTime endTime;
+  private Instant createTime;
+  private Instant startTime;
+  private Instant endTime;
   private int logsSize;
 
   /**
@@ -65,15 +65,15 @@ public class ScriptInfoForSingle extends RepresentationModel<ScriptInfoForSingle
     this.status = status;
   }
 
-  public void setCreateTime(OffsetDateTime createTime) {
+  public void setCreateTime(Instant createTime) {
     this.createTime = createTime;
   }
 
-  public void setStartTime(OffsetDateTime startTime) {
+  public void setStartTime(Instant startTime) {
     this.startTime = startTime;
   }
 
-  public void setEndTime(OffsetDateTime endTime) {
+  public void setEndTime(Instant endTime) {
     this.endTime = endTime;
   }
 
