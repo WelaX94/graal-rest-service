@@ -1,9 +1,6 @@
 package com.project.graalrestservice.web.exception_mapper;
 
 import com.project.graalrestservice.domain.script.exception.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,9 +20,6 @@ import static org.zalando.problem.Status.*;
 @ControllerAdvice
 public class ZalandoExceptionHandler implements ProblemHandling {
 
-  private static final Logger logger = LoggerFactory.getLogger(ZalandoExceptionHandler.class);
-  private static final String MDC_NAME_IDENTIFIER = "scriptName";
-
   @Override
   public ProblemBuilder prepare(Throwable throwable, StatusType status, URI type) {
     return Problem.builder().withType(type).withTitle(status.getReasonPhrase()).withStatus(status)
@@ -35,48 +29,36 @@ public class ZalandoExceptionHandler implements ProblemHandling {
   @ExceptionHandler
   public ResponseEntity<Problem> handlePageDoesNotExistException(PageDoesNotExistException e,
       NativeWebRequest request) {
-    logger.info("[{}] - Page doesn't exist. Exception processed successfully.",
-        MDC.get(MDC_NAME_IDENTIFIER));
     return create(NOT_FOUND, e, request);
   }
 
   @ExceptionHandler
   public ResponseEntity<Problem> handleScriptNotFoundException(ScriptNotFoundException e,
       NativeWebRequest request) {
-    logger.info("[{}] - Script not found. Exception processed successfully.",
-        MDC.get(MDC_NAME_IDENTIFIER));
     return create(NOT_FOUND, e, request);
   }
 
   @ExceptionHandler
   public ResponseEntity<Problem> handleWrongArgumentException(WrongArgumentException e,
       NativeWebRequest request) {
-    logger.info("[{}] - Wrong argument. Exception processed successfully.",
-        MDC.get(MDC_NAME_IDENTIFIER));
     return create(BAD_REQUEST, e, request);
   }
 
   @ExceptionHandler
   public ResponseEntity<Problem> handleWrongNameException(WrongNameException e,
       NativeWebRequest request) {
-    logger.info("[{}] - Wrong name. Exception processed successfully.",
-        MDC.get(MDC_NAME_IDENTIFIER));
     return create(CONFLICT, e, request);
   }
 
   @ExceptionHandler
   public ResponseEntity<Problem> handleWrongScriptException(WrongScriptException e,
       NativeWebRequest request) {
-    logger.info("[{}] - Wrong script. Exception processed successfully.",
-        MDC.get(MDC_NAME_IDENTIFIER));
     return create(UNPROCESSABLE_ENTITY, e, request);
   }
 
   @ExceptionHandler
   public ResponseEntity<Problem> handleWrongScriptStatusException(WrongScriptStatusException e,
       NativeWebRequest request) {
-    logger.info("[{}] - Wrong script status. Exception processed successfully.",
-        MDC.get(MDC_NAME_IDENTIFIER));
     return create(FORBIDDEN, e, request);
   }
 

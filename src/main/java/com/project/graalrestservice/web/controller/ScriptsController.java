@@ -82,14 +82,14 @@ public class ScriptsController {
       @RequestParam(required = false) String nameContains,
       @RequestParam(defaultValue = "false") boolean orderByName,
       @RequestParam(defaultValue = "false") boolean reverseOrder) {
-    logger.info("Script list request received. " + REQUEST_PARAMETERS, pageNumber, pageSize, status,
-        nameContains, orderByName, reverseOrder);
+    logger.debug("Script list request received. " + REQUEST_PARAMETERS, pageNumber, pageSize,
+        status, nameContains, orderByName, reverseOrder);
     MDC.put(MDC_NAME_IDENTIFIER, "GetScriptsMethod");
     List<Script> scriptList =
         scriptService.getScriptList(status, nameContains, orderByName, reverseOrder);
     Page<List<ScriptInfoForList>> scriptPage = convertListToPage(scriptList, pageNumber, pageSize,
         status, nameContains, orderByName, reverseOrder);
-    logger.info("Script list request successfully processed. " + REQUEST_PARAMETERS, pageNumber,
+    logger.debug("Script list request successfully processed. " + REQUEST_PARAMETERS, pageNumber,
         pageSize, status, nameContains, orderByName, reverseOrder);
     return new ResponseEntity<>(scriptPage, HttpStatus.OK);
   }
@@ -110,13 +110,13 @@ public class ScriptsController {
   @PutMapping(value = "/{scriptName}")
   public ResponseEntity<ScriptInfoForSingle> runScript(@RequestBody String scriptCode,
       @PathVariable String scriptName) {
-    logger.info("[{}] - A new script is requested to run", scriptName);
+    logger.debug("[{}] - A new script is requested to run", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     Script script = scriptService.addScript(scriptName, scriptCode);
     scriptService.startScriptAsynchronously(script);
     ScriptInfoForSingle scriptInfoForSingle = SingleScriptMapper.forSingle.map(script);
     scriptInfoForSingle.setLinks();
-    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
+    logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(scriptInfoForSingle, HttpStatus.CREATED);
   }
 
@@ -128,12 +128,12 @@ public class ScriptsController {
    */
   @GetMapping(value = "/{scriptName}")
   public ResponseEntity<ScriptInfoForSingle> getSingleScriptInfo(@PathVariable String scriptName) {
-    logger.info("[{}] - Single script info request received", scriptName);
+    logger.debug("[{}] - Single script info request received", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     ScriptInfoForSingle scriptInfoForSingle =
         SingleScriptMapper.forSingle.map(scriptService.getScript(scriptName));
     scriptInfoForSingle.setLinks();
-    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
+    logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(scriptInfoForSingle, HttpStatus.OK);
   }
 
@@ -153,7 +153,7 @@ public class ScriptsController {
   public ResponseEntity<String> getScriptLogs(@PathVariable String scriptName,
       @RequestParam(required = false, defaultValue = "0") Integer from,
       @RequestParam(required = false) Integer to) {
-    logger.info("[{}] - Script logs request received (from={}, to={})", scriptName, from, to);
+    logger.debug("[{}] - Script logs request received (from={}, to={})", scriptName, from, to);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     String logs = scriptService.getScript(scriptName).getOutputLogs();
     if (to == null)
@@ -164,11 +164,12 @@ public class ScriptsController {
       logs = logs.substring(from, to);
       logger.trace("[{}] - Try block passed without errors", scriptName);
     } catch (StringIndexOutOfBoundsException e) {
-      logger.debug("[{}] - Caught StringIndexOutOfBoundsException. Indexes entered incorrectly",
-          scriptName);
-      throw new WrongArgumentException("The 'from-to' range is entered incorrectly");
+      throw new WrongArgumentException("The 'from-to' range is entered incorrectly: " + from + "-"
+          + to + ". "
+          + "From must be less than to; from and to cannot be less than 0; to cannot be greater than the size of the logs",
+          e);
     }
-    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
+    logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(logs, HttpStatus.OK);
   }
 
@@ -180,10 +181,10 @@ public class ScriptsController {
    */
   @GetMapping(value = "/{scriptName}/script")
   public ResponseEntity<String> getScriptCode(@PathVariable String scriptName) {
-    logger.info("[{}] - Script code request received", scriptName);
+    logger.debug("[{}] - Script code request received", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     String scriptCode = scriptService.getScript(scriptName).getScriptCode();
-    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
+    logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
     return new ResponseEntity<>(scriptCode, HttpStatus.OK);
   }
 
@@ -202,12 +203,12 @@ public class ScriptsController {
   @PutMapping(value = "/{scriptName}/logs")
   public StreamingResponseBody runScriptWithLogsStreaming(@RequestBody String scriptCode,
       @PathVariable String scriptName) {
-    logger.info("[{}] - Script run with logs streaming request received", scriptName);
+    logger.debug("[{}] - Script run with logs streaming request received", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     Script script = scriptService.addScript(scriptName, scriptCode);
-    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
+    logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
     return (OutputStream outputStream) -> {
-      logger.info("[{}] - Streaming logs started", scriptName);
+      logger.debug("[{}] - Streaming logs started", scriptName);
       script.addStreamForRecording(outputStream);
       try {
         outputStream.flush();
@@ -216,11 +217,11 @@ public class ScriptsController {
           Thread.sleep(100);
         }
       } catch (ClientAbortException | InterruptedException e) { // NOSONAR
-        logger.info("[{}] - Client terminated the connection ({}).", scriptName, e.getMessage());
+        logger.warn("[{}] - Client terminated the connection.", scriptName, e);
       } finally {
         script.deleteStreamForRecording(outputStream);
       }
-      logger.info("[{}] - Streaming logs finished", scriptName);
+      logger.debug("[{}] - Streaming logs finished", scriptName);
     };
   }
 
@@ -234,10 +235,10 @@ public class ScriptsController {
    */
   @PostMapping(value = "/{scriptName}")
   public void stopScript(@PathVariable String scriptName) {
-    logger.info("[{}] - Stop script request received", scriptName);
+    logger.debug("[{}] - Stop script request received", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     scriptService.stopScript(scriptName);
-    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
+    logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
   }
 
   /**
@@ -251,10 +252,10 @@ public class ScriptsController {
    */
   @DeleteMapping(value = "/{scriptName}")
   public void deleteScript(@PathVariable String scriptName) {
-    logger.info("[{}] - Delete script request received", scriptName);
+    logger.debug("[{}] - Delete script request received", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     scriptService.deleteScript(scriptName);
-    logger.info(SCRIPT_REQUEST_PROCESSED, scriptName);
+    logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
   }
 
   /**

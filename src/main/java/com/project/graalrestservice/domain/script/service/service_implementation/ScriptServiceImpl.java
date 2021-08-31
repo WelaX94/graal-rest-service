@@ -89,7 +89,7 @@ public class ScriptServiceImpl implements ScriptService {
     checkName(scriptName);
     Script script = Script.create(scriptName, scriptCode, this.streamCapacity);
     scriptRepository.putScript(scriptName, script);
-    logger.debug("[{}] - New script was added to the service", scriptName);
+    logger.info("[{}] - New script was created and added to the repository", scriptName);
     return script;
   }
 
@@ -141,10 +141,11 @@ public class ScriptServiceImpl implements ScriptService {
     synchronized (script) {
       if (script.getStatus() == RUNNING)
         throw new WrongScriptStatusException("To delete a running script, you must first stop it",
-            script.getStatus());
+            script.getStatus(), IN_QUEUE, EXECUTION_CANCELED, EXECUTION_SUCCESSFUL,
+            EXECUTION_FAILED);
       scriptRepository.deleteScript(scriptName);
     }
-    logger.debug("[{}] - Script deleted from the service", script.getName());
+    logger.info("[{}] - Script deleted from the service", script.getName());
   }
 
   /**
@@ -157,7 +158,8 @@ public class ScriptServiceImpl implements ScriptService {
   private void checkName(String scriptName) {
     if (!this.correctlyScriptName.matcher(scriptName).matches())
       throw new WrongNameException(
-          "The name uses illegal characters or exceeds the allowed length");
+          "The name uses illegal characters or exceeds the allowed length. "
+              + "Allowed symbols: letters a-z and A-Z, numbers, underscore and hyphen. Allowed length: 1-100");
     logger.trace("[{}] - Name verification completed successfully", scriptName);
   }
 

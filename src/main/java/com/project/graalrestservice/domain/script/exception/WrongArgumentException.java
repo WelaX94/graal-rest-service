@@ -6,4 +6,8 @@ public class WrongArgumentException extends RuntimeException {
     super("Wrong argument. " + message);
   }
 
+  public WrongArgumentException(String message, Exception exception) {
+    super("Wrong argument. " + message, exception);
+  }
+
 }

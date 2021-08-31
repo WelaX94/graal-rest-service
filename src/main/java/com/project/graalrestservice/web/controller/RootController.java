@@ -18,7 +18,7 @@ public class RootController {
    */
   @GetMapping(value = "/")
   public RootInfo appStatus() {
-    logger.info("Root request successfully processed");
+    logger.debug("Root request successfully processed");
     return new RootInfo("The application is running");
   }
 

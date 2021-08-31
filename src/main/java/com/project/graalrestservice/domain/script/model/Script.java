@@ -70,9 +70,9 @@ public class Script implements Runnable {
   private static void validate(String scriptCode) {
     try (Context jsContext = Context.create("js")) {
       jsContext.parse("js", scriptCode);
-      logger.trace("[{} - Validation of the script was successful]", MDC.get(MDC_NAME_IDENTIFIER));
+      logger.trace("[{} - Validation of the script was successful", MDC.get(MDC_NAME_IDENTIFIER));
     } catch (PolyglotException e) {
-      logger.debug("[{} - Failed to validate the script]", MDC.get(MDC_NAME_IDENTIFIER));
+      logger.debug("[{} - Failed to validate the script", MDC.get(MDC_NAME_IDENTIFIER));
       throw new WrongScriptException(e.getMessage());
     }
   }
@@ -111,11 +111,11 @@ public class Script implements Runnable {
       logger.info("[{}] - Execution completed successfully", this.name);
     } catch (PolyglotException e) {
       processingFailedOrCanceledExecution(e);
-      logger.info("[{}] - Execution failed. {}", this.name, e.getMessage());
+      logger.info("[{}] - Execution failed.", this.name, e);
     } catch (ScriptNotFoundException e) {
       logger.info(
           "[{}] - The script has been removed from the repository. The run has been cancelled",
-          this.name);
+          this.name, e);
     }
   }
 
@@ -158,8 +158,7 @@ public class Script implements Runnable {
     try {
       this.mainStream.write(sw.toString().getBytes());
     } catch (IOException ex) {
-      logger.error("[{}] - error writing exception stack trace to log stream", this.name);
-      ex.printStackTrace();
+      logger.error("[{}] - error writing exception stack trace to log stream", this.name, e);
     }
     logger.trace("[{}] - Processing of failed completion of the script is finished", this.name);
   }
@@ -173,7 +172,7 @@ public class Script implements Runnable {
   public synchronized void stopScriptExecution() {
     if (this.status != RUNNING)
       throw new WrongScriptStatusException("You cannot stop a script that is not running",
-          this.status);
+          this.status, RUNNING);
     else
       this.context.close(true);
     logger.trace("[{}] - Script execution stopped", this.name);
