@@ -22,4 +22,6 @@ public interface ScriptService {
   @Async
   void startScriptAsynchronously(Script script);
 
+  void startScriptSynchronously(Script script);
+
 }

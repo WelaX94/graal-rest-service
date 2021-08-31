@@ -11,7 +11,6 @@ import com.project.graalrestservice.web.dto.ScriptInfoForList;
 import com.project.graalrestservice.web.dto.ScriptInfoForSingle;
 import com.project.graalrestservice.web.mapping.ListScriptMapper;
 import com.project.graalrestservice.web.mapping.SingleScriptMapper;
-import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -19,13 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.project.graalrestservice.domain.script.enumeration.ScriptStatus.*;
 
 /** RootController class responsible for "/scripts" */
 @RestController
@@ -201,28 +199,27 @@ public class ScriptsController {
    */
   @ResponseStatus(HttpStatus.ACCEPTED)
   @PutMapping(value = "/{scriptName}/logs")
-  public StreamingResponseBody runScriptWithLogsStreaming(@RequestBody String scriptCode,
-      @PathVariable String scriptName) {
+  public void runScriptWithLogsStreaming(@RequestBody String scriptCode,
+      @PathVariable String scriptName, HttpServletResponse response) {
     logger.debug("[{}] - Script run with logs streaming request received", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     Script script = scriptService.addScript(scriptName, scriptCode);
     logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
-    return (OutputStream outputStream) -> {
-      logger.debug("[{}] - Streaming logs started", scriptName);
+    OutputStream outputStream = null;
+    response.setStatus(202);
+    response.setHeader("Content-Type", "text/plain;charset=UTF-8");
+    try {
+      outputStream = response.getOutputStream();
       script.addStreamForRecording(outputStream);
-      try {
-        outputStream.flush();
-        scriptService.startScriptAsynchronously(script);
-        while (script.getStatus() == IN_QUEUE || script.getStatus() == RUNNING) {
-          Thread.sleep(100);
-        }
-      } catch (ClientAbortException | InterruptedException e) { // NOSONAR
-        logger.warn("[{}] - Client terminated the connection.", scriptName, e);
-      } finally {
-        script.deleteStreamForRecording(outputStream);
-      }
-      logger.debug("[{}] - Streaming logs finished", scriptName);
-    };
+      outputStream.flush();
+    } catch (IOException e) {
+      logger.warn("[{}] - Client terminated the connection before running the script.", scriptName,
+          e);
+    }
+    scriptService.startScriptSynchronously(script);
+    script.deleteStreamForRecording(outputStream);
+    logger.debug("[{}] - Streaming logs finished", scriptName);
+
   }
 
   /**

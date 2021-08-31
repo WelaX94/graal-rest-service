@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.ByteArrayOutputStream;
@@ -525,17 +526,15 @@ class ScriptsControllerTest {
 
   @Test
   void testRunScriptWithLogsStreaming() throws IOException {
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    StreamingResponseBody srb =
-        scriptsController.runScriptWithLogsStreaming("console.log('Hello')", "s_scr");
-    srb.writeTo(os);
-    assertEquals("Hello\n", os.toString());
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    scriptsController.runScriptWithLogsStreaming("console.log('Hello')", "s_scr", response);
+    assertEquals("Hello\n", response.getContentAsString());
     assertEquals(EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
 
-    os.reset();
-    srb = scriptsController.runScriptWithLogsStreaming("console.logaaa('Hello')", "f_scr");
-    srb.writeTo(os);
-    assertTrue(os.toString().contains("TypeError: (intermediate value).logaaa is not a function"));
+    response = new MockHttpServletResponse();
+    scriptsController.runScriptWithLogsStreaming("console.logaaa('Hello')", "f_scr", response);
+    assertTrue(response.getContentAsString()
+        .contains("TypeError: (intermediate value).logaaa is not a function"));
     assertEquals(EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
   }
 
