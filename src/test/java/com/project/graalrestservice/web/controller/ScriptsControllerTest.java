@@ -7,16 +7,13 @@ import com.project.graalrestservice.domain.script.service.service_implementation
 import com.project.graalrestservice.web.dto.Page;
 import com.project.graalrestservice.web.dto.ScriptInfoForList;
 import com.project.graalrestservice.web.dto.ScriptInfoForSingle;
-import com.project.graalrestservice.web.controller.ScriptsController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
