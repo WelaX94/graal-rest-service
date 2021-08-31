@@ -78,8 +78,8 @@ public class OutputStreamSplitter extends OutputStream {
    */
   private void handleIOException(IOException e, OutputStream outputStream) throws IOException {
     deleteStream(outputStream);
-    logger.warn("[{}] - Stream recording error. It will be removed from the stream list",
-        MDC.get("scriptName"), e);
+    logger.warn("[{}] - Stream recording error ({}). It will be removed from the stream list",
+        MDC.get("scriptName"), e.getMessage());
     if (this.streamSet.isEmpty())
       throw new IOException("OutputStreamSplitter: no streams for recording", e);
   }
