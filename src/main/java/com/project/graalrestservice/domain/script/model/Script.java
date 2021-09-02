@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.time.Instant;
 
@@ -98,7 +99,7 @@ public class Script implements Runnable {
    * {@link #processingFailedOrCanceledExecution(PolyglotException) unsuccessful} execution is
    * performed by the corresponding methods. {@link OutputStreamSplitter} used as a base streamer
    * for log processing. It is needed to be able to save logs and simultaneously
-   * {@link ScriptsController#runScriptWithLogsStreaming(String, String) stream them}.
+   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream them}.
    */
   @Override
   public void run() {
