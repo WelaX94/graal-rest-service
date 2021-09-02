@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.project.graalrestservice.domain.script.enumeration.ScriptStatus.*;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.awaitility.Awaitility.*;
 
@@ -551,12 +551,15 @@ class ScriptsControllerTest {
     assertEquals(EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
 
     final MockHttpServletResponse response2 = new MockHttpServletResponse();
-    new Thread(() -> scriptsController.runScriptWithLogsStreaming("console.log('ABC'); while(true) {}", "r_scr", response2)).start();
+    new Thread(() -> scriptsController.runScriptWithLogsStreaming("while(true) {console.log('A')}", "r_scr", response2)).start();
     await().until(() -> scriptMap.containsKey("r_scr"), equalTo(true));
     Script script = scriptMap.get("r_scr");
     await().until(
             fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
             equalTo(RUNNING));
+    await().until(
+            () -> response2.getContentAsString().length(),
+            greaterThan(200));
     response2.getOutputStream().close();
     assertEquals(RUNNING, script.getStatus());
     script.stopScriptExecution();
