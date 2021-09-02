@@ -440,28 +440,44 @@ class ScriptsControllerTest {
         () -> scriptsController.getScriptLogs("test", null, null));
 
     scriptsController.runScript("console.log('0123456789')", "numbers");
+    scriptsController.runScript("let a = 0;", "empty");
 
     await().until(
         fieldIn(scriptMap.get("numbers")).ofType(ScriptStatus.class).andWithName("status"),
         equalTo(EXECUTION_SUCCESSFUL));
+    await().until(fieldIn(scriptMap.get("empty")).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(EXECUTION_SUCCESSFUL));
 
     assertEquals(EXECUTION_SUCCESSFUL, scriptMap.get("numbers").getStatus());
+    assertEquals(EXECUTION_SUCCESSFUL, scriptMap.get("empty").getStatus());
     assertThrows(WrongArgumentException.class,
         () -> scriptsController.getScriptLogs("numbers", -10, null));
     assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("empty", -10, null));
+    assertThrows(WrongArgumentException.class,
         () -> scriptsController.getScriptLogs("numbers", 0, 999999));
+    assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("empty", 0, 999999));
     assertThrows(WrongArgumentException.class,
         () -> scriptsController.getScriptLogs("numbers", 0, -100));
     assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("empty", 0, -100));
+    assertThrows(WrongArgumentException.class,
         () -> scriptsController.getScriptLogs("numbers", 8, 5));
     assertThrows(WrongArgumentException.class,
-        () -> scriptsController.getScriptLogs("numbers", 3, 3));
+        () -> scriptsController.getScriptLogs("empty", 8, 5));
+    assertDoesNotThrow(() -> scriptsController.getScriptLogs("numbers", 3, 3));
+    assertDoesNotThrow(() -> scriptsController.getScriptLogs("numbers", 0, 0));
+    assertDoesNotThrow(() -> scriptsController.getScriptLogs("empty", 0, null));
+    assertThrows(WrongArgumentException.class,
+        () -> scriptsController.getScriptLogs("empty", 3, 3));
 
     assertEquals("0123456789\n", scriptsController.getScriptLogs("numbers", 0, null).getBody());
     assertEquals("0123456789\n", scriptsController.getScriptLogs("numbers", 0, 11).getBody());
     assertEquals("\n", scriptsController.getScriptLogs("numbers", 10, 11).getBody());
     assertEquals("0", scriptsController.getScriptLogs("numbers", 0, 1).getBody());
     assertEquals("34567", scriptsController.getScriptLogs("numbers", 3, 8).getBody());
+    assertEquals("", scriptsController.getScriptLogs("numbers", 0, 0).getBody());
   }
 
   @Test
@@ -533,6 +549,20 @@ class ScriptsControllerTest {
     assertTrue(response.getContentAsString()
         .contains("TypeError: (intermediate value).logaaa is not a function"));
     assertEquals(EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
+
+    final MockHttpServletResponse response2 = new MockHttpServletResponse();
+    new Thread(() -> scriptsController.runScriptWithLogsStreaming("console.log('ABC'); while(true) {}", "r_scr", response2)).start();
+    await().until(() -> scriptMap.containsKey("r_scr"), equalTo(true));
+    Script script = scriptMap.get("r_scr");
+    await().until(
+            fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
+            equalTo(RUNNING));
+    response2.getOutputStream().close();
+    assertEquals(RUNNING, script.getStatus());
+    script.stopScriptExecution();
+    await().until(
+            fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
+            equalTo(EXECUTION_CANCELED));
   }
 
 }
