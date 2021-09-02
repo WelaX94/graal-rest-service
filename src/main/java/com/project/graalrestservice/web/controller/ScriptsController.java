@@ -157,14 +157,12 @@ public class ScriptsController {
     if (to == null)
       to = logs.length();
     try {
-      if (from.equals(to))
-        throw new StringIndexOutOfBoundsException();
       logs = logs.substring(from, to);
-      logger.trace("[{}] - Try block passed without errors", scriptName);
     } catch (StringIndexOutOfBoundsException e) {
-      throw new WrongArgumentException("The 'from-to' range is entered incorrectly: " + from + "-"
-          + to + ". "
-          + "From must be less than to; from and to cannot be less than 0; to cannot be greater than the size of the logs",
+      throw new WrongArgumentException(
+          String.format("The 'from-to' range is entered incorrectly: %d-%d (logsSize=%d). "
+              + "From must be less or equal to; from and to cannot be less than 0; "
+              + "to cannot be greater than the size of the logs.", from, to, logs.length()),
           e);
     }
     logger.debug(SCRIPT_REQUEST_PROCESSED, scriptName);
