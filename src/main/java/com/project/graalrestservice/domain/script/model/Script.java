@@ -37,7 +37,8 @@ public class Script implements Runnable {
   /**
    * {@link OutputStreamSplitter} is needed to divide one OS into several independent of each other.
    * In this case, this functionality is needed to be able to save logs and simultaneously
-   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream them}.
+   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream
+   * them}.
    */
   private final OutputStreamSplitter mainStream;
   private final Instant createTime;
@@ -118,6 +119,8 @@ public class Script implements Runnable {
       logger.info(
           "[{}] - The script has been removed from the repository. The run has been cancelled",
           this.name, e);
+    } finally {
+      this.mainStream.closeAllStreams();
     }
   }
 

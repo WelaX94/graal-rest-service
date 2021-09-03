@@ -21,7 +21,7 @@ public class OutputStreamSplitter extends OutputStream {
    * If true, then the {@link #flush()} method will be automatically called after writing a new byte
    * to the stream
    */
-  private volatile boolean autoFlushable = true;
+  private volatile boolean autoFlushable = false;
 
   /**
    * Method to write byte to set of streams. There must always be at least one stream in a
@@ -82,6 +82,17 @@ public class OutputStreamSplitter extends OutputStream {
         MDC.get("scriptName"), e.getMessage());
     if (this.streamSet.isEmpty())
       throw new IOException("OutputStreamSplitter: no streams for recording", e);
+  }
+
+  public synchronized void closeAllStreams() {
+    for (OutputStream outputStream : this.streamSet) {
+      try {
+        outputStream.close();
+      } catch (IOException e) {
+        logger.warn("[{}] - Failed to close the stream ({}).", MDC.get("scriptName"),
+            e.getMessage());
+      }
+    }
   }
 
   public void setAutoFlushable(boolean autoFlushable) {
