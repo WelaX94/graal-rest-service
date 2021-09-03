@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -25,6 +25,7 @@ import static com.project.graalrestservice.domain.script.enumeration.ScriptStatu
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.awaitility.Awaitility.*;
+import static java.util.concurrent.TimeUnit.*;
 
 @SpringBootTest
 class ScriptsControllerTest {
@@ -538,29 +539,14 @@ class ScriptsControllerTest {
   }
 
   @Test
-  void testRunScriptWithLogsStreaming() throws IOException {
-    MockHttpServletResponse response = new MockHttpServletResponse();
-    scriptsController.runScriptWithLogsStreaming("console.log('Hello')", "s_scr", response);
-    assertEquals("Hello\n", response.getContentAsString());
-    assertEquals(EXECUTION_SUCCESSFUL, scriptMap.get("s_scr").getStatus());
-
-    response = new MockHttpServletResponse();
-    scriptsController.runScriptWithLogsStreaming("console.logaaa('Hello')", "f_scr", response);
-    assertTrue(response.getContentAsString()
-        .contains("TypeError: (intermediate value).logaaa is not a function"));
-    assertEquals(EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
-
-    final MockHttpServletResponse response2 = new MockHttpServletResponse();
-    new Thread(() -> scriptsController.runScriptWithLogsStreaming("while(true) {console.log('A')}",
-        "r_scr", response2)).start();
-    await().until(() -> scriptMap.containsKey("r_scr"), equalTo(true));
+  void testRunScriptWithLogsStreamingAndStopScript() throws IOException {
+    ResponseBodyEmitter rbe =
+        scriptsController.runScriptWithLogsStreaming("while(true) {console.log('A')}", "r_scr");
     Script script = scriptMap.get("r_scr");
     await().until(fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
         equalTo(RUNNING));
-    await().until(() -> response2.getContentAsString().length(), greaterThan(200));
-    response2.getOutputStream().close();
-    assertEquals(RUNNING, script.getStatus());
-    script.stopScriptExecution();
+    await().atLeast(3, SECONDS);
+    scriptsController.stopScript("r_scr");
     await().until(fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
         equalTo(EXECUTION_CANCELED));
   }
