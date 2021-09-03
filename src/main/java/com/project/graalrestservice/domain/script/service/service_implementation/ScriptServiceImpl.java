@@ -10,6 +10,7 @@ import com.project.graalrestservice.domain.script.exception.WrongScriptStatusExc
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -35,7 +36,7 @@ public class ScriptServiceImpl implements ScriptService {
    */
   @Autowired
   public ScriptServiceImpl(ScriptRepository scriptRepository,
-      @org.springframework.beans.factory.annotation.Value("${scripts.outputStream.capacity}") int streamCapacity) {
+      @Value("${scripts.outputStream.capacity}") int streamCapacity) {
     this.scriptRepository = scriptRepository;
     this.streamCapacity = streamCapacity;
   }
@@ -45,7 +46,7 @@ public class ScriptServiceImpl implements ScriptService {
    * generated and filtered at the {@link ScriptRepository#getScriptList(ScriptStatus, String)
    * repository level} and sorted at the service (this) level. By default, no filters are applied
    * and sorting is done by date of script creation.
-   * 
+   *
    * @param scriptStatus this parameter is a filter. Allows you to specify the scripts with which
    *        statuses you are interested in the output. If null - scripts with all statuses will be
    *        displayed.
@@ -79,7 +80,7 @@ public class ScriptServiceImpl implements ScriptService {
    * object}. And if everything is good, then it will be
    * {@link ScriptRepository#putScript(String, Script) added to the system} (if there is no script
    * with the same name).
-   * 
+   *
    * @param scriptName script name (identifier)
    * @param scriptCode JS body
    * @return created Script object
@@ -95,7 +96,7 @@ public class ScriptServiceImpl implements ScriptService {
 
   /**
    * Method for running the script in asynchronous mode
-   * 
+   *
    * @param script launch script
    */
   @Override
@@ -117,7 +118,7 @@ public class ScriptServiceImpl implements ScriptService {
 
   /**
    * A method to get information about the script you are looking for
-   * 
+   *
    * @param scriptName script name (identifier)
    * @return Script information about the script
    */
@@ -130,7 +131,7 @@ public class ScriptServiceImpl implements ScriptService {
 
   /**
    * Method for stopping a running script. You can only stop a script with the status RUNNING.
-   * 
+   *
    * @param scriptName script name (identifier)
    */
   @Override
@@ -142,7 +143,7 @@ public class ScriptServiceImpl implements ScriptService {
   /**
    * Method for removing a script from the {@link ScriptRepository}. You cannot delete a script with
    * RUNNING status. Otherwise, an {@link WrongScriptStatusException exception} will be thrown.
-   * 
+   *
    * @param scriptName script name (identifier)
    * @throws WrongScriptException if script is running
    */
@@ -161,9 +162,8 @@ public class ScriptServiceImpl implements ScriptService {
 
   /**
    * A method for checking a script name for forbidden words and characters
-   * 
+   *
    * @param scriptName script name (identifier)
-   * 
    * @throws WrongNameException if script name contains forbidden words and symbols
    */
   private void checkName(String scriptName) {

@@ -28,7 +28,7 @@ public class Script implements Runnable {
   private static final String MDC_NAME_IDENTIFIER = "scriptName";
   private final String name;
   private final String scriptCode;
-  private volatile ScriptStatus status;
+  private ScriptStatus status;
   /**
    * The {@link CircularOutputStream} is used to store logs. If its size is exceeded, the data will
    * be overwritten according to the Circular buffer principle
@@ -37,7 +37,7 @@ public class Script implements Runnable {
   /**
    * {@link OutputStreamSplitter} is needed to divide one OS into several independent of each other.
    * In this case, this functionality is needed to be able to save logs and simultaneously
-   * {@link ScriptsController#runScriptWithLogsStreaming(String, String) stream them}.
+   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream them}.
    */
   private final OutputStreamSplitter mainStream;
   private final Instant createTime;
@@ -99,7 +99,8 @@ public class Script implements Runnable {
    * {@link #processingFailedOrCanceledExecution(PolyglotException) unsuccessful} execution is
    * performed by the corresponding methods. {@link OutputStreamSplitter} used as a base streamer
    * for log processing. It is needed to be able to save logs and simultaneously
-   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream them}.
+   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream
+   * them}.
    */
   @Override
   public void run() {

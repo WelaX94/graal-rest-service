@@ -551,21 +551,18 @@ class ScriptsControllerTest {
     assertEquals(EXECUTION_FAILED, scriptMap.get("f_scr").getStatus());
 
     final MockHttpServletResponse response2 = new MockHttpServletResponse();
-    new Thread(() -> scriptsController.runScriptWithLogsStreaming("while(true) {console.log('A')}", "r_scr", response2)).start();
+    new Thread(() -> scriptsController.runScriptWithLogsStreaming("while(true) {console.log('A')}",
+        "r_scr", response2)).start();
     await().until(() -> scriptMap.containsKey("r_scr"), equalTo(true));
     Script script = scriptMap.get("r_scr");
-    await().until(
-            fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
-            equalTo(RUNNING));
-    await().until(
-            () -> response2.getContentAsString().length(),
-            greaterThan(200));
+    await().until(fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(RUNNING));
+    await().until(() -> response2.getContentAsString().length(), greaterThan(200));
     response2.getOutputStream().close();
     assertEquals(RUNNING, script.getStatus());
     script.stopScriptExecution();
-    await().until(
-            fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
-            equalTo(EXECUTION_CANCELED));
+    await().until(fieldIn(script).ofType(ScriptStatus.class).andWithName("status"),
+        equalTo(EXECUTION_CANCELED));
   }
 
 }
