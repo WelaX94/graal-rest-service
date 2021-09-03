@@ -106,17 +106,6 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   /**
-   * Method for running the script in synchronous mode
-   *
-   * @param script launch script
-   */
-  @Override
-  public void startScriptSynchronously(Script script) {
-    logger.debug("[{}] - Starting script in synchronously mode", script.getName());
-    script.run();
-  }
-
-  /**
    * A method to get information about the script you are looking for
    *
    * @param scriptName script name (identifier)

@@ -1,13 +1,6 @@
 server:
   port: '3030'
 
-webmvc:
-  executor:
-    corePoolSize: '20'
-    maxPoolSize: '50'
-    queueCapacity: '300'
-    threadNamePrefix: 'mvc-exec-'
-
 spring:
   mvc:
     throw-exception-if-no-handler-found: 'true'

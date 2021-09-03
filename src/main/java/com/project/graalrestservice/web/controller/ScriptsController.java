@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -199,7 +198,7 @@ public class ScriptsController {
   @ResponseStatus(HttpStatus.ACCEPTED)
   @PutMapping(value = "/{scriptName}/logs")
   public ResponseBodyEmitter runScriptWithLogsStreaming(@RequestBody String scriptCode,
-      @PathVariable String scriptName, HttpServletResponse response) {
+      @PathVariable String scriptName) {
     logger.debug("[{}] - Script run with logs streaming request received", scriptName);
     MDC.put(MDC_NAME_IDENTIFIER, scriptName);
     Script script = scriptService.addScript(scriptName, scriptCode);

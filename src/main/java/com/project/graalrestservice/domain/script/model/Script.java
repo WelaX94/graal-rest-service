@@ -37,8 +37,7 @@ public class Script implements Runnable {
   /**
    * {@link OutputStreamSplitter} is needed to divide one OS into several independent of each other.
    * In this case, this functionality is needed to be able to save logs and simultaneously
-   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream
-   * them}.
+   * {@link ScriptsController#runScriptWithLogsStreaming(String, String) stream them}.
    */
   private final OutputStreamSplitter mainStream;
   private final Instant createTime;
@@ -100,8 +99,7 @@ public class Script implements Runnable {
    * {@link #processingFailedOrCanceledExecution(PolyglotException) unsuccessful} execution is
    * performed by the corresponding methods. {@link OutputStreamSplitter} used as a base streamer
    * for log processing. It is needed to be able to save logs and simultaneously
-   * {@link ScriptsController#runScriptWithLogsStreaming(String, String, HttpServletResponse) stream
-   * them}.
+   * {@link ScriptsController#runScriptWithLogsStreaming(String, String) stream them}.
    */
   @Override
   public void run() {
